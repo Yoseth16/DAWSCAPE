@@ -7,29 +7,59 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #0a0a0a; color: #00ff00; font-family: 'Courier New', Courier, monospace;
-            height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; overflow: hidden;
+            background-color: #050505; color: #00ff00; font-family: 'Courier New', Courier, monospace;
+            height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0;
+            background-image: radial-gradient(circle, #050505 0%, #001100 100%);
         }
-        .glitch-container {
-            text-align: center; padding: 40px; border: 1px solid #00ff00;
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.2); background: rgba(0, 255, 0, 0.05);
+        .terminal-box {
+            border: 2px solid #00ff00; padding: 40px; box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            background: rgba(0, 20, 0, 0.8); max-width: 500px; width: 100%;
         }
-        h1 { font-size: 4rem; font-weight: bold; letter-spacing: 5px; text-shadow: 2px 2px 0px #ff003c, -2px -2px 0px #00e6fe; }
+        h1 {
+            font-size: 3.5rem; font-weight: bold; text-align: center; letter-spacing: 5px;
+            text-shadow: 0 0 10px #00ff00; margin-bottom: 30px;
+        }
+        .form-control {
+            background-color: transparent; border: 1px solid #00ff00; color: #00ff00;
+            border-radius: 0; font-family: 'Courier New', Courier, monospace;
+        }
+        .form-control:focus {
+            background-color: rgba(0, 255, 0, 0.1); border-color: #00ff00; color: #00ff00;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+        .form-control::placeholder { color: rgba(0, 255, 0, 0.5); }
         .btn-start {
-            margin-top: 30px; background: transparent; color: #00ff00; border: 2px solid #00ff00;
-            padding: 10px 30px; font-size: 1.5rem; font-weight: bold; transition: all 0.3s; cursor: not-allowed;
+            width: 100%; background: #00ff00; color: #000; border: none; padding: 15px;
+            font-size: 1.5rem; font-weight: bold; letter-spacing: 2px; margin-top: 20px;
+            transition: all 0.3s; cursor: pointer; text-transform: uppercase;
         }
+        .btn-start:hover {
+            background: #fff; color: #000; box-shadow: 0 0 20px #fff;
+        }
+        .glitch-text { animation: blink 2s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     </style>
 </head>
 <body>
-    <div class="glitch-container">
+
+    <div class="terminal-box">
         <h1>DAWSCAPE</h1>
-        <p class="fs-4 mt-3">El instituto está en peligro. ¿Podrás escapar?</p>
-        <div class="mt-4 text-white-50 small">
-            [ ESTADO DEL SISTEMA: CARGANDO ACERTIJOS... ]<br>
-            [ ESPERANDO INSTRUCCIONES DEL EQUIPO DE DISEÑO... ]
-        </div>
-        <button class="btn btn-start" disabled>INICIAR JUEGO</button>
+        <p class="text-center mb-4 glitch-text">>_ ACCESO RESTRINGIDO. IDENTIFÍQUESE.</p>
+
+        <form action="/empezar" method="POST">
+            @csrf <div class="mb-3">
+                <label class="form-label">>_ NOMBRE DE USUARIO / ALIAS</label>
+                <input type="text" name="nombre" class="form-control" placeholder="Ej: Neo..." required autocomplete="off">
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">>_ CLASE / CURSO</label>
+                <input type="text" name="clase" class="form-control" placeholder="Ej: 1DAW..." required autocomplete="off">
+            </div>
+
+            <button type="submit" class="btn-start">X TART</button>
+        </form>
     </div>
+
 </body>
 </html>
