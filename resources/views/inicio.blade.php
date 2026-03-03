@@ -78,6 +78,13 @@
                 </div>
             @endif
 
+            <div class="mb-4 form-check text-start">
+                <input type="checkbox" class="form-check-input" id="checkHonestidad" required>
+                <label class="form-check-label text-white-50" for="checkHonestidad" style="font-size: 0.8rem;">
+                    Certifico bajo honor que este es mi correo corporativo real (@estudiante.xtart.com). 
+                    El uso de identidad falsa conllevará la expulsión del ranking.
+                </label>
+            </div>
             <button type="submit" class="btn-start">X TART</button>
         </form>
     </div>
