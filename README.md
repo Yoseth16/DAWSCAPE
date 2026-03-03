@@ -26,11 +26,6 @@ Este proyecto no es solo una web estática, cuenta con una arquitectura backend 
 3.  **Prueba 2 (Hacking Ético):** Simulación de vulnerabilidad de Inyección SQL para bypass de autenticación.
 4.  **Ranking:** Cálculo en tiempo real de la duración de la partida (segundos) y guardado en base de datos.
 
-## ⚠️ Nota sobre la Autenticación (Microsoft)
-
-Actualmente, el sistema utiliza una **validación de dominio por software**.
-> *La integración nativa con Microsoft Azure AD (OAuth 2.0) para el "Login con Microsoft" está planificada en el código, pero se encuentra pendiente de la aprobación de credenciales API por parte del departamento de IT del centro.*
-
 ## 🛠️ Instalación (Despliegue Local)
 
 Si quieres probar este proyecto en tu máquina (Laragon/XAMPP):
