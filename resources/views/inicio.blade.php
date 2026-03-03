@@ -47,15 +47,36 @@
         <p class="text-center mb-4 glitch-text">>_ ACCESO RESTRINGIDO. IDENTIFÍQUESE.</p>
 
         <form action="/empezar" method="POST">
-            @csrf <div class="mb-3">
-                <label class="form-label">>_ NOMBRE DE USUARIO / ALIAS</label>
-                <input type="text" name="nombre" class="form-control" placeholder="Ej: Neo..." required autocomplete="off">
+            @csrf
+            
+            <div class="mb-3">
+                <label class="form-label">>_ CORREO INSTITUCIONAL</label>
+                <input 
+                    type="email" 
+                    name="email" 
+                    class="form-control" 
+                    placeholder="usuario@estudiante.xtart.com" 
+                    required 
+                    autocomplete="off"
+                >
+                <small class="text-secondary" style="font-size: 0.7rem;">* Solo se permite el dominio @estudiante.xtart.com</small>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">>_ NICKNAME / ALIAS</label>
+                <input type="text" name="nombre" class="form-control" placeholder="Ej: Neo" required>
             </div>
 
             <div class="mb-4">
-                <label class="form-label">>_ CLASE / CURSO</label>
-                <input type="text" name="clase" class="form-control" placeholder="Ej: 1DAW..." required autocomplete="off">
+                <label class="form-label">>_ CLASE</label>
+                <input type="text" name="clase" class="form-control" placeholder="Ej: 1DAW" required>
             </div>
+
+            @if(session('error'))
+                <div class="alert alert-danger" style="background: transparent; border: 1px solid red; color: red;">
+                    >_ ERROR: {{ session('error') }}
+                </div>
+            @endif
 
             <button type="submit" class="btn-start">X TART</button>
         </form>

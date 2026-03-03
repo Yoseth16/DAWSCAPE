@@ -40,3 +40,18 @@ Route::get('/final', function () {
     }
     return view('final');
 });
+// RUTA SECRETA DE ADMIN CON CONTRASEÑA
+Route::get('/admin', function () {
+    // Definimos usuario y contraseña aquí (puedes cambiarlos)
+    $usuario_correcto = '1daw';
+    $password_correcto = '1daw'; // ¡Pon la contraseña que quieras!
+
+    // Pedimos al navegador que muestre la ventanita de login
+    if (request()->getUser() != $usuario_correcto || request()->getPassword() != $password_correcto) {
+        $headers = ['WWW-Authenticate' => 'Basic'];
+        return response('Acceso Denegado: Credenciales incorrectas.', 401, $headers);
+    }
+
+    // Si la contraseña es correcta, dejamos pasar al controlador
+    return app(App\Http\Controllers\JuegoController::class)->adminPanel();
+});
