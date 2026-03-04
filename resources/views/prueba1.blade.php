@@ -52,21 +52,29 @@
     </div>
 
     <script>
-        let tiempo = 1800; // 30 minutos en segundos
-        const display = document.getElementById('cronometro');
+    // Recibimos el tiempo restante real desde el Controlador de Laravel
+    let tiempo = {{ $tiempo_restante }}; 
+    
+    const display = document.getElementById('cronometro');
 
-        setInterval(function() {
-            let minutos = parseInt(tiempo / 60, 10);
-            let segundos = parseInt(tiempo % 60, 10);
-            minutos = minutos < 10 ? "0" + minutos : minutos;
-            segundos = segundos < 10 ? "0" + segundos : segundos;
-            display.textContent = minutos + ":" + segundos;
-            if (--tiempo < 0) {
-                tiempo = 0;
-                alert("¡TIEMPO AGOTADO! El instituto ha sido comprometido.");
-                // Aquí luego programaremos que te eche de la partida
-            }
-        }, 1000);
-    </script>
+    setInterval(function() {
+        if (tiempo <= 0) {
+            tiempo = 0;
+            display.textContent = "00:00";
+            alert("¡TIEMPO AGOTADO! Misión fallida.");
+            // Aquí podrías redirigir a una pantalla de Game Over
+            return;
+        }
+
+        let minutos = parseInt(tiempo / 60, 10);
+        let segundos = parseInt(tiempo % 60, 10);
+
+        minutos = minutos < 10 ? "0" + minutos : minutos;
+        segundos = segundos < 10 ? "0" + segundos : segundos;
+
+        display.textContent = minutos + ":" + segundos;
+        tiempo--; // Restamos un segundo
+    }, 1000);
+</script>
 </body>
 </html>

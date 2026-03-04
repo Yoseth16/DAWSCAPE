@@ -21,31 +21,43 @@
         </div>
 
         <table class="table table-dark table-hover table-bordered">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>AGENTE (NOMBRE)</th>
-                    <th>DIVISIÓN (CLASE)</th>
-                    <th>TIEMPO TOTAL</th>
-                    <th>FECHA MISIÓN</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($partidas as $partida)
-                <tr>
-                    <td>#{{ $partida->id }}</td>
-                    <td>{{ $partida->nombre }}</td>
-                    <td>{{ $partida->clase }}</td>
-                    <td>
-                        <span class="badge bg-success">
-                            {{ floor($partida->tiempo_segundos / 60) }}m {{ $partida->tiempo_segundos % 60 }}s
-                        </span>
-                    </td>
-                    <td>{{ $partida->created_at->format('d/m/Y H:i') }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+    <thead>
+        <tr>
+            <th>EQUIPO</th>
+            <th>CORREO</th>
+            <th>CLASE</th>
+            <th>ESTADO</th>
+            <th>TIEMPO TOTAL</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($partidas as $partida)
+        <tr>
+            <td>{{ $partida->nombre_equipo }}</td>
+            <td>{{ $partida->email }}</td>
+            <td>{{ $partida->clase }}</td>
+            
+            <td>
+                @if($partida->fase_actual === 'FINALIZADO')
+                    <span class="badge bg-success">✅ COMPLETADO</span>
+                @else
+                    <span class="badge bg-warning text-dark">⏳ {{ $partida->fase_actual }}</span>
+                @endif
+            </td>
+
+            <td>
+                @if($partida->fase_actual === 'FINALIZADO')
+                    <span class="text-success fw-bold">
+                        {{ floor($partida->tiempo_segundos / 60) }}m {{ $partida->tiempo_segundos % 60 }}s
+                    </span>
+                @else
+                    <span class="text-secondary">--:-- (Jugando)</span>
+                @endif
+            </td>
+        </tr>
+        @endforeach
+    </tbody>
+</table>
 
         @if($partidas->isEmpty())
             <div class="alert alert-warning text-center">
