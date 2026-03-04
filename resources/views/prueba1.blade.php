@@ -52,8 +52,8 @@
     </div>
 
     <script>
-    // Recibimos el tiempo restante real desde el Controlador de Laravel
-    let tiempo = {{ $tiempo_restante }}; 
+    // Opción A: Usando comillas (El editor ya no se queja)
+let tiempo = parseInt("{{ $tiempo_restante }}");
     
     const display = document.getElementById('cronometro');
 
