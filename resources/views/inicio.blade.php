@@ -63,9 +63,9 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">>_ NICKNAME / ALIAS</label>
-                <input type="text" name="nombre" class="form-control" placeholder="Ej: Neo" required>
-            </div>
+    <label class="form-label">>_ NOMBRE DEL EQUIPO (Máx 4 agentes)</label>
+    <input type="text" name="nombre_equipo" class="form-control" placeholder="Ej: Los Hackers de 1DAW" required autocomplete="off">
+</div>
 
             <div class="mb-4">
                 <label class="form-label">>_ CLASE</label>

@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('partidas', function (Blueprint $table) {
             $table->id();
-            $table->string('email')->unique(); // <--- ¡LA CLAVE! 'unique' impide duplicados
-            $table->string('nombre'); // Alias o Nickname
+            $table->string('email')->unique();
+            $table->string('nombre_equipo');
             $table->string('clase');
-            $table->integer('tiempo_segundos');
+            $table->integer('tiempo_segundos')->nullable(); // Tiempo total final
+            $table->timestamp('inicio_juego')->nullable();  // <--- ¡ESTA ES LA CLAVE!
+            $table->string('fase_actual')->default('Inicio');
             $table->timestamps();
         });
     }

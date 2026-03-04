@@ -39,13 +39,29 @@
     </div>
 
     <script>
-        // Un cronómetro visual sencillo para mantener la tensión
-        let tiempo = 1500; 
-        setInterval(function() {
-            let m = parseInt(tiempo / 60, 10); let s = parseInt(tiempo % 60, 10);
-            document.getElementById('cronometro').textContent = (m < 10 ? "0"+m : m) + ":" + (s < 10 ? "0"+s : s);
-            if (--tiempo < 0) tiempo = 0;
-        }, 1000);
-    </script>
+    // Recibimos el tiempo restante real desde el Controlador de Laravel
+    let tiempo = {{ $tiempo_restante }}; 
+    
+    const display = document.getElementById('cronometro');
+
+    setInterval(function() {
+        if (tiempo <= 0) {
+            tiempo = 0;
+            display.textContent = "00:00";
+            alert("¡TIEMPO AGOTADO! Misión fallida.");
+            // Aquí podrías redirigir a una pantalla de Game Over
+            return;
+        }
+
+        let minutos = parseInt(tiempo / 60, 10);
+        let segundos = parseInt(tiempo % 60, 10);
+
+        minutos = minutos < 10 ? "0" + minutos : minutos;
+        segundos = segundos < 10 ? "0" + segundos : segundos;
+
+        display.textContent = minutos + ":" + segundos;
+        tiempo--; // Restamos un segundo
+    }, 1000);
+</script>
 </body>
 </html>

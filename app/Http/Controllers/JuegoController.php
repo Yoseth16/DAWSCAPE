@@ -4,96 +4,126 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-use App\Models\Partida; // <--- ¡IMPORTANTE! Importamos el modelo de la BBDD
+use App\Models\Partida;
 
 class JuegoController extends Controller
 {
+    // --- LÓGICA PRIVADA BLINDADA ---
+    private function obtenerTiempoRestante()
+    {
+        // 1. Buscamos la partida en BBDD por el email de la sesión
+        if (!session()->has('email')) return 0;
+        
+        $partida = Partida::where('email', session('email'))->first();
+        
+        if (!$partida || !$partida->inicio_juego) {
+            return 1800; // 30 minutos por defecto si no ha empezado
+        }
+        
+        // 2. Cálculo ABSOLUTO (Imposible que falle)
+        $inicio = Carbon::parse($partida->inicio_juego);
+        $ahora = Carbon::now();
+        
+        // Cuántos segundos han pasado realmente desde que pulsó el botón
+        $segundos_transcurridos = $ahora->diffInSeconds($inicio);
+        
+        // 3. Restamos a los 30 minutos (1800 segundos)
+        $restante = 1800 - $segundos_transcurridos;
+        
+        // Si sale negativo (se pasó de tiempo), devolvemos 0
+        return $restante > 0 ? $restante : 0;
+    }
+
+    // --- LOGIN DE EQUIPO ---
     public function empezar(Request $request)
     {
-        // 1. VALIDACIÓN ESTRICTA (DOMINIO INSTITUCIONAL)
         $request->validate([
             'email' => [
-                'required',
-                'email',
-                // Aquí está el truco: una función anónima que verifica el final del texto
+                'required', 'email',
                 function ($attribute, $value, $fail) {
                     if (!str_ends_with($value, '@estudiante.xtart.com')) {
-                        $fail('ACCESO DENEGADO: Debes usar tu correo corporativo (@estudiante.xtart.com).');
+                        $fail('ACCESO DENEGADO: Usar correo corporativo (@estudiante.xtart.com).');
                     }
                 },
             ],
-            'nombre' => 'required|min:2',
+            'nombre_equipo' => 'required|min:2',
             'clase'  => 'required'
         ]);
 
-        // 2. SISTEMA ANTI-TRAMPAS (UNICIDAD)
-        // Comprobamos si este email ya ganó (buscando en la BBDD)
-        $yaJugo = Partida::where('email', $request->email)->exists();
-
-        if ($yaJugo) {
-            return back()->with('error', 'ESTE AGENTE YA HA COMPLETADO LA MISIÓN. SOLO SE PERMITE UN INTENTO.');
+        if (Partida::where('email', $request->email)->exists()) {
+            return back()->with('error', 'ESTE EQUIPO YA HA JUGADO.');
         }
 
-        // 3. TODO CORRECTO: GUARDAMOS SESIÓN Y ENTRAMOS
+        // GUARDAMOS EN BBDD LA HORA EXACTA DE INICIO
+        Partida::create([
+            'email' => $request->email,
+            'nombre_equipo' => $request->nombre_equipo,
+            'clase' => $request->clase,
+            'fase_actual' => 'Prueba 1',
+            'tiempo_segundos' => 0,
+            'inicio_juego' => Carbon::now() // <--- RELOJ MAESTRO
+        ]);
+
+        // Guardamos sesión solo para identificar al usuario
         session([
-            'email'   => $request->email,
-            'jugador' => $request->nombre,
-            'clase'   => $request->clase,
-            'inicio_juego' => Carbon::now()
+            'email' => $request->email,
+            'nombre_equipo' => $request->nombre_equipo,
+            'clase' => $request->clase
         ]);
 
         return redirect('/prueba1');
     }
 
+    // --- VISTAS (Usan el cálculo blindado) ---
+    public function mostrarPrueba1() {
+        if (!session()->has('email')) return redirect('/');
+        $tiempo_restante = $this->obtenerTiempoRestante();
+        return view('prueba1', compact('tiempo_restante'));
+    }
+
+    public function mostrarPrueba2() {
+        if (!session()->has('prueba1_superada')) return redirect('/prueba1');
+        $tiempo_restante = $this->obtenerTiempoRestante();
+        return view('prueba2', compact('tiempo_restante'));
+    }
+
+    // --- VALIDACIONES ---
     public function validarPrueba1(Request $request)
     {
-        $codigo = trim($request->codigo);
-
-        if ($codigo == '80') {
+        if (trim($request->codigo) == '80') {
             session(['prueba1_superada' => true]);
+            Partida::where('email', session('email'))->update(['fase_actual' => 'Prueba 2']);
             return redirect('/prueba2');
-        } else {
-            return back()->with('error', 'CÓDIGO INCORRECTO. Acceso denegado.');
         }
+        return back()->with('error', 'PUERTO INCORRECTO.');
     }
 
     public function validarPrueba2(Request $request)
     {
         $codigo = strtoupper(trim($request->codigo));
 
-        if (str_contains($codigo, "' OR") || str_contains($codigo, "1=1") || str_contains($codigo, "'='")) {
+        if (str_contains($codigo, "' OR") || str_contains($codigo, "1=1")) {
             session(['prueba2_superada' => true]);
             
-            $inicio = session('inicio_juego');
+            // CÁLCULO FINAL PARA GUARDAR EN BBDD
+            $partida = Partida::where('email', session('email'))->first();
+            $inicio = Carbon::parse($partida->inicio_juego);
             $segundos_totales = Carbon::now()->diffInSeconds($inicio);
-            session(['tiempo_total' => $segundos_totales]);
 
-            // --- GUARDAMOS CON EL EMAIL ---
-            // Usamos 'create' dentro de un try-catch por si acaso intentan hackear el formulario
-            try {
-                Partida::create([
-                    'email'  => session('email'), // <--- Guardamos el email
-                    'nombre' => session('jugador'),
-                    'clase'  => session('clase'),
-                    'tiempo_segundos' => $segundos_totales
-                ]);
-            } catch (\Exception $e) {
-                // Si falla (por ejemplo, si abrió dos pestañas para jugar dos veces a la vez)
-                return redirect('/')->with('error', 'ERROR: Intento duplicado detectado.');
-            }
+            // ACTUALIZAMOS BBDD - ESTO SOLUCIONA EL BUG DEL ADMIN
+            $partida->update([
+                'tiempo_segundos' => $segundos_totales,
+                'fase_actual' => 'FINALIZADO' // Estado clave para el admin
+            ]);
 
             return redirect('/final');
-        } else {
-            return back()->with('error', 'ERROR DE SINTAXIS. PISTA: Inyección SQL básica.');
         }
+        return back()->with('error', 'SINTAXIS INCORRECTA.');
     }
 
-    // --- NUEVA FUNCIÓN: EL PANEL DE ADMIN ---
     public function adminPanel()
     {
-        // Sacamos todas las partidas ordenadas por tiempo (los más rápidos primero)
         $partidas = Partida::orderBy('tiempo_segundos', 'asc')->get();
-        
         return view('admin', compact('partidas'));
     }
 }
