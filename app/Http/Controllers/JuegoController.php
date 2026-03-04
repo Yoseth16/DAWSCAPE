@@ -12,26 +12,28 @@ class JuegoController extends Controller
     private function obtenerTiempoRestante()
     {
         // 1. Buscamos la partida en BBDD por el email de la sesión
-        if (!session()->has('email')) return 0;
-        
+        if (!session()->has('email'))
+            return 0;
+
         $partida = Partida::where('email', session('email'))->first();
-        
+
         if (!$partida || !$partida->inicio_juego) {
             return 1800; // 30 minutos por defecto si no ha empezado
         }
-        
-        // 2. Cálculo ABSOLUTO (Imposible que falle)
+
+        // 2. Cálculo ABSOLUTO desde BBDD (Imposible de manipular)
         $inicio = Carbon::parse($partida->inicio_juego);
         $ahora = Carbon::now();
-        
+
         // Cuántos segundos han pasado realmente desde que pulsó el botón
-        $segundos_transcurridos = $ahora->diffInSeconds($inicio);
-        
+        // abs() para garantizar que nunca sea negativo por orden de parámetros
+        $segundos_transcurridos = abs($ahora->diffInSeconds($inicio));
+
         // 3. Restamos a los 30 minutos (1800 segundos)
         $restante = 1800 - $segundos_transcurridos;
-        
+
         // Si sale negativo (se pasó de tiempo), devolvemos 0
-        return $restante > 0 ? $restante : 0;
+        return $restante > 0 ? (int)$restante : 0;
     }
 
     // --- LOGIN DE EQUIPO ---
@@ -41,13 +43,13 @@ class JuegoController extends Controller
             'email' => [
                 'required', 'email',
                 function ($attribute, $value, $fail) {
-                    if (!str_ends_with($value, '@estudiante.xtart.com')) {
-                        $fail('ACCESO DENEGADO: Usar correo corporativo (@estudiante.xtart.com).');
-                    }
-                },
+            if (!str_ends_with($value, '@estudiante.xtart.com')) {
+                $fail('ACCESO DENEGADO: Usar correo corporativo (@estudiante.xtart.com).');
+            }
+        },
             ],
             'nombre_equipo' => 'required|min:2',
-            'clase'  => 'required'
+            'clase' => 'required'
         ]);
 
         if (Partida::where('email', $request->email)->exists()) {
@@ -74,17 +76,39 @@ class JuegoController extends Controller
         return redirect('/prueba1');
     }
 
-    // --- VISTAS (Usan el cálculo blindado) ---
-    public function mostrarPrueba1() {
-        if (!session()->has('email')) return redirect('/');
+    // --- VISTAS (Usan el cálculo blindado desde BBDD) ---
+    public function mostrarPrueba1()
+    {
+        if (!session()->has('email'))
+            return redirect('/');
         $tiempo_restante = $this->obtenerTiempoRestante();
         return view('prueba1', compact('tiempo_restante'));
     }
 
-    public function mostrarPrueba2() {
-        if (!session()->has('prueba1_superada')) return redirect('/prueba1');
+    public function mostrarPrueba2()
+    {
+        if (!session()->has('prueba1_superada'))
+            return redirect('/prueba1');
         $tiempo_restante = $this->obtenerTiempoRestante();
         return view('prueba2', compact('tiempo_restante'));
+    }
+
+    // --- PANTALLA FINAL ---
+    public function mostrarFinal()
+    {
+        if (!session()->has('prueba2_superada'))
+            return redirect('/prueba2');
+
+        // Traemos los datos REALES de la BBDD
+        $partida = Partida::where('email', session('email'))->first();
+
+        // Top 3 equipos finalizados, ordenados por tiempo
+        $top3 = Partida::where('fase_actual', 'FINALIZADO')
+            ->orderBy('tiempo_segundos', 'asc')
+            ->limit(3)
+            ->get();
+
+        return view('final', compact('partida', 'top3'));
     }
 
     // --- VALIDACIONES ---
@@ -104,16 +128,16 @@ class JuegoController extends Controller
 
         if (str_contains($codigo, "' OR") || str_contains($codigo, "1=1")) {
             session(['prueba2_superada' => true]);
-            
+
             // CÁLCULO FINAL PARA GUARDAR EN BBDD
             $partida = Partida::where('email', session('email'))->first();
             $inicio = Carbon::parse($partida->inicio_juego);
-            $segundos_totales = Carbon::now()->diffInSeconds($inicio);
+            $segundos_totales = abs(Carbon::now()->diffInSeconds($inicio));
 
-            // ACTUALIZAMOS BBDD - ESTO SOLUCIONA EL BUG DEL ADMIN
+            // ACTUALIZAMOS BBDD
             $partida->update([
                 'tiempo_segundos' => $segundos_totales,
-                'fase_actual' => 'FINALIZADO' // Estado clave para el admin
+                'fase_actual' => 'FINALIZADO'
             ]);
 
             return redirect('/final');
@@ -121,9 +145,13 @@ class JuegoController extends Controller
         return back()->with('error', 'SINTAXIS INCORRECTA.');
     }
 
+    // --- PANEL DE ADMINISTRACIÓN ---
     public function adminPanel()
     {
-        $partidas = Partida::orderBy('tiempo_segundos', 'asc')->get();
+        // Primero los finalizados ordenados por tiempo, luego los que siguen jugando
+        $partidas = Partida::orderByRaw("CASE WHEN fase_actual = 'FINALIZADO' THEN 0 ELSE 1 END")
+            ->orderBy('tiempo_segundos', 'asc')
+            ->get();
         return view('admin', compact('partidas'));
     }
 }

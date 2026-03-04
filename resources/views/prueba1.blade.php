@@ -24,8 +24,8 @@
 
     <div class="header">
         <div>
-            <strong>Agente:</strong> {{ session('jugador') }} <br>
-            <small><strong>División:</strong> {{ session('clase') }}</small>
+            <strong>Equipo:</strong> {{ session('nombre_equipo') }} <br>
+            <small><strong>Clase:</strong> {{ session('clase') }}</small>
         </div>
         <div class="timer" id="cronometro">30:00</div>
     </div>

@@ -16,52 +16,66 @@
 <body>
     <div class="container">
         <div class="d-flex justify-content-between align-items-center">
-            <h1>>_ REGISTRO DE AGENTES EXITOSOS</h1>
+            <h1>>_ REGISTRO DE EQUIPOS</h1>
             <a href="/" class="btn btn-outline-light">VOLVER AL JUEGO</a>
         </div>
 
         <table class="table table-dark table-hover table-bordered">
-    <thead>
-        <tr>
-            <th>EQUIPO</th>
-            <th>CORREO</th>
-            <th>CLASE</th>
-            <th>ESTADO</th>
-            <th>TIEMPO TOTAL</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach($partidas as $partida)
-        <tr>
-            <td>{{ $partida->nombre_equipo }}</td>
-            <td>{{ $partida->email }}</td>
-            <td>{{ $partida->clase }}</td>
-            
-            <td>
-                @if($partida->fase_actual === 'FINALIZADO')
-                    <span class="badge bg-success">✅ COMPLETADO</span>
-                @else
-                    <span class="badge bg-warning text-dark">⏳ {{ $partida->fase_actual }}</span>
-                @endif
-            </td>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>EQUIPO</th>
+                    <th>CORREO</th>
+                    <th>CLASE</th>
+                    <th>ESTADO</th>
+                    <th>TIEMPO TOTAL</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($partidas as $index => $partida)
+                <tr>
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $partida->nombre_equipo }}</td>
+                    <td>{{ $partida->email }}</td>
+                    <td>{{ $partida->clase }}</td>
+                    
+                    <td>
+                        @if($partida->fase_actual === 'FINALIZADO')
+                            <span class="badge bg-success">✅ COMPLETADO</span>
+                        @else
+                            <span class="badge bg-warning text-dark">⏳ {{ $partida->fase_actual }}</span>
+                        @endif
+                    </td>
 
-            <td>
-                @if($partida->fase_actual === 'FINALIZADO')
-                    <span class="text-success fw-bold">
-                        {{ floor($partida->tiempo_segundos / 60) }}m {{ $partida->tiempo_segundos % 60 }}s
-                    </span>
-                @else
-                    <span class="text-secondary">--:-- (Jugando)</span>
-                @endif
-            </td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
+                    <td>
+                        @if($partida->fase_actual === 'FINALIZADO')
+                            <span class="text-success fw-bold">
+                                {{ floor($partida->tiempo_segundos / 60) }}m {{ $partida->tiempo_segundos % 60 }}s
+                            </span>
+                        @else
+                            {{-- Tiempo en vivo para equipos que aún están jugando --}}
+                            @if($partida->inicio_juego)
+                                @php
+                                    $segundos_jugando = abs(now()->diffInSeconds(\Carbon\Carbon::parse($partida->inicio_juego)));
+                                    $minutos_jugando = floor($segundos_jugando / 60);
+                                    $segs_jugando = $segundos_jugando % 60;
+                                @endphp
+                                <span class="text-warning">
+                                    🕐 {{ $minutos_jugando }}m {{ $segs_jugando }}s (jugando)
+                                </span>
+                            @else
+                                <span class="text-secondary">--:-- (sin empezar)</span>
+                            @endif
+                        @endif
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
 
         @if($partidas->isEmpty())
             <div class="alert alert-warning text-center">
-                AÚN NO HAY AGENTES QUE HAYAN LOGRADO ESCAPAR.
+                AÚN NO HAY EQUIPOS REGISTRADOS.
             </div>
         @endif
     </div>

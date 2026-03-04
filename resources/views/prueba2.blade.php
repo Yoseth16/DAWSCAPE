@@ -16,7 +16,7 @@
 </head>
 <body>
     <div class="header">
-        <div><strong>Agente:</strong> {{ session('jugador') }} <br><small><strong>División:</strong> {{ session('clase') }}</small></div>
+        <div><strong>Equipo:</strong> {{ session('nombre_equipo') }} <br><small><strong>Clase:</strong> {{ session('clase') }}</small></div>
         <div class="timer" id="cronometro">--:--</div>
     </div>
 

@@ -17,24 +17,30 @@
 
     <div class="victory-box">
         <h1>¡SISTEMA HACKEADO!</h1>
-        <p class="fs-4">Enhorabuena, Agente <strong>{{ session('jugador') }}</strong> ({{ session('clase') }}).</p>
+        <p class="fs-4">Enhorabuena, equipo <strong>{{ $partida->nombre_equipo }}</strong> ({{ $partida->clase }}).</p>
         <p>Has conseguido escapar del instituto a tiempo.</p>
         
         <div class="mt-4">
             <p class="mb-0">Tu tiempo total ha sido:</p>
-            <div class="time">{{ floor(session('tiempo_total') / 60) }}m {{ session('tiempo_total') % 60 }}s</div>
+            <div class="time">{{ floor($partida->tiempo_segundos / 60) }}m {{ $partida->tiempo_segundos % 60 }}s</div>
         </div>
 
         <div class="ranking">
-            <h4 class="text-center">>_ TOP 3 AGENTES</h4>
-            <ol>
-                <li>Neo (2DAW) - 01m 45s</li>
-                <li>Trinity (1SMR) - 03m 12s</li>
-                <li><strong>{{ session('jugador') }} ({{ session('clase') }}) - {{ floor(session('tiempo_total') / 60) }}m {{ session('tiempo_total') % 60 }}s</strong></li>
-            </ol>
+            <h4 class="text-center">>_ TOP 3 EQUIPOS</h4>
+            @if($top3->count() > 0)
+                <ol>
+                    @foreach($top3 as $equipo)
+                        <li @if($equipo->email === $partida->email) style="color: #fff; font-weight: bold;" @endif>
+                            {{ $equipo->nombre_equipo }} ({{ $equipo->clase }}) - {{ floor($equipo->tiempo_segundos / 60) }}m {{ $equipo->tiempo_segundos % 60 }}s
+                        </li>
+                    @endforeach
+                </ol>
+            @else
+                <p class="text-center text-secondary">Aún no hay datos de ranking.</p>
+            @endif
         </div>
 
-        <a href="/" class="btn btn-outline-success mt-4">JUGAR DE NUEVO</a>
+        <a href="/" class="btn btn-outline-success mt-4">VOLVER AL INICIO</a>
     </div>
 
 </body>

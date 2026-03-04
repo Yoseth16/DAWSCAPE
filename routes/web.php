@@ -9,30 +9,24 @@ Route::get('/', function () {
 });
 
 // 2. PROCESAR LOGIN DE EQUIPO
-Route::post('/empezar', [JuegoController::class, 'empezar']);
+Route::post('/empezar', [JuegoController::class , 'empezar']);
 
-// 3. PRUEBA 1 (Con lógica de tiempo real)
-// OJO: Cambiamos 'function()...' por '[JuegoController::class, 'mostrarPrueba1']'
-Route::get('/prueba1', [JuegoController::class, 'mostrarPrueba1']); 
-Route::post('/prueba1', [JuegoController::class, 'validarPrueba1']);
+// 3. PRUEBA 1 (Con lógica de tiempo real desde BBDD)
+Route::get('/prueba1', [JuegoController::class , 'mostrarPrueba1']);
 
-// 4. PRUEBA 2 (Con lógica de tiempo real)
-Route::get('/prueba2', [JuegoController::class, 'mostrarPrueba2']);
-Route::post('/prueba2', [JuegoController::class, 'validarPrueba2']);
+Route::post('/prueba1', [JuegoController::class , 'validarPrueba1']);
 
-// 5. PANTALLA FINAL
-Route::get('/final', function () {
-    // Aquí podemos dejar la seguridad básica o moverla al controlador también
-    if (!session()->has('prueba2_superada')) {
-        return redirect('/prueba2');
-    }
-    return view('final');
-});
+// 4. PRUEBA 2 (Con lógica de tiempo real desde BBDD)
+Route::get('/prueba2', [JuegoController::class , 'mostrarPrueba2']);
+Route::post('/prueba2', [JuegoController::class , 'validarPrueba2']);
 
-// 6. PANEL DE ADMIN (Protegido)
+// 5. PANTALLA FINAL (Delegada al controlador para pasar datos de BBDD)
+Route::get('/final', [JuegoController::class , 'mostrarFinal']);
+
+// 6. PANEL DE ADMIN (Protegido con HTTP Basic Auth)
 Route::get('/admin', function () {
     $usuario_correcto = '1daw';
-    $password_correcto = '1daw'; 
+    $password_correcto = '1daw';
 
     if (request()->getUser() != $usuario_correcto || request()->getPassword() != $password_correcto) {
         $headers = ['WWW-Authenticate' => 'Basic'];
