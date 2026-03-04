@@ -16,7 +16,7 @@
 <body>
     <div class="container">
         <div class="d-flex justify-content-between align-items-center">
-            <h1>>_ REGISTRO DE EQUIPOS</h1>
+            <h1>REGISTRO DE EQUIPOS</h1>
             <a href="/" class="btn btn-outline-light">VOLVER AL JUEGO</a>
         </div>
 

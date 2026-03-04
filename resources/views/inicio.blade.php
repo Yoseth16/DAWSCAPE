@@ -44,13 +44,13 @@
 
     <div class="terminal-box">
         <h1>DAWSCAPE</h1>
-        <p class="text-center mb-4 glitch-text">>_ ACCESO RESTRINGIDO. IDENTIFÍQUESE.</p>
+        <p class="text-center mb-4 glitch-text">ACCESO RESTRINGIDO. IDENTIFÍQUESE.</p>
 
         <form action="/empezar" method="POST">
             @csrf
             
             <div class="mb-3">
-                <label class="form-label">>_ CORREO INSTITUCIONAL</label>
+                <label class="form-label">CORREO INSTITUCIONAL</label>
                 <input 
                     type="email" 
                     name="email" 
@@ -63,12 +63,12 @@
             </div>
 
             <div class="mb-3">
-    <label class="form-label">>_ NOMBRE DEL EQUIPO (Máx 4 agentes)</label>
+    <label class="form-label">NOMBRE DEL EQUIPO (Máx 4 agentes)</label>
     <input type="text" name="nombre_equipo" class="form-control" placeholder="Ej: Los Hackers de 1DAW" required autocomplete="off">
 </div>
 
             <div class="mb-4">
-                <label class="form-label">>_ CLASE</label>
+                <label class="form-label">CLASE</label>
                 <input type="text" name="clase" class="form-control" placeholder="Ej: 1DAW" required>
             </div>
 

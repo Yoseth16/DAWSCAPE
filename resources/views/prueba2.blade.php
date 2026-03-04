@@ -27,7 +27,7 @@
             </div>
         @endif
 
-        <h2 class="text-center mb-4">>_ PRUEBA 2: INYECCIÓN DE CÓDIGO</h2>
+        <h2 class="text-center mb-4">PRUEBA 2: INYECCIÓN DE CÓDIGO</h2>
         
         <p class="text-center"><em>"Has llegado al panel de control del servidor, pero necesitas contraseña. ¿Cómo podrías escribir una condición que SIEMPRE sea verdadera para saltarte la seguridad?"</em></p>
         

@@ -36,7 +36,7 @@
                 >_ ERROR: {{ session('error') }}
             </div>
         @endif
-        <h2 class="text-center mb-4">>_ PRUEBA 1: EL ENIGMA DEL PUERTO</h2>
+        <h2 class="text-center mb-4">PRUEBA 1: EL ENIGMA DEL PUERTO</h2>
         
         <p class="text-center"><em>"Para navegar por la red mundial, un protocolo debes usar. Oculto en el texto, el número encontrarás. HTTP es tu guía, ¿por qué puerta entrarás?"</em></p>
         
