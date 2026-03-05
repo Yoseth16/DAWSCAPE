@@ -61,8 +61,8 @@
   .header-timer {
     font-family: 'Orbitron', sans-serif;
     font-size: 1.3rem;
-    color: #ff003c;
-    text-shadow: 0 0 10px #ff003c;
+    color: var(--green);
+    text-shadow: 0 0 10px var(--green);
     letter-spacing: 0.1em;
   }
 
@@ -342,10 +342,6 @@
       <div class="hud-label">Prueba</div>
       <div class="hud-val" id="q-counter">1 / 6</div>
     </div>
-    <div style="text-align:right">
-      <div class="hud-label">Intentos fallidos</div>
-      <div class="hud-val" id="wrong-counter">0</div>
-    </div>
   </div>
   <div style="width:100%; max-width:680px;">
     <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
@@ -356,7 +352,7 @@
     <input class="answer-input" id="answer-input" type="text" placeholder="_ _ _ _ _ _ _" autocomplete="off" spellcheck="false">
     <div class="feedback" id="feedback"></div>
     <br>
-    <button class="btn" onclick="checkAnswer()" style="width:100%; margin-top:0.5rem">VERIFICAR →</button>
+    <button id="verify-btn" class="btn" onclick="checkAnswer()" style="width:100%; margin-top:0.5rem">VERIFICAR →</button>
   </div>
 </div>
 
@@ -366,30 +362,31 @@
   <div class="win-title">ACCESO CONCEDIDO</div>
   <div class="subtitle">// Todos los sistemas desbloqueados</div>
   <div class="result-panel" id="win-stats"></div>
-  <button class="btn" onclick="resetGame()">↺ REINICIAR</button>
+  <a href="/prueba2yoseth" class="btn">PASAR A LA SIGUIENTE PRUEBA →</a>
 </div>
 
 <script>
 // ── TIMER DESDE BBDD ────────────────────────────────────────
-let tiempo = parseInt("{{ $tiempo_restante }}");
+let tiempo = parseInt("{{ $tiempo_transcurrido ?? 0 }}");
 
 const timerDisplay = document.getElementById('cronometro');
+const MAX_MINUTOS = 90;
 
 function actualizarTimer() {
-  if (tiempo <= 0) {
-    tiempo = 0;
-    timerDisplay.textContent = "00:00";
-    return;
-  }
-
   let minutos = parseInt(tiempo / 60, 10);
   let segundos = parseInt(tiempo % 60, 10);
 
-  minutos  = minutos  < 10 ? "0" + minutos  : minutos;
-  segundos = segundos < 10 ? "0" + segundos : segundos;
+  let m = minutos  < 10 ? "0" + minutos  : minutos;
+  let s = segundos < 10 ? "0" + segundos : segundos;
 
-  timerDisplay.textContent = minutos + ":" + segundos;
-  tiempo--;
+  timerDisplay.textContent = m + ":" + s;
+
+  if (minutos >= MAX_MINUTOS) {
+      window.location.href = '/final';
+      return;
+  }
+
+  tiempo++;
 }
 
 actualizarTimer(); // Ejecutar inmediatamente para mostrar el timer
@@ -424,7 +421,7 @@ const questions = [
   {
     label: "// ACERTIJO 05",
     riddle: `Soy el guardián del aula.\nMe encuentras en el lugar más visible de todos,\npresidiendo la pizarra, mirando a todos.\n\nNo soy un número ni una palabra,\nsino una cadena de caracteres que nació en fábrica.\n\nEncuéntrame. Léeme. Introdúceme.\n\n¿Cuál es mi código?`,
-    answer: "5X0LH8BX100127T",
+    answer: "5x0lh8bx100127t",
     alt: ["5x0lh8bx100127t"]
   },
   {
@@ -437,8 +434,8 @@ const questions = [
 
 // ── ESTADO ───────────────────────────────────────────────────
 let currentQ = 0;
-let totalWrong = 0;
-let wrongThisQ = 0;
+let isTransitioning = false;
+let userAnswers = [];
 
 // ── PARTÍCULAS ───────────────────────────────────────────────
 (function() {
@@ -466,34 +463,59 @@ function normalize(str) {
 // ── GAME ─────────────────────────────────────────────────────
 function startGame() {
   currentQ = 0;
-  totalWrong = 0;
-  wrongThisQ = 0;
+  isTransitioning = false;
+  userAnswers = [];
   showScreen('screen-quiz');
   loadQuestion();
 }
 
 function loadQuestion() {
-  wrongThisQ = 0;
   const q = questions[currentQ];
   document.getElementById('question-card').setAttribute('data-label', q.label);
   document.getElementById('riddle-box').innerText = q.riddle;
-  document.getElementById('answer-input').value = '';
-  document.getElementById('answer-input').className = 'answer-input';
+  
+  const inp = document.getElementById('answer-input');
+  const btn = document.getElementById('verify-btn');
+  
+  inp.value = '';
+  inp.className = 'answer-input';
+  inp.disabled = false;
+  if(btn) btn.disabled = false;
+  
   document.getElementById('feedback').textContent = '';
   document.getElementById('feedback').className = 'feedback';
   document.getElementById('q-counter').textContent = `${currentQ + 1} / ${questions.length}`;
-  document.getElementById('wrong-counter').textContent = totalWrong;
   document.getElementById('progress-fill').style.width = (currentQ / questions.length * 100) + '%';
 
-  const inp = document.getElementById('answer-input');
-  inp.onkeydown = e => { if (e.key === 'Enter') checkAnswer(); };
+  // Solo se bindea cuando el componente está libre
+  inp.onkeydown = e => { 
+      if (e.key === 'Enter') {
+          e.preventDefault(); // Evitamos acciones nativas
+          checkAnswer(); 
+      }
+  };
   inp.focus();
+  
+  isTransitioning = false; // Liberamos el candado
 }
 
 function checkAnswer() {
+  if (isTransitioning) return; // IGNORAR CUALQUIER CLICK O ENTER SI HAY TRANSICIÓN
+
   const input = document.getElementById('answer-input');
+  const btn = document.getElementById('verify-btn');
   const val = input.value;
-  if (!val.trim()) return;
+  
+  if (!val.trim()) {
+      input.classList.add('wrong');
+      document.getElementById('feedback').className = 'feedback err';
+      document.getElementById('feedback').textContent = '[ERROR] No se han detectado datos de entrada.';
+      setTimeout(() => {
+        input.classList.remove('wrong');
+        document.getElementById('feedback').textContent = '';
+      }, 1500);
+      return; // IMPIDE AVANZAR SI ESTÁ VACÍO
+  }
 
   const q = questions[currentQ];
   const userAns = normalize(val);
@@ -501,48 +523,64 @@ function checkAnswer() {
   const alts = (q.alt || []).map(normalize);
 
   if (userAns === correct || alts.includes(userAns)) {
+    isTransitioning = true; // ACTIVAMOS CANDADO
+    input.disabled = true;  // BLOQUEO TOTAL DE INPUT
+    input.onkeydown = null; // ELIMINAMOS FLUSHING
+    if(btn) btn.disabled = true;
+
+    userAnswers.push(userAns);
+
     input.classList.add('correct');
     document.getElementById('feedback').className = 'feedback ok';
-    document.getElementById('feedback').textContent = '✔ CORRECTO — Nivel superado';
+    document.getElementById('feedback').textContent = '[OK] Respuesta aceptada — Cortafuegos superado';
     setTimeout(() => {
       currentQ++;
       if (currentQ >= questions.length) showWin();
       else loadQuestion();
-    }, 1000);
+    }, 1500);
   } else {
-    totalWrong++;
-    wrongThisQ++;
+    isTransitioning = true; // BLOQUEO TEMPORAL DURANTE EL ERROR
+    input.disabled = true;
+    if(btn) btn.disabled = true;
+    
     input.classList.add('wrong');
     document.getElementById('feedback').className = 'feedback err';
-    document.getElementById('feedback').textContent = '✖ INCORRECTO — Inténtalo de nuevo';
-    document.getElementById('wrong-counter').textContent = totalWrong;
+    document.getElementById('feedback').textContent = '[ERROR] Respuesta incorrecta. Inténtalo de nuevo.';
     setTimeout(() => {
       input.classList.remove('wrong');
       input.value = '';
+      input.disabled = false;
+      if(btn) btn.disabled = false;
       document.getElementById('feedback').textContent = '';
-    }, 700);
+      isTransitioning = false;
+      input.focus();
+    }, 1500);
   }
 }
 
 function showWin() {
   document.getElementById('progress-fill').style.width = '100%';
   document.getElementById('win-stats').innerHTML =
-    `Acertijos resueltos: <span>${questions.length} / ${questions.length}</span><br>` +
-    `Respuestas incorrectas totales: <span>${totalWrong}</span><br><br>` +
+    `Acertijos logicos eludidos: <span>${questions.length} / ${questions.length}</span><br><br>` +
     `<span style="font-size:0.8rem; color:#445544">// SISTEMA DESBLOQUEADO — PUEDES SALIR</span>`;
   showScreen('screen-win');
 
-  // Notificar al servidor que se completó el escape room
-  fetch("{{ url('/pruebas/aula-115/completar') }}", {
+// Notificar al servidor que se completó el escape room
+  fetch("/prueba1mario", {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     },
     body: JSON.stringify({
-      total_wrong: totalWrong,
-      completed: true
+      completed: true,
+      answers: userAnswers
     })
+  }).then(response => {
+      if(response.ok) {
+          // Si el servidor lo guarda bien, no redirigimos automáticamente.
+          // El usuario pulsará el botón para pasar de prueba y se le llevará a la prueba2yoseth.
+      }
   }).catch(err => console.error('Error al notificar al servidor:', err));
 }
 

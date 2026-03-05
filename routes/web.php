@@ -11,14 +11,13 @@ Route::get('/', function () {
 // 2. PROCESAR LOGIN DE EQUIPO
 Route::post('/empezar', [JuegoController::class , 'empezar']);
 
-// 3. PRUEBA 1 (Con lógica de tiempo real desde BBDD)
-Route::get('/prueba1', [JuegoController::class , 'mostrarPrueba1']);
+// 3. PRUEBA 1 MARIO (Antigua: AULA 115)
+Route::get('/prueba1mario', [JuegoController::class, 'mostrarPrueba1Mario']);
+Route::post('/prueba1mario', [JuegoController::class, 'validarPrueba1Mario']);
 
-Route::post('/prueba1', [JuegoController::class , 'validarPrueba1']);
-
-// 4. PRUEBA 2 (Con lógica de tiempo real desde BBDD)
-Route::get('/prueba2', [JuegoController::class , 'mostrarPrueba2']);
-Route::post('/prueba2', [JuegoController::class , 'validarPrueba2']);
+// 4. PRUEBA 2: EL CLÚSTER FRAGMENTADO (Expendedoras)
+Route::get('/prueba2yoseth', [JuegoController::class, 'mostrarPrueba2Yoseth']);
+Route::post('/prueba2yoseth', [JuegoController::class, 'validarPrueba2Yoseth']);
 
 // 5. PANTALLA FINAL (Delegada al controlador para pasar datos de BBDD)
 Route::get('/final', [JuegoController::class , 'mostrarFinal']);
@@ -27,15 +26,39 @@ Route::get('/final', [JuegoController::class , 'mostrarFinal']);
 Route::get('/pruebas/aula-115', [JuegoController::class , 'mostrarAula115']);
 Route::post('/pruebas/aula-115/completar', [JuegoController::class , 'completarAula115']);
 
-// 7. PANEL DE ADMIN (Protegido con HTTP Basic Auth)
-Route::get('/admin', function () {
-    $usuario_correcto = '1daw';
-    $password_correcto = '1daw';
+// 7. PANEL DE ADMIN Y MANEJO (Protegido con HTTP Basic Auth)
+Route::middleware('auth.basic')->group(function () {
+    // Si necesitas Auth básico nativo añade 'auth.basic' arriba en arr, pero como usan custom, metémolos en un prefijo manual
+});
 
-    if (request()->getUser() != $usuario_correcto || request()->getPassword() != $password_correcto) {
-        $headers = ['WWW-Authenticate' => 'Basic'];
-        return response('Acceso Denegado: Credenciales incorrectas.', 401, $headers);
-    }
+Route::prefix('admin')->group(function () {
 
-    return app(App\Http\Controllers\JuegoController::class)->adminPanel();
+    // Middleware custom inline de protección (reaplicado para todas las subrutas de Admin)
+    $authMiddleware = function ($request, \Closure $next) {
+        $usuario_correcto = '1daw';
+        $password_correcto = '1daw';
+        if ($request->getUser() != $usuario_correcto || $request->getPassword() != $password_correcto) {
+            $headers = ['WWW-Authenticate' => 'Basic'];
+            return response('Acceso Denegado: Credenciales incorrectas.', 401, $headers);
+        }
+        return $next($request);
+    };
+
+    Route::get('/', function () use ($authMiddleware) {
+        return $authMiddleware(request(), function() {
+            return app(App\Http\Controllers\JuegoController::class)->adminPanel();
+        });
+    });
+
+    Route::delete('/equipo/{id}', function ($id) use ($authMiddleware) {
+        return $authMiddleware(request(), function() use ($id) {
+            return app(App\Http\Controllers\JuegoController::class)->eliminarEquipo($id);
+        });
+    });
+
+    Route::get('/exportar-top20', function () use ($authMiddleware) {
+        return $authMiddleware(request(), function() {
+            return app(App\Http\Controllers\JuegoController::class)->exportarTop20PDF();
+        });
+    });
 });
