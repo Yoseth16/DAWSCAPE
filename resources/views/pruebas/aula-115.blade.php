@@ -328,7 +328,7 @@
   <div class="intro-text">
     <p>Agente, el sistema de seguridad del <strong style="color:var(--green)">Aula de Informática</strong> ha sido activado.</p>
     <br>
-    <p>Para desbloquear la salida, deberás resolver <strong style="color:var(--green)">5 acertijos</strong> ocultos en esta sala. Observa bien cada rincón.</p>
+    <p>Para desbloquear la salida, deberás resolver <strong style="color:var(--green)">6 acertijos</strong> ocultos en esta sala. Observa bien cada rincón.</p>
     <br>
     <p style="color:#445544">Sin pistas. Sin ayuda. Solo tus ojos y tu ingenio.</p>
   </div>
@@ -340,7 +340,7 @@
   <div class="hud" style="width:100%; max-width:680px;">
     <div>
       <div class="hud-label">Prueba</div>
-      <div class="hud-val" id="q-counter">1 / 5</div>
+      <div class="hud-val" id="q-counter">1 / 6</div>
     </div>
     <div style="text-align:right">
       <div class="hud-label">Intentos fallidos</div>
@@ -422,10 +422,16 @@ const questions = [
     alt: ["catorce"]
   },
   {
-    label: "// ACERTIJO FINAL",
+    label: "// ACERTIJO 05",
     riddle: `Soy el guardián del aula.\nMe encuentras en el lugar más visible de todos,\npresidiendo la pizarra, mirando a todos.\n\nNo soy un número ni una palabra,\nsino una cadena de caracteres que nació en fábrica.\n\nEncuéntrame. Léeme. Introdúceme.\n\n¿Cuál es mi código?`,
     answer: "5X0LH8BX100127T",
     alt: ["5x0lh8bx100127t"]
+  },
+  {
+    label: "// ACERTIJO FINAL",
+    riddle: `Has llegado lejos, agente.\nPero el último candado requiere lógica pura.\n\nSuma todos los números que has descubierto:\nla sala, las máquinas, las pantallas y las luces.\n\nAhora, extrae todos los dígitos ocultos en el código de serie\ny súmalos entre sí.\n\nEl resultado final es la suma de ambos valores.\n\n¿Cuál es el código de salida?`,
+    answer: "201",
+    alt: ["doscientos uno"]
   }
 ];
 
