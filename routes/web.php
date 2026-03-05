@@ -23,7 +23,11 @@ Route::post('/prueba2', [JuegoController::class , 'validarPrueba2']);
 // 5. PANTALLA FINAL (Delegada al controlador para pasar datos de BBDD)
 Route::get('/final', [JuegoController::class , 'mostrarFinal']);
 
-// 6. PANEL DE ADMIN (Protegido con HTTP Basic Auth)
+// 6. PRUEBAS - Subcarpeta accesible por subruta
+Route::get('/pruebas/escape-room', [JuegoController::class , 'mostrarEscapeRoom']);
+Route::post('/pruebas/escape-room/completar', [JuegoController::class , 'completarEscapeRoom']);
+
+// 7. PANEL DE ADMIN (Protegido con HTTP Basic Auth)
 Route::get('/admin', function () {
     $usuario_correcto = '1daw';
     $password_correcto = '1daw';

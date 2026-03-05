@@ -145,6 +145,37 @@ class JuegoController extends Controller
         return back()->with('error', 'SINTAXIS INCORRECTA.');
     }
 
+    // --- ESCAPE ROOM (PRUEBAS) ---
+    public function mostrarEscapeRoom()
+    {
+        // Accesible sin login: si hay sesión usa el timer de BBDD, si no usa 30 min por defecto
+        $tiempo_restante = session()->has('email')
+            ? $this->obtenerTiempoRestante()
+            : 1800;
+
+        return view('pruebas.escape-room', compact('tiempo_restante'));
+    }
+
+    public function completarEscapeRoom(Request $request)
+    {
+        // Si hay sesión activa, registrar en BBDD
+        if (session()->has('email')) {
+            $partida = Partida::where('email', session('email'))->first();
+
+            if ($partida) {
+                $inicio = Carbon::parse($partida->inicio_juego);
+                $segundos_totales = abs(Carbon::now()->diffInSeconds($inicio));
+
+                $partida->update([
+                    'tiempo_segundos' => $segundos_totales,
+                    'fase_actual' => 'FINALIZADO'
+                ]);
+            }
+        }
+
+        return response()->json(['success' => true, 'message' => 'Escape room completado']);
+    }
+
     // --- PANEL DE ADMINISTRACIÓN ---
     public function adminPanel()
     {
