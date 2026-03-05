@@ -527,7 +527,7 @@ function showWin() {
   showScreen('screen-win');
 
   // Notificar al servidor que se completó el escape room
-  fetch("{{ url('/pruebas/escape-room/completar') }}", {
+  fetch("{{ url('/pruebas/aula-115/completar') }}", {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

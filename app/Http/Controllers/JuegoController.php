@@ -145,18 +145,18 @@ class JuegoController extends Controller
         return back()->with('error', 'SINTAXIS INCORRECTA.');
     }
 
-    // --- ESCAPE ROOM (PRUEBAS) ---
-    public function mostrarEscapeRoom()
+    // --- PRUEBA: AULA 115 (Ordenadores y número de serie) ---
+    public function mostrarAula115()
     {
         // Accesible sin login: si hay sesión usa el timer de BBDD, si no usa 30 min por defecto
         $tiempo_restante = session()->has('email')
             ? $this->obtenerTiempoRestante()
             : 1800;
 
-        return view('pruebas.escape-room', compact('tiempo_restante'));
+        return view('pruebas.aula-115', compact('tiempo_restante'));
     }
 
-    public function completarEscapeRoom(Request $request)
+    public function completarAula115(Request $request)
     {
         // Si hay sesión activa, registrar en BBDD
         if (session()->has('email')) {
