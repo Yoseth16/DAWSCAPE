@@ -171,9 +171,22 @@
         </div>
 
         <div class="sidebar-footer">
-            <a href="/" class="btn-logout">
-                <i class="ph ph-sign-out"></i> Salir al Inicio
-            </a>
+            <div class="user-info mb-3 d-flex align-items-center gap-2" style="padding: 0 0.5rem;">
+                <div class="avatar-sm bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 0.8rem; font-weight: bold;">
+                    {{ substr(Auth::user()->name, 0, 1) }}
+                </div>
+                <div class="overflow-hidden">
+                    <div class="text-truncate" style="font-size: 0.85rem; font-weight: 600;">{{ Auth::user()->name }}</div>
+                    <div class="text-truncate" style="font-size: 0.7rem; color: #94a3b8;">{{ Auth::user()->email }}</div>
+                </div>
+            </div>
+            
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="btn-logout border-0" style="background: rgba(239, 68, 68, 0.1);">
+                    <i class="ph ph-sign-out"></i> Cerrar Sesión
+                </button>
+            </form>
         </div>
     </aside>
 

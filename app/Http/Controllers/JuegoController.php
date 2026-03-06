@@ -99,6 +99,14 @@ class JuegoController extends Controller
             $partida->update([
                 'fase_actual' => 'Prueba 2 Yoseth',
             ]);
+
+            // REGISTRO DE HITO (FASE 6 V2)
+            \App\Models\HitoFase::create([
+                'partida_id' => $partida->id,
+                'fase' => 'Prueba 1 Mario Superada',
+                'segundos_transcurridos' => $this->timerService->obtenerTiempoTranscurrido(),
+                'alcanzado_at' => Carbon::now()
+            ]);
         }
 
         // Devolvemos un OK en formato JSON
@@ -131,6 +139,14 @@ class JuegoController extends Controller
         if ($partida && $partida->inicio_juego) {
             $partida->update([
                 'fase_actual'     => 'Prueba 3 Angel',
+            ]);
+
+            // REGISTRO DE HITO (FASE 6 V2)
+            \App\Models\HitoFase::create([
+                'partida_id' => $partida->id,
+                'fase' => 'Prueba 2 Yoseth Superada',
+                'segundos_transcurridos' => $this->timerService->obtenerTiempoTranscurrido(),
+                'alcanzado_at' => Carbon::now()
             ]);
         }
 
@@ -166,6 +182,14 @@ class JuegoController extends Controller
         if ($partida && $partida->inicio_juego) {
             $partida->update([
                 'fase_actual'     => 'Prueba 4 Arturo',
+            ]);
+
+            // REGISTRO DE HITO (FASE 6 V2)
+            \App\Models\HitoFase::create([
+                'partida_id' => $partida->id,
+                'fase' => 'Prueba 3 Angel Superada',
+                'segundos_transcurridos' => $this->timerService->obtenerTiempoTranscurrido(),
+                'alcanzado_at' => Carbon::now()
             ]);
         }
 
@@ -208,6 +232,14 @@ class JuegoController extends Controller
             $partida->update([
                 'fase_actual'     => 'Prueba 5 Eloy',
             ]);
+
+            // REGISTRO DE HITO (FASE 6 V2)
+            \App\Models\HitoFase::create([
+                'partida_id' => $partida->id,
+                'fase' => 'Prueba 4 Arturo Superada',
+                'segundos_transcurridos' => $this->timerService->obtenerTiempoTranscurrido(),
+                'alcanzado_at' => Carbon::now()
+            ]);
         }
 
         // Mensaje final desde Back
@@ -249,6 +281,14 @@ class JuegoController extends Controller
         if ($partida && $partida->inicio_juego) {
             $partida->update([
                 'fase_actual'     => 'Prueba 6 Migue',
+            ]);
+
+            // REGISTRO DE HITO (FASE 6 V2)
+            \App\Models\HitoFase::create([
+                'partida_id' => $partida->id,
+                'fase' => 'Prueba 5 Eloy Superada',
+                'segundos_transcurridos' => $this->timerService->obtenerTiempoTranscurrido(),
+                'alcanzado_at' => Carbon::now()
             ]);
         }
 
@@ -293,11 +333,48 @@ class JuegoController extends Controller
                 'tiempo_segundos' => $segundos_totales,
                 'fase_actual'     => 'FINALIZADO',
             ]);
+
+            // REGISTRO DE HITO FINAL (FASE 6 V2)
+            \App\Models\HitoFase::create([
+                'partida_id' => $partida->id,
+                'fase' => 'JUEGO FINALIZADO',
+                'segundos_transcurridos' => $segundos_totales,
+                'alcanzado_at' => Carbon::now()
+            ]);
         }
 
         return response()->json([
             'success' => true,
             'mensaje' => '¡NUCLEO ESTABILIZADO! Has escapado del DAWSCAPE.'
+        ]);
+    }
+
+    public function pedirPista(Request $request)
+    {
+        $partida = $this->timerService->obtenerPartidaActiva();
+
+        if (!$partida) {
+            return response()->json(['success' => false, 'message' => 'Sesión no activa.'], 403);
+        }
+
+        $fase = $partida->fase_actual;
+        $pista = config("escape.pistas.{$fase}", 'No hay pistas disponibles para esta fase.');
+        $penalizacion = config('escape.penalizacion_pista', 180);
+
+        $partida->increment('penalizacion_segundos', $penalizacion);
+
+        // Opcional: Registrar hito de pista solicitada
+        \App\Models\HitoFase::create([
+            'partida_id' => $partida->id,
+            'fase' => "PISTA SOLICITADA: {$fase}",
+            'segundos_transcurridos' => $this->timerService->obtenerTiempoTranscurrido(),
+            'alcanzado_at' => Carbon::now()
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'pista' => $pista,
+            'nueva_penalizacion' => $partida->penalizacion_segundos
         ]);
     }
 

@@ -2,181 +2,83 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\JuegoController;
-
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\QrController;
+use App\Http\Controllers\ProfileController;
 
-// 1. PANTALLA DE INICIO (LOGIN)
+// ==========================================
+// ZONA PUBLICA - ESCAPE ROOM (ALUMNOS)
+// ==========================================
+
 Route::get('/', function () {
     return view('inicio');
+})->name('inicio');
+
+Route::post('/empezar', [JuegoController::class, 'empezarPartida']);
+
+// Grupo protegido para las fases del juego (Asegura progreso lineal)
+Route::middleware(['check.fase'])->group(function () {
+    Route::get('/prueba1mario', [JuegoController::class, 'mostrarPrueba1'])->name('prueba1');
+    Route::post('/prueba1mario', [JuegoController::class, 'validarPrueba1']);
+
+    Route::get('/prueba2yoseth', [JuegoController::class, 'mostrarPrueba2'])->name('prueba2');
+    Route::post('/prueba2yoseth', [JuegoController::class, 'validarPrueba2']);
+
+    Route::get('/prueba3angel', [JuegoController::class, 'mostrarPrueba3'])->name('prueba3');
+    Route::post('/prueba3angel', [JuegoController::class, 'validarPrueba3']);
+
+    Route::get('/prueba4arturo', [JuegoController::class, 'mostrarPrueba4'])->name('prueba4');
+    Route::post('/prueba4arturo', [JuegoController::class, 'validarPrueba4']);
+
+    Route::get('/prueba5eloy', [JuegoController::class, 'mostrarPrueba5'])->name('prueba5');
+    Route::post('/prueba5eloy', [JuegoController::class, 'validarPrueba5']);
+
+    Route::get('/prueba6migue', [JuegoController::class, 'mostrarPrueba6'])->name('prueba6');
+    Route::post('/prueba6migue', [JuegoController::class, 'validarPrueba6']);
+
+    Route::get('/final', [JuegoController::class, 'mostrarFinal'])->name('final');
+
+    Route::post('/pedir-pista', [JuegoController::class, 'pedirPista'])->name('pedir.pista');
 });
 
-// 2. PROCESAR LOGIN DE EQUIPO
-Route::post('/empezar', [JuegoController::class , 'empezar']);
+// Enrutamiento Inteligente de Escaneo QR
+Route::get('/qr/{id}', [QrController::class, 'escanearQr'])->name('qr.scan');
 
-// 3. PRUEBA 1 MARIO (Antigua: AULA 115)
-Route::middleware('check.fase:email,/')->group(function () {
-    Route::get('/prueba1mario', [JuegoController::class, 'mostrarPrueba1Mario']);
-    Route::post('/prueba1mario', [JuegoController::class, 'validarPrueba1Mario']);
-});
-
-// 4. PRUEBA 2: EL CLÚSTER FRAGMENTADO (Expendedoras)
-Route::middleware('check.fase:prueba1mario_superada,/prueba1mario')->group(function () {
-    Route::get('/prueba2yoseth', [JuegoController::class, 'mostrarPrueba2Yoseth']);
-    Route::post('/prueba2yoseth', [JuegoController::class, 'validarPrueba2Yoseth']);
-});
-
-// 4.1. PRUEBA 3: OPERACIÓN CAFEÍNA (Máquina Café vía QR)
-Route::middleware('check.fase:prueba2yoseth_superada,/prueba2yoseth')->group(function () {
-    Route::get('/prueba3angel', [JuegoController::class, 'mostrarPrueba3Angel']);
-    Route::post('/prueba3angel', [JuegoController::class, 'validarPrueba3Angel']);
-});
-
-// 4.1. PRUEBA 4: OPERACIÓN REPUESTOS (Oasis Snacks vía QR)
-Route::middleware('check.fase:prueba3angel_superada,/prueba3angel')->group(function () {
-    Route::get('/prueba4arturo', [JuegoController::class, 'mostrarPrueba4Arturo']);
-    Route::post('/prueba4arturo', [JuegoController::class, 'validarPrueba4Arturo']);
-});
-
-// 4.1. PRUEBA 5: PROTOCOLO ESPEJO (Taquillas vía QR)
-Route::middleware('check.fase:prueba4arturo_superada,/prueba4arturo')->group(function () {
-    Route::get('/prueba5eloy', [JuegoController::class, 'mostrarPrueba5Eloy']);
-    Route::post('/prueba5eloy', [JuegoController::class, 'validarPrueba5Eloy']);
-});
-
-// 4.1. PRUEBA 6: SOBRECARGA DEL SISTEMA (Mígue - Simon Dice Cooperativo)
-Route::middleware('check.fase:prueba5eloy_superada,/prueba5eloy')->group(function () {
-    Route::get('/prueba6migue', [JuegoController::class, 'mostrarPrueba6Migue']);
-    Route::post('/prueba6migue', [JuegoController::class, 'validarPrueba6Migue']);
-});
-
-// RUTA PARA TESTEAR LA PRUEBA 6 DIRECTAMENTE (BYPASS)
-Route::get('/bypass-prueba6', function() {
-    session([
-        'email' => 'admin@estudiante.xtart.com',
-        'nombre_equipo' => 'Test',
-        'clase' => 'Profe',
-        'prueba1mario_superada' => true,
-        'prueba2yoseth_superada' => true,
-        'prueba3angel_superada' => true,
-        'prueba4arturo_superada' => true,
-        'prueba5eloy_superada' => true,
-    ]);
-    
-    \App\Models\Partida::firstOrCreate(
-        ['email' => 'admin@estudiante.xtart.com'],
-        [
-            'nombre_equipo' => 'Test',
-            'clase' => 'Profe',
-            'fase_actual' => 'Prueba 6 Migue',
-            'tiempo_segundos' => 0,
-            'inicio_juego' => \Carbon\Carbon::now()
-        ]
-    );
-
-    return redirect('/prueba6migue');
-});
-
-// 5. PANTALLA FINAL (Delegada al controlador para pasar datos de BBDD)
-Route::middleware('check.fase:prueba6migue_superada,/prueba6migue')->group(function () {
-    Route::get('/final', [JuegoController::class , 'mostrarFinal']);
-});
-
-// 6. PRUEBAS - Subcarpeta escalable (añadir más rutas aquí para nuevas pruebas)
-Route::get('/pruebas/aula-115', [JuegoController::class , 'mostrarAula115']);
-Route::post('/pruebas/aula-115/completar', [JuegoController::class , 'completarAula115']);
 
 // ==========================================
-// MÓDULO: SISTEMA DE QRs
+// ZONA PRIVADA - PANEL DE PROFESORES
 // ==========================================
-// Ruta para escanear QR (alumnos)
-Route::get('/qr/{identificador}', [QrController::class, 'escanearQR'])->name('qr.escanear');
 
-// 7. PANEL DE ADMIN Y MANEJO (Protegido con HTTP Basic Auth)
-Route::middleware('auth.basic')->group(function () {
-    // Si necesitas Auth básico nativo añade 'auth.basic' arriba en arr, pero como usan custom, metémolos en un prefijo manual
-});
-
-Route::prefix('admin')->group(function () {
-
-    // Middleware custom inline de protección (reaplicado para todas las subrutas de Admin)
-    // $authMiddleware = function ($request, \Closure $next) { ... } -> Reemplazado por AdminAuth
-
-    Route::get('/', function () {
-        return app(App\Http\Controllers\AdminController::class)->adminPanel();
-    })->middleware('admin.auth');
-
-    Route::delete('/equipo/{id}', function ($id) {
-        return app(App\Http\Controllers\AdminController::class)->eliminarEquipo($id);
-    })->middleware('admin.auth');
-
-    Route::get('/exportar-top20', function () {
-        return app(App\Http\Controllers\AdminController::class)->exportarTop20PDF();
-    })->middleware('admin.auth');
-
-    // ==========================================
-    // SISTEMA DE QRs: Panel de Administración
-    // ==========================================
-    Route::get('/qrs', function () {
-        return app(App\Http\Controllers\QrController::class)->gestionarQrs();
-    })->middleware('admin.auth')->name('admin.qrs');
-
-    Route::post('/qrs', function () {
-        return app(App\Http\Controllers\QrController::class)->guardarQr(request());
-    })->middleware('admin.auth');
-
-    Route::delete('/qrs/{id}', function ($id) {
-        return app(App\Http\Controllers\QrController::class)->eliminarQr($id);
-    })->middleware('admin.auth');
-
-    // ==========================================
-    // RUTAS DE TESTEO (BYPASS) PARA EL ADMINISTRADOR
-    // ==========================================
+// Envolvemos todo el Dashboard y gestión en el Middleware nativo Auth (Breeze)
+Route::middleware(['auth', 'verified'])->group(function () {
     
-    // Función helper para forzar sesión de admin temporalmente y devolver la vista
-    $adminTestView = function($viewName, $data = []) {
-        // Forzar sesión falsa en caso de no haber sesión de equipo
-        session([
-                'nombre_equipo' => '[Modo Administrador]', 
-                'clase' => 'Testing',
-                'prueba1mario_superada' => true,
-                'prueba2yoseth_superada' => true,
-                'prueba3angel_superada' => true,
-                'prueba4arturo_superada' => true,
-                'prueba5eloy_superada' => true,
-                'prueba6migue_superada' => true,
-            ]);
-        $defaultData = [
-            'tiempo_transcurrido' => 0,
-            'identificador' => 'admin-bypass'
-        ];
-        return view($viewName, array_merge($defaultData, $data));
-    };
+    // El dashboard principal será nuestra vista /admin
+    Route::get('/dashboard', [AdminController::class, 'adminPanel'])->name('dashboard');
+    Route::get('/admin', function() { return redirect('/dashboard'); }); // Alias por costumbre
 
-    // Aplicar el middleware a todas las rutas de bypass agrupadas
-    Route::middleware('admin.auth')->group(function () use ($adminTestView) {
+    // Gestión de Partidas
+    Route::get('/admin/api/stats', [AdminController::class, 'apiStats']);
+    Route::delete('/admin/equipo/{uuid}', [AdminController::class, 'eliminarEquipo']);
+    Route::get('/admin/exportar-top20', [AdminController::class, 'exportarTop20PDF']);
 
-    Route::get('/prueba/prueba1mario', function () use ($adminTestView) {
-        return $adminTestView('prueba1mario');
-    })->name('admin.prueba.prueba1mario');
+    // Gestión de QRs Dinámicos
+    Route::get('/admin/qrs', [QrController::class, 'mostrarGestor'])->name('admin.qrs');
+    Route::post('/admin/qrs', [QrController::class, 'generarQr']);
+    Route::delete('/admin/qrs/{id}', [QrController::class, 'eliminarQr']);
 
-    Route::get('/prueba/prueba2yoseth', function () use ($adminTestView) {
-        return $adminTestView('prueba2yoseth');
-    })->name('admin.prueba.prueba2yoseth');
+    // Rutas de Testing Directo (Bypass para el profesor)
+    Route::get('/prueba/prueba1mario', [JuegoController::class, 'mostrarPrueba1'])->name('admin.prueba.prueba1mario');
+    Route::get('/prueba/prueba2yoseth', [JuegoController::class, 'mostrarPrueba2'])->name('admin.prueba.prueba2yoseth');
+    Route::get('/prueba/prueba3angel', [JuegoController::class, 'mostrarPrueba3'])->name('admin.prueba.prueba3angel');
+    Route::get('/prueba/prueba4arturo', [JuegoController::class, 'mostrarPrueba4'])->name('admin.prueba.prueba4arturo');
+    Route::get('/prueba/prueba5eloy', [JuegoController::class, 'mostrarPrueba5'])->name('admin.prueba.prueba5eloy');
+    Route::get('/prueba/prueba6migue', [JuegoController::class, 'mostrarPrueba6'])->name('admin.prueba.prueba6migue');
 
-    Route::get('/prueba/prueba3angel', function () use ($adminTestView) {
-        return $adminTestView('qr.maquina-cafe', ['titulo_prueba' => '[ADMIN TEST] Máquina de Café']);
-    })->name('admin.prueba.prueba3angel');
-
-    Route::get('/prueba/prueba4arturo', function () use ($adminTestView) {
-        return $adminTestView('qr.maquina-snacks', ['titulo_prueba' => '[ADMIN TEST] Máquina Oasis']);
-    })->name('admin.prueba.prueba4arturo');
-
-    Route::get('/prueba/prueba5eloy', function () use ($adminTestView) {
-        return $adminTestView('qr.taquillas', ['titulo_prueba' => '[ADMIN TEST] Protocolo Espejo']);
-    })->name('admin.prueba.prueba5eloy');
-
-    Route::get('/prueba/prueba6migue', function () use ($adminTestView) {
-        return $adminTestView('prueba6migue');
-    })->name('admin.prueba.prueba6migue');
+    // Gestión de Perfil de Profesor (Breeze)
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-});
+
+// Importar rutas de Laravel Auth
+require __DIR__.'/auth.php';

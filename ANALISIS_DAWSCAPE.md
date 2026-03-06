@@ -7,6 +7,17 @@ Este documento detalla la estructura, patrones y flujos de seguridad implementad
 ### 1.1. Arquitectura MVC (Model-View-Controller)
 La aplicación sigue estrictamente el patrón MVC clásico de Laravel, pero se ha saneado dividiendo responsabilidades (`Single Responsibility Principle`):
 - **`JuegoController`**: Gestiona **exclusivamente** el flujo de las pruebas del jugador (renderizar vistas de puzzles) y la validación de sus respuestas correctas.
+- **Fase 5:** Dashboard Premium Admin con Chart.js.
+- **Fase 6:** Nivel StartUp V2 (Auth Breeze, UUIDs, Tiempo Real, PWA, Audio, Tests).
+
+## Arquitectura Actual
+- **Framework:** Laravel 11.
+- **Frontend:** Blade, Vanilla CSS, Orbitron/Share Tech Mono fonts.
+- **Auth:** Laravel Breeze (Capa Enterprise).
+- **Base de Datos:** SQLite con UUIDs para seguridad y tabla de trazabilidad de hitos.
+- **Real-Time:** AJAX Polling (8s) para métricas dinámicas.
+- **PWA:** Manifest v3 para instalación móvil.
+- **Audio:** Web Audio API (Sintetizador Cyberpunk).
 - **`AdminController`**: Gestiona el panel de control del profesorado, el borrado de equipos, el testeo (bypass) de pruebas y la exportación de ránkings a formato PDF.
 - **`QrController`**: Encapsula toda la lógica de creación dinámica de códigos QR en BBDD, eliminaciones y el enrutamiento inteligente cuando un alumno escanea una pista.
 

@@ -11,7 +11,27 @@ class Partida extends Model
         'nombre_equipo', 
         'clase', 
         'tiempo_segundos', 
-        'inicio_juego', // <--- Añádelo aquí
-        'fase_actual'
+        'inicio_juego', 
+        'fase_actual',
+        'uuid',
+        'penalizacion_segundos'
     ];
+
+    /**
+     * Boot function from Laravel.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            if (empty($model->uuid)) {
+                $model->uuid = (string) \Illuminate\Support\Str::uuid();
+            }
+        });
+    }
+
+    public function hitos()
+    {
+        return $this->hasMany(HitoFase::class);
+    }
 }

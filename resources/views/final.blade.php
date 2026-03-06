@@ -251,6 +251,11 @@
       <div class="time-display">
         {{ floor($partida->tiempo_segundos / 60) }}m {{ $partida->tiempo_segundos % 60 }}s
       </div>
+      @if($partida->penalizacion_segundos > 0)
+        <div style="color: #f59e0b; font-size: 0.9rem; margin-top: -10px; margin-bottom: 20px;">
+          (Incluye {{ floor($partida->penalizacion_segundos / 60) }}m de penalización por pistas)
+        </div>
+      @endif
   @endif
 
       <div class="ranking-panel">
