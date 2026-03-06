@@ -41,7 +41,7 @@
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    padding: 2rem;
+    padding: 1.5rem;
     position: relative;
     z-index: 10;
   }
@@ -75,7 +75,7 @@
     max-width: 500px;
     border: 1px solid var(--border);
     background: var(--panel);
-    padding: 2.5rem 2rem;
+    padding: clamp(1.5rem, 5vw, 2.5rem) clamp(1rem, 4vw, 2rem);
     position: relative;
     box-shadow: 0 0 30px rgba(0, 255, 136, 0.1);
   }
@@ -110,7 +110,7 @@
     color: var(--green);
     font-family: 'Share Tech Mono', monospace;
     font-size: 1.1rem;
-    padding: 0.6rem 0.5rem;
+    padding: 0.8rem 0.5rem;
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
   }
@@ -135,8 +135,8 @@
     margin-top: 0.15rem;
     font: inherit;
     color: currentColor;
-    width: 1.15em;
-    height: 1.15em;
+    width: 1.25em;
+    height: 1.25em;
     border: 1px solid var(--green);
     display: grid;
     place-content: center;
@@ -155,7 +155,7 @@
 
   input[type="checkbox"]:checked::before { transform: scale(1); }
   
-  .checkbox-label { font-size: 0.8rem; color: #669977; line-height: 1.5; cursor: pointer; }
+  .checkbox-label { font-size: 0.85rem; color: #669977; line-height: 1.5; cursor: pointer; }
 
   .btn {
     font-family: 'Orbitron', sans-serif;

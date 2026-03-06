@@ -41,7 +41,7 @@
         align-items: center;
         justify-content: center;
         min-height: 100vh;
-        padding: 2rem;
+        padding: 1.5rem;
         position: relative;
         z-index: 10;
         animation: fadeIn 1s ease;
@@ -52,7 +52,7 @@
         max-width: 680px;
         border: 1px solid var(--border);
         background: var(--panel);
-        padding: 3rem;
+        padding: clamp(1.5rem, 5vw, 3rem) clamp(1rem, 4vw, 3rem);
         position: relative;
         text-align: center;
         box-shadow: 0 0 40px rgba(0, 255, 136, 0.1);
@@ -112,10 +112,10 @@
 
       .time-display {
         font-family: 'Orbitron', sans-serif;
-        font-size: 3.5rem;
+        font-size: clamp(2rem, 10vw, 3.5rem);
         color: var(--green);
         text-shadow: 0 0 20px var(--green);
-        margin: 2rem 0;
+        margin: 1.5rem 0;
         letter-spacing: 0.1em;
       }
 
@@ -123,8 +123,8 @@
         text-align: left;
         background: rgba(0, 0, 0, 0.4);
         border: 1px dotted var(--border);
-        padding: 1.5rem;
-        margin-top: 2rem;
+        padding: clamp(1rem, 4vw, 1.5rem);
+        margin-top: 1.5rem;
       }
 
       .ranking-panel h4 {
@@ -166,6 +166,7 @@
         overflow: hidden;
         margin-top: 2rem;
         font-weight: 700;
+        width: 100%;
       }
 
       .btn::before {

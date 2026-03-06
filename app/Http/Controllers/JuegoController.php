@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Partida;
 use Barryvdh\DomPDF\Facade\Pdf;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class JuegoController extends Controller
 {
@@ -196,7 +197,161 @@ class JuegoController extends Controller
         
         session(['prueba2yoseth_superada' => true]);
 
-        // AHORA SÍ: CÁLCULO FINAL Y CIERRE
+        // AHORA SÍ: NO VAMOS AL FINAL AÚN. VAMOS A LA PRUEBA 3.
+        $partida = $this->obtenerPartidaActiva();
+
+        if ($partida && $partida->inicio_juego) {
+            $partida->update([
+                'fase_actual'     => 'Prueba 3 Angel',
+            ]);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    // =====================================================
+    // PRUEBA 3: OPERACIÓN CAFEÍNA
+    // =====================================================
+    public function mostrarPrueba3Angel()
+    {
+        // Require haber completado la 2
+        if (!session()->has('prueba2yoseth_superada')) {
+            return redirect('/prueba2yoseth');
+        }
+
+        if ($this->verificarTimeout()) return redirect('/final')->with('timeout', true);
+
+        $tiempo_transcurrido = $this->obtenerTiempoTranscurrido();
+        return view('prueba3angel', compact('tiempo_transcurrido'));
+    }
+
+    public function validarPrueba3Angel(Request $request)
+    {
+        // Require haber completado la 2
+        if (!session()->has('prueba2yoseth_superada')) {
+            return response()->json(['success' => false, 'message' => 'Falta completar pruebas previas'], 403);
+        }
+
+        $request->validate([
+            'checksum' => 'required|numeric'
+        ]);
+
+        $CHECKSUM_CORRECTO = 124; // 19 botones + 110 cents + 5 azucar
+
+        if ((int)$request->checksum !== $CHECKSUM_CORRECTO) {
+            return response()->json(['success' => false, 'message' => 'Checksum erróneo']);
+        }
+
+        session(['prueba3angel_superada' => true]);
+
+        // Ya no es la última, pasamos a Prueba 4
+        $partida = $this->obtenerPartidaActiva();
+
+        if ($partida && $partida->inicio_juego) {
+            $partida->update([
+                'fase_actual'     => 'Prueba 4 Arturo',
+            ]);
+        }
+
+        // Mensaje final desde Back
+        $mensajeFinal = "Has purgado la red de cafeína. El sistema vuelve a fluir, pero el rastro digital\nno termina aquí. La siguiente pieza del puzzle te espera donde los snacks\nson liberados de su encierro.";
+
+        return response()->json([
+            'success' => true,
+            'mensaje' => $mensajeFinal
+        ]);
+    }
+
+    // =====================================================
+    // PRUEBA 4: OPERACIÓN REPUESTOS (Oasis)
+    // =====================================================
+    public function mostrarPrueba4Arturo()
+    {
+        // Require haber completado la 3
+        if (!session()->has('prueba3angel_superada')) {
+            return redirect('/prueba3angel');
+        }
+
+        if ($this->verificarTimeout()) return redirect('/final')->with('timeout', true);
+
+        $tiempo_transcurrido = $this->obtenerTiempoTranscurrido();
+        return view('prueba4arturo', compact('tiempo_transcurrido'));
+    }
+
+    public function validarPrueba4Arturo(Request $request)
+    {
+        // Require haber completado la 3
+        if (!session()->has('prueba3angel_superada')) {
+            return response()->json(['success' => false, 'message' => 'Falta completar pruebas previas'], 403);
+        }
+
+        $request->validate([
+            'checksum' => 'required|numeric'
+        ]);
+
+        $CHECKSUM_OASIS = 141; // Ej: 6 filas + cod 128 cafe + 7 items A1 -> Total manual: 141
+
+        if ((int)$request->checksum !== $CHECKSUM_OASIS) {
+            return response()->json(['success' => false, 'message' => 'Checksum erróneo']);
+        }
+
+        session(['prueba4arturo_superada' => true]);
+
+        // Ya no es la última, pasamos a Prueba 5
+        $partida = $this->obtenerPartidaActiva();
+
+        if ($partida && $partida->inicio_juego) {
+            $partida->update([
+                'fase_actual'     => 'Prueba 5 Eloy',
+            ]);
+        }
+
+        // Mensaje final desde Back
+        $mensajeFinal = "El orden natural ha desaparecido. Lo que empieza por A ahora termina en Z.\nEl archivo maestro ha sido fragmentado y ocultado en 64 nodos metálicos.";
+
+        return response()->json([
+            'success' => true,
+            'mensaje' => $mensajeFinal
+        ]);
+    }
+
+    // =====================================================
+    // PRUEBA 5: PROTOCOLO ESPEJO (Taquillas)
+    // =====================================================
+    public function mostrarPrueba5Eloy()
+    {
+        // Require haber completado la 4
+        if (!session()->has('prueba4arturo_superada')) {
+            return redirect('/prueba4arturo');
+        }
+
+        if ($this->verificarTimeout()) return redirect('/final')->with('timeout', true);
+
+        $tiempo_transcurrido = $this->obtenerTiempoTranscurrido();
+        return view('prueba5eloy', compact('tiempo_transcurrido'));
+    }
+
+    public function validarPrueba5Eloy(Request $request)
+    {
+        // Require haber completado la 4
+        if (!session()->has('prueba4arturo_superada')) {
+            return response()->json(['success' => false, 'message' => 'Falta completar pruebas previas'], 403);
+        }
+
+        $request->validate([
+            'checksum' => 'required|string'
+        ]);
+
+        $PALABRA_ESPEJO = "ZASIELX";
+        $input_normalizado = strtoupper(trim($request->checksum));
+
+        if ($input_normalizado !== $PALABRA_ESPEJO) {
+            return response()->json(['success' => false, 'message' => 'Palabra clave errónea']);
+        }
+
+        session(['prueba5eloy_superada' => true]);
+
+        // AHORA SÍ, CÁLCULO FINAL Y CIERRE (Por ahora Prueba 5 es la última)
         $partida = $this->obtenerPartidaActiva();
 
         if ($partida && $partida->inicio_juego) {
@@ -209,14 +364,20 @@ class JuegoController extends Controller
             ]);
         }
 
-        return response()->json(['success' => true]);
+        // Mensaje final desde Back
+        $mensajeFinal = "El orden ha sido restaurado. El sistema vuelve a reconocer el abecedario\noriginal. Pero el núcleo del DAWSCAPE aún no está completamente seguro…\nLa siguiente anomalía te espera donde los datos se cruzan y las\ndecisiones se ejecutan.";
+
+        return response()->json([
+            'success' => true,
+            'mensaje' => $mensajeFinal
+        ]);
     }
 
     // --- PANTALLA FINAL ---
     public function mostrarFinal()
     {
-        if (!session()->has('prueba2yoseth_superada'))
-            return redirect('/prueba2yoseth');
+        if (!session()->has('prueba5eloy_superada'))
+            return redirect('/prueba5eloy');
 
         // Traemos los datos REALES de la BBDD
         $partida = Partida::where('email', session('email'))->first();
@@ -262,6 +423,105 @@ class JuegoController extends Controller
         }
 
         return response()->json(['success' => true, 'message' => 'Escape room completado']);
+    }
+
+    // =====================================================
+    // SISTEMA DE QRs (MÓDULO VERSIÓN BBDD DINÁMICA)
+    // =====================================================
+
+    public function gestionarQrs()
+    {
+        $qrs = \App\Models\Qr::orderBy('created_at', 'desc')->get();
+        return view('admin.gestionar-qrs', compact('qrs'));
+    }
+
+    public function guardarQr(Request $request)
+    {
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'required|string',
+            'fase_requerida' => 'nullable|string|max:255'
+        ]);
+
+        // Generamos un slug seguro a partir del nombre para la URL
+        $slug = \Illuminate\Support\Str::slug($request->nombre) . '-' . uniqid();
+        $url = url('/qr/' . $slug);
+
+        \App\Models\Qr::create([
+            'nombre' => $request->nombre,
+            'descripcion' => $request->descripcion,
+            'fase_requerida' => $request->fase_requerida,
+            'url' => $url
+        ]);
+
+        return back()->with('success', 'QR "' . $request->nombre . '" generado correctamente.');
+    }
+
+    public function eliminarQr($id)
+    {
+        $qr = \App\Models\Qr::find($id);
+        if ($qr) {
+            $qr->delete();
+            return back()->with('success', 'QR eliminado del sistema.');
+        }
+        return back()->with('error', 'El QR no existe.');
+    }
+
+    public function escanearQR($identificador)
+    {
+        // Paso 1 - Autenticación
+        if (!session()->has('email')) {
+            return redirect('/')->with('error', 'Inicia sesión con tu equipo para ver esta pista.');
+        }
+
+        // Buscamos el QR en la BBDD por su URL final que termina en ese identificador
+        $qr = \App\Models\Qr::where('url', 'LIKE', '%/qr/' . $identificador)->first();
+
+        if (!$qr) {
+            abort(404, 'Código QR no reconocido en el sistema.');
+        }
+
+        $partida = $this->obtenerPartidaActiva();
+
+        if (!$partida) {
+            return redirect('/')->with('error', 'Inicia sesión con tu equipo para ver esta pista.');
+        }
+
+        // Paso 2 - Validación de fase (Solo si el QR tiene una fase_requerida)
+        if (!empty($qr->fase_requerida)) {
+            if (trim(strtolower($partida->fase_actual)) !== trim(strtolower($qr->fase_requerida))) {
+                $tiempo_transcurrido = $this->obtenerTiempoTranscurrido();
+                return view('qr.error-fase', [
+                    'mensaje' => '¡Eh, listillos! Aún no estáis en esta fase. Resolved la prueba actual primero.',
+                    'tiempo_transcurrido' => $tiempo_transcurrido
+                ]);
+            }
+        }
+
+        if ($this->verificarTimeout()) return redirect('/final')->with('timeout', true);
+
+        // Paso 3 - Éxito
+        $tiempo_transcurrido = $this->obtenerTiempoTranscurrido();
+        $titulo_prueba = $qr->nombre;
+        
+        // Si es el QR especial de la máquina de café (para la prueba 3)
+        // Lo verificamos por el identificador o si contiene 'cafe' para más seguridad
+        if (str_contains(strtolower($identificador), 'cafe') || str_contains(strtolower($qr->nombre), 'cafe')) {
+            return view('qr.maquina-cafe', compact('tiempo_transcurrido', 'titulo_prueba', 'identificador'));
+        }
+
+        // Si es el QR especial de la máquina Oasis (para la prueba 4)
+        if (str_contains(strtolower($identificador), 'snacks') || str_contains(strtolower($qr->nombre), 'oasis')) {
+            return view('qr.maquina-snacks', compact('tiempo_transcurrido', 'titulo_prueba', 'identificador'));
+        }
+
+        // Si es el QR especial de las taquillas (para la prueba 5)
+        if (str_contains(strtolower($identificador), 'taquilla') || str_contains(strtolower($qr->nombre), 'taquilla')) {
+            return view('qr.taquillas', compact('tiempo_transcurrido', 'titulo_prueba', 'identificador'));
+        }
+        
+        // Si no es especial, cargamos la vista de plantilla-pista genérica
+        return view('qr.plantilla-pista', compact('tiempo_transcurrido', 'titulo_prueba', 'identificador'));
     }
 
     // --- PANEL DE ADMINISTRACIÓN ---

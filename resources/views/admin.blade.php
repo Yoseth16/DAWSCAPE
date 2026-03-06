@@ -152,6 +152,17 @@
         <div class="dashboard-header">
             <h1>Registro Activo de Equipos</h1>
             <div style="display:flex; gap:1rem; align-items:center;">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-weight: 600;">
+                        🛠️ Testear Pruebas
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/admin/prueba/prueba3angel" target="_blank">Test: Operación Cafeína</a></li>
+                        <li><a class="dropdown-item" href="/admin/prueba/prueba4arturo" target="_blank">Test: Operación Repuestos</a></li>
+                        <li><a class="dropdown-item" href="/admin/prueba/prueba5eloy" target="_blank">Test: Protocolo Espejo</a></li>
+                    </ul>
+                </div>
+                <a href="/admin/qrs" class="btn btn-sm btn-outline-primary" style="font-weight: 600;">📱 Gestionar QRs</a>
                 <a href="/admin/exportar-top20" class="export-btn" target="_blank">📄 Exportar Top 20 PDF</a>
                 <a href="/" class="btn btn-sm btn-outline-primary">← Salir</a>
             </div>
@@ -283,5 +294,7 @@
             });
         }
     </script>
+    <!-- Add Bootstrap JS for Dropdown -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

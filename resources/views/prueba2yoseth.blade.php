@@ -66,7 +66,7 @@
     letter-spacing: 0.1em;
   }
 
-  .screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; padding-top: 5rem; position: relative; z-index: 10; }
+  .screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 1.5rem; padding-top: 5rem; padding-bottom: 2rem; position: relative; z-index: 10; }
 
   /* ALERT BOX */
   .alert-box {
@@ -74,7 +74,7 @@
     max-width: 680px;
     border: 1px solid var(--red);
     background: rgba(255, 34, 68, 0.05);
-    padding: 2rem;
+    padding: clamp(1.2rem, 4vw, 2rem);
     position: relative;
     margin-bottom: 2rem;
     animation: fadeIn 1s ease;
@@ -94,7 +94,7 @@
   }
 
   .alert-box p {
-    font-size: 1.05rem;
+    font-size: clamp(0.95rem, 4vw, 1.05rem);
     line-height: 1.9;
     color: #ffcccc;
     margin-bottom: 1rem;
@@ -106,7 +106,7 @@
     max-width: 680px;
     border: 1px solid var(--border);
     background: var(--panel);
-    padding: 2rem;
+    padding: clamp(1.5rem, 4vw, 2rem);
     position: relative;
     animation: fadeIn 1.5s ease;
   }
@@ -137,7 +137,7 @@
     border-bottom: 2px solid var(--green);
     color: var(--green);
     font-family: 'Share Tech Mono', monospace;
-    font-size: 1.8rem;
+    font-size: clamp(1.4rem, 6vw, 1.8rem);
     padding: 0.8rem 0.5rem;
     outline: none;
     letter-spacing: 0.5em;
@@ -189,7 +189,9 @@
     position: relative;
     overflow: hidden;
     width: 100%;
+    max-width: 350px;
     margin-top: 1rem;
+    text-align: center;
     display: none;
   }
 
@@ -258,7 +260,7 @@
 
   <div class="console-out" id="console-out"></div>
   
-  <a href="/final" class="btn" id="next-btn">PASAR A LA SIGUIENTE PRUEBA →</a>
+  <a href="/prueba3angel" class="btn" id="next-btn">PASAR A LA SIGUIENTE PRUEBA →</a>
 
 </div>
 

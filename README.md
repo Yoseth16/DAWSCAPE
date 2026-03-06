@@ -4,27 +4,42 @@
 
 > **Proyecto de Gamificación y Ciberseguridad para 1º DAW**
 
-DAWSCAPE es una experiencia inmersiva web desarrollada en Laravel. El objetivo es poner a prueba los conocimientos de los alumnos sobre redes, protocolos web y seguridad informática (SQL Injection) en un entorno controlado y competitivo.
+DAWSCAPE es una experiencia inmersiva web desarrollada en Laravel. El objetivo es poner a prueba los conocimientos de los alumnos en un entorno controlado y competitivo. Ha sido estructurado mediante un flujo de pantallas gamificadas estilo "terminal/hacker".
 
-## 🚀 Características Técnicas
+## 🚀 Actualizaciones Recientes (Backend y Mobile-First)
 
-Este proyecto no es solo una web estática, cuenta con una arquitectura backend completa:
+- **Refactorización UI Total (Mobile-First):** Todas las interfaces del juego han sido reconstruidas para garantizar una legibilidad y usabilidad perfectas en teléfonos móviles. Se ha utilizado la función `clamp()` de CSS, fuentes a un mínimo de 16px para evitar auto-zoom en iOS/Android y botones adaptados para pulsación táctil (área tap de más de 48px).
+- **Sistema de QRs Físicos Integrado:** Se ha añadido una infraestructura backend para generar códigos QR escaneables por los alumnos, enlazando el mundo real (el centro/instituto) con la aplicación web.
+- **Nuevas Pruebas y Expansión:** El juego cuenta ahora con un recorrido completo de 5 pruebas entrelazadas.
+- **Panel de Admin Avanzado:** Funciones de gestión en caliente con búsqueda, saltos/bypass directos a cualquier prueba para verificar el estado de la vista como profesor, control CRUD de usuarios y exportación de ranking TOP 20 en PDF.
 
-* **Motor:** Laravel 10 (PHP 8.2).
-* **Base de Datos:** SQLite (Registro persistente de partidas).
-* **Front-end:** Blade + Bootstrap 5 (Estética Hacker/Terminal).
-* **Seguridad Implementada:**
-    * **Protección CSRF:** En todos los formularios.
-    * **Validación de Dominio:** Restricción estricta a correos `@estudiante.xtart.com`.
-    * **Sistema Anti-Replay:** Un usuario solo puede completar el juego una vez (verificación contra BBDD).
-    * **Panel de Administración:** Ruta protegida `/admin` con autenticación básica para profesores.
+## 🎮 Mecánica del Juego y Flujo de Pruebas
 
-## 🎮 Mecánica del Juego
+El juego consta de una ruta lineal y secuencial bajo la presión de un cronómetro persistente en la Base de Datos (límite por defecto de 90 minutos):
 
-1.  **Login Seguro:** Registro con validación de correo corporativo y "Declaración de Honestidad".
-2.  **Prueba 1 (Redes):** Puzzle de lógica sobre puertos estándar y protocolos HTTP (Puerto 80).
-3.  **Prueba 2 (Hacking Ético):** Simulación de vulnerabilidad de Inyección SQL para bypass de autenticación.
-4.  **Ranking:** Cálculo en tiempo real de la duración de la partida (segundos) y guardado en base de datos.
+1.  **Login Seguro:** Registro con validación de correo corporativo estricto y "Declaración de Honor".
+2.  **Prueba 1 (Aula 115):** 6 Acertijos escalonados de lógica matemática y observación visual del entorno físico del aula.
+3.  **Prueba 2 (Clúster Fragmentado):** Reconstrucción de un anagrama escondido.
+4.  **Prueba 3 (Operación Cafeína):** Checksum de hardware físico. Escaneo de QR en la máquina de café de la sala de profesores.
+5.  **Prueba 4 (Operación Repuestos):** Auditoría física sobre la máquina expendedora Oasis. Escaneo de terminal QR.
+6.  **Prueba 5 (Protocolo Espejo):** Desencriptación basada en alfabeto invertido escondida en las taquillas de pasillo.
+7.  **Ranking Final:** Extracción del tiempo exacto que le tomó al equipo superar el cortafuegos para su posterior entrada en la clasificación oficial.
+
+## 🔐 Respuestas Maestras (Solo para Administrador)
+
+Estas son las contraseñas exactas codificadas en el backend requeridas para avanzar en las diferentes etapas del juego:
+
+- **Prueba 1 (Aula 115):**
+    - Acertijo 1 (puerta): `115`
+    - Acertijo 2 (ordenadores pares): `16`
+    - Acertijo 3 (pantallas x2): `32`
+    - Acertijo 4 (luces pares): `14`
+    - Acertijo 5 (serial de la pantalla principal): `5x0lh8bx100127t`
+    - Acertijo 6 (suma de salida): `201`
+- **Prueba 2 (Clúster Fragmentado):** Anagrama `ROCIO`
+- **Prueba 3 (Operación Cafeína - QR Máquina de Café):** Suma total (Checksum): `124`
+- **Prueba 4 (Operación Repuestos - QR Máquina Oasis Snacks):** Suma total (Checksum): `141`
+- **Prueba 5 (Protocolo Espejo - QR Taquillas):** Código de entrada: `ZASIELX`
 
 ## 🛠️ Instalación (Despliegue Local)
 
@@ -53,6 +68,7 @@ Si quieres probar este proyecto en tu máquina (Laragon/XAMPP):
     ```
 
 ---
+
 <p align="center">
     Desarrollado con ❤️ y mucho café por el equipo de <strong>DAWSCAPE</strong>.
     <br>

@@ -67,7 +67,7 @@
   }
 
   .screen { display: none; min-height: 100vh; }
-  .screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; padding-top: 5rem; }
+  .screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; padding-top: 5rem; padding-bottom: 2rem; }
 
   /* INTRO */
   #screen-intro { text-align: center; gap: 2rem; animation: fadeIn 1s ease; }
@@ -94,9 +94,10 @@
     line-height: 1.9;
     color: #88ccaa;
     border: 1px solid var(--border);
-    padding: 1.8rem 2rem;
+    padding: clamp(1.2rem, 4vw, 1.8rem) clamp(1.2rem, 4vw, 2rem);
     background: var(--panel);
     position: relative;
+    font-size: clamp(0.95rem, 4vw, 1.05rem);
   }
 
   .intro-text::before {
@@ -123,6 +124,9 @@
     transition: all 0.25s;
     position: relative;
     overflow: hidden;
+    width: 100%;
+    max-width: 350px;
+    text-align: center;
   }
 
   .btn::before {
@@ -186,7 +190,7 @@
     width: 100%;
     border: 1px solid var(--border);
     background: var(--panel);
-    padding: 2rem;
+    padding: clamp(1.5rem, 4vw, 2rem);
     position: relative;
   }
 

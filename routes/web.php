@@ -19,12 +19,30 @@ Route::post('/prueba1mario', [JuegoController::class, 'validarPrueba1Mario']);
 Route::get('/prueba2yoseth', [JuegoController::class, 'mostrarPrueba2Yoseth']);
 Route::post('/prueba2yoseth', [JuegoController::class, 'validarPrueba2Yoseth']);
 
+// 4.1. PRUEBA 3: OPERACIÓN CAFEÍNA (Máquina Café vía QR)
+Route::get('/prueba3angel', [JuegoController::class, 'mostrarPrueba3Angel']);
+Route::post('/prueba3angel', [JuegoController::class, 'validarPrueba3Angel']);
+
+// 4.1. PRUEBA 4: OPERACIÓN REPUESTOS (Oasis Snacks vía QR)
+Route::get('/prueba4arturo', [JuegoController::class, 'mostrarPrueba4Arturo']);
+Route::post('/prueba4arturo', [JuegoController::class, 'validarPrueba4Arturo']);
+
+// 4.1. PRUEBA 5: PROTOCOLO ESPEJO (Taquillas vía QR)
+Route::get('/prueba5eloy', [JuegoController::class, 'mostrarPrueba5Eloy']);
+Route::post('/prueba5eloy', [JuegoController::class, 'validarPrueba5Eloy']);
+
 // 5. PANTALLA FINAL (Delegada al controlador para pasar datos de BBDD)
 Route::get('/final', [JuegoController::class , 'mostrarFinal']);
 
 // 6. PRUEBAS - Subcarpeta escalable (añadir más rutas aquí para nuevas pruebas)
 Route::get('/pruebas/aula-115', [JuegoController::class , 'mostrarAula115']);
 Route::post('/pruebas/aula-115/completar', [JuegoController::class , 'completarAula115']);
+
+// ==========================================
+// MÓDULO: SISTEMA DE QRs
+// ==========================================
+// Ruta para escanear QR (alumnos)
+Route::get('/qr/{identificador}', [JuegoController::class, 'escanearQR'])->name('qr.escanear');
 
 // 7. PANEL DE ADMIN Y MANEJO (Protegido con HTTP Basic Auth)
 Route::middleware('auth.basic')->group(function () {
@@ -59,6 +77,60 @@ Route::prefix('admin')->group(function () {
     Route::get('/exportar-top20', function () use ($authMiddleware) {
         return $authMiddleware(request(), function() {
             return app(App\Http\Controllers\JuegoController::class)->exportarTop20PDF();
+        });
+    });
+
+    // ==========================================
+    // SISTEMA DE QRs: Panel de Administración
+    // ==========================================
+    Route::get('/qrs', function () use ($authMiddleware) {
+        return $authMiddleware(request(), function() {
+            return app(App\Http\Controllers\JuegoController::class)->gestionarQrs();
+        });
+    })->name('admin.qrs');
+
+    Route::post('/qrs', function () use ($authMiddleware) {
+        return $authMiddleware(request(), function() {
+            return app(App\Http\Controllers\JuegoController::class)->guardarQr(request());
+        });
+    });
+
+    Route::delete('/qrs/{id}', function ($id) use ($authMiddleware) {
+        return $authMiddleware(request(), function() use ($id) {
+            return app(App\Http\Controllers\JuegoController::class)->eliminarQr($id);
+        });
+    });
+
+    // ==========================================
+    // RUTAS DE TESTEO (BYPASS) PARA EL ADMINISTRADOR
+    // ==========================================
+    Route::get('/prueba/prueba3angel', function () use ($authMiddleware) {
+        return $authMiddleware(request(), function() {
+            return view('qr.maquina-cafe', [
+                'tiempo_transcurrido' => 0,
+                'titulo_prueba' => '[ADMIN TEST] Máquina de Café',
+                'identificador' => 'admin-bypass'
+            ]);
+        });
+    });
+
+    Route::get('/prueba/prueba4arturo', function () use ($authMiddleware) {
+        return $authMiddleware(request(), function() {
+            return view('qr.maquina-snacks', [
+                'tiempo_transcurrido' => 0,
+                'titulo_prueba' => '[ADMIN TEST] Máquina Oasis',
+                'identificador' => 'admin-bypass'
+            ]);
+        });
+    });
+
+    Route::get('/prueba/prueba5eloy', function () use ($authMiddleware) {
+        return $authMiddleware(request(), function() {
+            return view('qr.taquillas', [
+                'tiempo_transcurrido' => 0,
+                'titulo_prueba' => '[ADMIN TEST] Protocolo Espejo',
+                'identificador' => 'admin-bypass'
+            ]);
         });
     });
 });
