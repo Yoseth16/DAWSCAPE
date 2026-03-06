@@ -153,13 +153,13 @@
             <h1>Registro Activo de Equipos</h1>
             <div style="display:flex; gap:1rem; align-items:center;">
                 <div class="dropdown">
-                    <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-weight: 600;">
+                    <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-weight: 600;">
                         🛠️ Testear Pruebas
                     </button>
-                        <li><a class="dropdown-item" href="/admin/prueba/prueba3angel" target="_blank">Test: Operación Cafeína</a></li>
-                        <li><a class="dropdown-item" href="/admin/prueba/prueba4arturo" target="_blank">Test: Operación Repuestos</a></li>
-                        <li><a class="dropdown-item" href="/admin/prueba/prueba5eloy" target="_blank">Test: Protocolo Espejo</a></li>
-                        <li><a class="dropdown-item" href="/admin/prueba/prueba6migue" target="_blank">Test: Sobrecarga del Sistema</a></li>
+                    <ul class="dropdown-menu">
+                        @foreach($rutasPruebas as $prueba)
+                            <li><a class="dropdown-item" href="{{ $prueba['url'] }}" target="_blank">{{ $prueba['nombre'] }}</a></li>
+                        @endforeach
                     </ul>
                 </div>
                 <a href="/admin/qrs" class="btn btn-sm btn-outline-primary" style="font-weight: 600;">📱 Gestionar QRs</a>

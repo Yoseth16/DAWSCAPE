@@ -585,8 +585,24 @@ class JuegoController extends Controller
             END")
             ->orderBy('tiempo_segundos', 'asc')
             ->get();
-            
-        return view('admin', compact('partidas', 'top5'));
+        // Autodescubrimiento de rutas de pruebas para el menú Admin
+        $rutasPruebas = collect(\Illuminate\Support\Facades\Route::getRoutes()->getRoutes())
+            ->filter(function ($route) {
+                return str_starts_with($route->getName(), 'admin.prueba.');
+            })
+            ->map(function ($route) {
+                // Extraer el nombre legible de la ruta (ej: admin.prueba.prueba1mario -> Prueba1mario)
+                $nombreSlug = str_replace('admin.prueba.', '', $route->getName());
+                // Formatear un poco el nombre
+                $nombreLegible = ucfirst(preg_replace('/([a-zA-Z]+)(\d+)(.*)/', '$1 $2 $3', $nombreSlug));
+                return [
+                    'url' => url('/') . '/' . ltrim($route->uri(), '/'),
+                    'nombre' => 'Test: ' . $nombreLegible
+                ];
+            })
+            ->values();
+
+        return view('admin', compact('partidas', 'top5', 'rutasPruebas'));
     }
 
     public function eliminarEquipo($id)

@@ -135,43 +135,50 @@ Route::prefix('admin')->group(function () {
     // ==========================================
     // RUTAS DE TESTEO (BYPASS) PARA EL ADMINISTRADOR
     // ==========================================
-    Route::get('/prueba/prueba3angel', function () use ($authMiddleware) {
-        return $authMiddleware(request(), function() {
-            return view('qr.maquina-cafe', [
+    
+    // Función helper para forzar sesión de admin temporalmente y devolver la vista
+    $adminTestView = function($viewName, $data = []) use ($authMiddleware) {
+        return $authMiddleware(request(), function() use ($viewName, $data) {
+            // Forzar sesión falsa en caso de no haber sesión de equipo
+            session([
+                'nombre_equipo' => '[Modo Administrador]', 
+                'clase' => 'Testing',
+                'prueba1mario_superada' => true,
+                'prueba2yoseth_superada' => true,
+                'prueba3angel_superada' => true,
+                'prueba4arturo_superada' => true,
+                'prueba5eloy_superada' => true,
+                'prueba6migue_superada' => true,
+            ]);
+            $defaultData = [
                 'tiempo_transcurrido' => 0,
-                'titulo_prueba' => '[ADMIN TEST] Máquina de Café',
                 'identificador' => 'admin-bypass'
-            ]);
+            ];
+            return view($viewName, array_merge($defaultData, $data));
         });
-    });
+    };
 
-    Route::get('/prueba/prueba4arturo', function () use ($authMiddleware) {
-        return $authMiddleware(request(), function() {
-            return view('qr.maquina-snacks', [
-                'tiempo_transcurrido' => 0,
-                'titulo_prueba' => '[ADMIN TEST] Máquina Oasis',
-                'identificador' => 'admin-bypass'
-            ]);
-        });
-    });
+    Route::get('/prueba/prueba1mario', function () use ($adminTestView) {
+        return $adminTestView('prueba1mario');
+    })->name('admin.prueba.prueba1mario');
 
-    Route::get('/prueba/prueba5eloy', function () use ($authMiddleware) {
-        return $authMiddleware(request(), function() {
-            return view('qr.taquillas', [
-                'tiempo_transcurrido' => 0,
-                'titulo_prueba' => '[ADMIN TEST] Protocolo Espejo',
-                'identificador' => 'admin-bypass'
-            ]);
-        });
-    });
+    Route::get('/prueba/prueba2yoseth', function () use ($adminTestView) {
+        return $adminTestView('prueba2yoseth');
+    })->name('admin.prueba.prueba2yoseth');
 
-    Route::get('/prueba/prueba6migue', function () use ($authMiddleware) {
-        return $authMiddleware(request(), function() {
-            // Pasamos tiempo a 0 y forzamos sesión falsa en caso de no haber sesión de equipo
-            session(['nombre_equipo' => '[Modo Administrador]', 'clase' => 'Testing']);
-            return view('prueba6migue', [
-                'tiempo_transcurrido' => 0
-            ]);
-        });
-    });
+    Route::get('/prueba/prueba3angel', function () use ($adminTestView) {
+        return $adminTestView('qr.maquina-cafe', ['titulo_prueba' => '[ADMIN TEST] Máquina de Café']);
+    })->name('admin.prueba.prueba3angel');
+
+    Route::get('/prueba/prueba4arturo', function () use ($adminTestView) {
+        return $adminTestView('qr.maquina-snacks', ['titulo_prueba' => '[ADMIN TEST] Máquina Oasis']);
+    })->name('admin.prueba.prueba4arturo');
+
+    Route::get('/prueba/prueba5eloy', function () use ($adminTestView) {
+        return $adminTestView('qr.taquillas', ['titulo_prueba' => '[ADMIN TEST] Protocolo Espejo']);
+    })->name('admin.prueba.prueba5eloy');
+
+    Route::get('/prueba/prueba6migue', function () use ($adminTestView) {
+        return $adminTestView('prueba6migue');
+    })->name('admin.prueba.prueba6migue');
 });
