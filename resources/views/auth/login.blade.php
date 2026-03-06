@@ -4,9 +4,12 @@
 
 @push('styles')
 <style>
-    body {
+    html, body {
         margin: 0;
         padding: 0;
+        height: 100%;
+    }
+    body {
         min-height: 100vh;
         display: flex;
         align-items: center;
@@ -159,7 +162,7 @@
 
             <div class="form-group">
                 <label for="email">Email del Profesor</label>
-                <input type="email" id="email" name="email" class="form-control" value="{{ old('email') }}" required autofocus placeholder="ejemplo@dawscape.com">
+                <input type="email" id="email" name="email" class="form-control" value="{{ old('email') }}" required autofocus placeholder="1daw@dawscape.com">
             </div>
 
             <div class="form-group">
