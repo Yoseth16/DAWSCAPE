@@ -11,7 +11,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            'admin.auth' => \App\Http\Middleware\AdminAuth::class,
+            'check.fase' => \App\Http\Middleware\CheckFase::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\JuegoController;
 
+use App\Http\Controllers\QrController;
+
 // 1. PANTALLA DE INICIO (LOGIN)
 Route::get('/', function () {
     return view('inicio');
@@ -12,28 +14,40 @@ Route::get('/', function () {
 Route::post('/empezar', [JuegoController::class , 'empezar']);
 
 // 3. PRUEBA 1 MARIO (Antigua: AULA 115)
-Route::get('/prueba1mario', [JuegoController::class, 'mostrarPrueba1Mario']);
-Route::post('/prueba1mario', [JuegoController::class, 'validarPrueba1Mario']);
+Route::middleware('check.fase:email,/')->group(function () {
+    Route::get('/prueba1mario', [JuegoController::class, 'mostrarPrueba1Mario']);
+    Route::post('/prueba1mario', [JuegoController::class, 'validarPrueba1Mario']);
+});
 
 // 4. PRUEBA 2: EL CLÚSTER FRAGMENTADO (Expendedoras)
-Route::get('/prueba2yoseth', [JuegoController::class, 'mostrarPrueba2Yoseth']);
-Route::post('/prueba2yoseth', [JuegoController::class, 'validarPrueba2Yoseth']);
+Route::middleware('check.fase:prueba1mario_superada,/prueba1mario')->group(function () {
+    Route::get('/prueba2yoseth', [JuegoController::class, 'mostrarPrueba2Yoseth']);
+    Route::post('/prueba2yoseth', [JuegoController::class, 'validarPrueba2Yoseth']);
+});
 
 // 4.1. PRUEBA 3: OPERACIÓN CAFEÍNA (Máquina Café vía QR)
-Route::get('/prueba3angel', [JuegoController::class, 'mostrarPrueba3Angel']);
-Route::post('/prueba3angel', [JuegoController::class, 'validarPrueba3Angel']);
+Route::middleware('check.fase:prueba2yoseth_superada,/prueba2yoseth')->group(function () {
+    Route::get('/prueba3angel', [JuegoController::class, 'mostrarPrueba3Angel']);
+    Route::post('/prueba3angel', [JuegoController::class, 'validarPrueba3Angel']);
+});
 
 // 4.1. PRUEBA 4: OPERACIÓN REPUESTOS (Oasis Snacks vía QR)
-Route::get('/prueba4arturo', [JuegoController::class, 'mostrarPrueba4Arturo']);
-Route::post('/prueba4arturo', [JuegoController::class, 'validarPrueba4Arturo']);
+Route::middleware('check.fase:prueba3angel_superada,/prueba3angel')->group(function () {
+    Route::get('/prueba4arturo', [JuegoController::class, 'mostrarPrueba4Arturo']);
+    Route::post('/prueba4arturo', [JuegoController::class, 'validarPrueba4Arturo']);
+});
 
 // 4.1. PRUEBA 5: PROTOCOLO ESPEJO (Taquillas vía QR)
-Route::get('/prueba5eloy', [JuegoController::class, 'mostrarPrueba5Eloy']);
-Route::post('/prueba5eloy', [JuegoController::class, 'validarPrueba5Eloy']);
+Route::middleware('check.fase:prueba4arturo_superada,/prueba4arturo')->group(function () {
+    Route::get('/prueba5eloy', [JuegoController::class, 'mostrarPrueba5Eloy']);
+    Route::post('/prueba5eloy', [JuegoController::class, 'validarPrueba5Eloy']);
+});
 
 // 4.1. PRUEBA 6: SOBRECARGA DEL SISTEMA (Mígue - Simon Dice Cooperativo)
-Route::get('/prueba6migue', [JuegoController::class, 'mostrarPrueba6Migue']);
-Route::post('/prueba6migue', [JuegoController::class, 'validarPrueba6Migue']);
+Route::middleware('check.fase:prueba5eloy_superada,/prueba5eloy')->group(function () {
+    Route::get('/prueba6migue', [JuegoController::class, 'mostrarPrueba6Migue']);
+    Route::post('/prueba6migue', [JuegoController::class, 'validarPrueba6Migue']);
+});
 
 // RUTA PARA TESTEAR LA PRUEBA 6 DIRECTAMENTE (BYPASS)
 Route::get('/bypass-prueba6', function() {
@@ -63,7 +77,9 @@ Route::get('/bypass-prueba6', function() {
 });
 
 // 5. PANTALLA FINAL (Delegada al controlador para pasar datos de BBDD)
-Route::get('/final', [JuegoController::class , 'mostrarFinal']);
+Route::middleware('check.fase:prueba6migue_superada,/prueba6migue')->group(function () {
+    Route::get('/final', [JuegoController::class , 'mostrarFinal']);
+});
 
 // 6. PRUEBAS - Subcarpeta escalable (añadir más rutas aquí para nuevas pruebas)
 Route::get('/pruebas/aula-115', [JuegoController::class , 'mostrarAula115']);
@@ -73,7 +89,7 @@ Route::post('/pruebas/aula-115/completar', [JuegoController::class , 'completarA
 // MÓDULO: SISTEMA DE QRs
 // ==========================================
 // Ruta para escanear QR (alumnos)
-Route::get('/qr/{identificador}', [JuegoController::class, 'escanearQR'])->name('qr.escanear');
+Route::get('/qr/{identificador}', [QrController::class, 'escanearQR'])->name('qr.escanear');
 
 // 7. PANEL DE ADMIN Y MANEJO (Protegido con HTTP Basic Auth)
 Route::middleware('auth.basic')->group(function () {
@@ -83,64 +99,43 @@ Route::middleware('auth.basic')->group(function () {
 Route::prefix('admin')->group(function () {
 
     // Middleware custom inline de protección (reaplicado para todas las subrutas de Admin)
-    $authMiddleware = function ($request, \Closure $next) {
-        $usuario_correcto = '1daw';
-        $password_correcto = '1daw';
-        if ($request->getUser() != $usuario_correcto || $request->getPassword() != $password_correcto) {
-            $headers = ['WWW-Authenticate' => 'Basic'];
-            return response('Acceso Denegado: Credenciales incorrectas.', 401, $headers);
-        }
-        return $next($request);
-    };
+    // $authMiddleware = function ($request, \Closure $next) { ... } -> Reemplazado por AdminAuth
 
-    Route::get('/', function () use ($authMiddleware) {
-        return $authMiddleware(request(), function() {
-            return app(App\Http\Controllers\JuegoController::class)->adminPanel();
-        });
-    });
+    Route::get('/', function () {
+        return app(App\Http\Controllers\AdminController::class)->adminPanel();
+    })->middleware('admin.auth');
 
-    Route::delete('/equipo/{id}', function ($id) use ($authMiddleware) {
-        return $authMiddleware(request(), function() use ($id) {
-            return app(App\Http\Controllers\JuegoController::class)->eliminarEquipo($id);
-        });
-    });
+    Route::delete('/equipo/{id}', function ($id) {
+        return app(App\Http\Controllers\AdminController::class)->eliminarEquipo($id);
+    })->middleware('admin.auth');
 
-    Route::get('/exportar-top20', function () use ($authMiddleware) {
-        return $authMiddleware(request(), function() {
-            return app(App\Http\Controllers\JuegoController::class)->exportarTop20PDF();
-        });
-    });
+    Route::get('/exportar-top20', function () {
+        return app(App\Http\Controllers\AdminController::class)->exportarTop20PDF();
+    })->middleware('admin.auth');
 
     // ==========================================
     // SISTEMA DE QRs: Panel de Administración
     // ==========================================
-    Route::get('/qrs', function () use ($authMiddleware) {
-        return $authMiddleware(request(), function() {
-            return app(App\Http\Controllers\JuegoController::class)->gestionarQrs();
-        });
-    })->name('admin.qrs');
+    Route::get('/qrs', function () {
+        return app(App\Http\Controllers\QrController::class)->gestionarQrs();
+    })->middleware('admin.auth')->name('admin.qrs');
 
-    Route::post('/qrs', function () use ($authMiddleware) {
-        return $authMiddleware(request(), function() {
-            return app(App\Http\Controllers\JuegoController::class)->guardarQr(request());
-        });
-    });
+    Route::post('/qrs', function () {
+        return app(App\Http\Controllers\QrController::class)->guardarQr(request());
+    })->middleware('admin.auth');
 
-    Route::delete('/qrs/{id}', function ($id) use ($authMiddleware) {
-        return $authMiddleware(request(), function() use ($id) {
-            return app(App\Http\Controllers\JuegoController::class)->eliminarQr($id);
-        });
-    });
+    Route::delete('/qrs/{id}', function ($id) {
+        return app(App\Http\Controllers\QrController::class)->eliminarQr($id);
+    })->middleware('admin.auth');
 
     // ==========================================
     // RUTAS DE TESTEO (BYPASS) PARA EL ADMINISTRADOR
     // ==========================================
     
     // Función helper para forzar sesión de admin temporalmente y devolver la vista
-    $adminTestView = function($viewName, $data = []) use ($authMiddleware) {
-        return $authMiddleware(request(), function() use ($viewName, $data) {
-            // Forzar sesión falsa en caso de no haber sesión de equipo
-            session([
+    $adminTestView = function($viewName, $data = []) {
+        // Forzar sesión falsa en caso de no haber sesión de equipo
+        session([
                 'nombre_equipo' => '[Modo Administrador]', 
                 'clase' => 'Testing',
                 'prueba1mario_superada' => true,
@@ -150,13 +145,15 @@ Route::prefix('admin')->group(function () {
                 'prueba5eloy_superada' => true,
                 'prueba6migue_superada' => true,
             ]);
-            $defaultData = [
-                'tiempo_transcurrido' => 0,
-                'identificador' => 'admin-bypass'
-            ];
-            return view($viewName, array_merge($defaultData, $data));
-        });
+        $defaultData = [
+            'tiempo_transcurrido' => 0,
+            'identificador' => 'admin-bypass'
+        ];
+        return view($viewName, array_merge($defaultData, $data));
     };
+
+    // Aplicar el middleware a todas las rutas de bypass agrupadas
+    Route::middleware('admin.auth')->group(function () use ($adminTestView) {
 
     Route::get('/prueba/prueba1mario', function () use ($adminTestView) {
         return $adminTestView('prueba1mario');
@@ -181,4 +178,5 @@ Route::prefix('admin')->group(function () {
     Route::get('/prueba/prueba6migue', function () use ($adminTestView) {
         return $adminTestView('prueba6migue');
     })->name('admin.prueba.prueba6migue');
+});
 });

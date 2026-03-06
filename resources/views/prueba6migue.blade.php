@@ -1,13 +1,9 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="csrf-token" content="{{ csrf_token() }}">
-<title>SOBRECARGA DEL SISTEMA | DAWSCAPE</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+@extends('layouts.app')
 
+@section('title', 'SOBRECARGA DEL SISTEMA | DAWSCAPE')
+
+@push('styles')
+<style>
   :root {
     --green: #00ff88;
     --red: #ff2244;
@@ -212,8 +208,9 @@
   @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
 </style>
-</head>
-<body>
+@endpush
+
+@section('content')
 
 <!-- HEADER -->
 <div class="game-header">
@@ -261,6 +258,7 @@
     <a href="/final" class="success-btn">COMPLETAR ESCAPE ROOM →</a>
 </div>
 
+@push('scripts')
 <!-- LIBRERÍA DE SONIDOS (Simulados generados con Web Audio API para no requerir mp3 externos) -->
 <script>
 // Web Audio API Synth Simple
@@ -438,7 +436,8 @@ function winGame() {
     fetch("/prueba6migue", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
-        body: JSON.stringify({ completed: true })
+        // Enviamos la secuencia para validarla en servidor
+        body: JSON.stringify({ completed: true, expected_sequence: sequence })
     }).then(r => r.json()).then(res => {
         if(res.success) {
             console.log(res.mensaje);
@@ -446,6 +445,5 @@ function winGame() {
     });
 }
 </script>
-
-</body>
-</html>
+@endpush
+@endsection

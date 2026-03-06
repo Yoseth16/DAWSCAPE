@@ -6,12 +6,13 @@
 
 DAWSCAPE es una experiencia inmersiva web desarrollada en Laravel. El objetivo es poner a prueba los conocimientos de los alumnos en un entorno controlado y competitivo. Ha sido estructurado mediante un flujo de pantallas gamificadas estilo "terminal/hacker".
 
-## 🚀 Actualizaciones Recientes (Backend y Mobile-First)
+## 🚀 Actualizaciones Recientes (Backend y Nivel Enterprise)
 
-- **Refactorización UI Total (Mobile-First):** Todas las interfaces del juego han sido reconstruidas para garantizar una legibilidad y usabilidad perfectas en teléfonos móviles. Se ha utilizado la función `clamp()` de CSS, fuentes a un mínimo de 16px para evitar auto-zoom en iOS/Android y botones adaptados para pulsación táctil (área tap de más de 48px).
-- **Sistema de QRs Físicos Integrado:** Se ha añadido una infraestructura backend para generar códigos QR escaneables por los alumnos, enlazando el mundo real (el centro/instituto) con la aplicación web.
-- **Nuevas Pruebas y Expansión:** El juego cuenta ahora con un recorrido completo de 5 pruebas entrelazadas.
-- **Panel de Admin Avanzado:** Funciones de gestión en caliente con búsqueda, saltos/bypass directos a cualquier prueba para verificar el estado de la vista como profesor, control CRUD de usuarios y exportación de ranking TOP 20 en PDF.
+- **Refactorización Arquitectónica Total (Fase 4):** Se ha migrado toda la lógica del código espagueti de las primeras versiones hacia una arquitectura limpia utilizando Patrón de **Servicios** (`GameTimerService`), **FormRequests** y un poderoso **Middleware de Progresión (`CheckFase`)** que asegura que nadie pueda saltarse pasos.
+- **Rediseño Dashboard Premium (Fase 5):** Transformación completa del Panel de Administración. Ahora es un ERP profesional con Sidebar lateral estática, diseño en Glassmorphism, métricas KPIs en tiempo real (Equipos Activos, Promedios) y gráficos dinámicos integrados con **Chart.js**.
+- **Sistema de QRs Físicos Integrado:** Infraestructura dedicada para generar códigos QR escaneables mediante el Dashboard Administrativo.
+- **Seguridad "Server-Side":** Toda la monitorización y control de trampas (Timeouts o manipulación de URLs) recae 100% sobre las sesiones del backend en Laravel, garantizando integridad.
+- **Refactorización UI Total (Mobile-First):** Las interfaces del juego del jugador están optimizadas con tipografías y áreas de "tap" táctiles.
 
 ## 🎮 Mecánica del Juego y Flujo de Pruebas
 

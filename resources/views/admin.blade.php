@@ -1,300 +1,417 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin | DAWSCAPE</title>
-    <!-- Mantenemos Bootstrap pero lo personalizamos -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+@extends('layouts.admin')
+
+@section('title', 'Admin Dashboard Premium | DAWSCAPE')
+
+@push('admin-styles')
+    <!-- Solo estilos específicos de la vista principal -->
     <style>
-        body {
-            background-color: #f4f7f6;
-            color: #333333;
-            font-family: 'Inter', sans-serif;
-            padding: 3rem 1rem;
+        /* --- CARDS (KPIs) --- */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
         }
 
-        .dashboard-container {
-            max-width: 1100px;
-            margin: 0 auto;
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.04);
-            padding: 2.5rem;
-        }
-
-        .dashboard-header {
+        .kpi-card {
+            background: var(--surface-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid #eef2f5;
-            padding-bottom: 1.5rem;
-            margin-bottom: 2rem;
+            gap: 1.2rem;
+            transition: transform 0.3s;
         }
 
-        h1 {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #1a2b3c;
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        .kpi-icon-wrap {
+            width: 54px;
+            height: 54px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.7rem;
+            flex-shrink: 0;
+        }
+
+        .kpi-blue { background: #eff6ff; color: #3b82f6; }
+        .kpi-green { background: #f0fdf4; color: #10b981; }
+        .kpi-yellow { background: #fefce8; color: #eab308; }
+        .kpi-purple { background: #faf5ff; color: #a855f7; }
+
+        .kpi-info h4 {
             margin: 0;
-            letter-spacing: -0.5px;
-        }
-
-        .btn-outline-primary {
-            border-color: #e0e6ed;
-            color: #5c6b7a;
-            font-weight: 500;
-            border-radius: 6px;
-        }
-        .btn-outline-primary:hover {
-            background-color: #f8fafc;
-            border-color: #cbd5e1;
-            color: #1e293b;
-        }
-
-        .table-custom {
-            border-collapse: separate;
-            border-spacing: 0;
-            width: 100%;
-        }
-
-        .table-custom th {
-            background-color: #f8fafc;
-            color: #64748b;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            padding: 1rem 1.2rem;
-            border-bottom: 1px solid #e2e8f0;
-            border-top: 1px solid #e2e8f0;
-        }
-        .table-custom th:first-child { border-top-left-radius: 8px; border-left: 1px solid #e2e8f0; }
-        .table-custom th:last-child { border-top-right-radius: 8px; border-right: 1px solid #e2e8f0; }
-
-        .table-custom td {
-            padding: 1.2rem;
-            vertical-align: middle;
-            color: #334155;
-            font-size: 0.95rem;
-            border-bottom: 1px solid #f1f5f9;
         }
 
-        .table-custom tbody tr {
-            transition: background-color 0.2s;
-        }
-        .table-custom tbody tr:hover {
-            background-color: #f8fafc;
+        .kpi-info p {
+            margin: 5px 0 0 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1;
         }
 
-        .badge {
-            font-weight: 500;
-            padding: 0.4rem 0.8rem;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            letter-spacing: 0.3px;
+        /* --- DOS COLUMNAS (Chart + Podium) --- */
+        .mid-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .panel-heading {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
-        /* Soft color badges */
-        .badge-success { background-color: #d1fae5; color: #065f46; }
-        .badge-danger { background-color: #fee2e2; color: #991b1b; }
-        .badge-warning { background-color: #fef3c7; color: #92400e; }
+        .panel-heading i { color: var(--brand-color); }
 
-        .time-text { font-family: monospace; font-size: 0.95rem; font-weight: 600; }
-        .time-success { color: #059669; }
-        .time-danger { color: #dc2626; }
-        .time-playing { color: #d97706; }
-        .time-idle { color: #94a3b8; }
-        
-        .team-name { font-weight: 600; color: #0f172a; }
-        .team-email { color: #64748b; font-size: 0.85rem; }
+        .chart-container { position: relative; height: 250px; width: 100%; display: flex; justify-content: center; }
 
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: #64748b;
-            background: #f8fafc;
-            border-radius: 8px;
-            border: 1px dashed #cbd5e1;
+        /* Podium List */
+        .podium-list { display: flex; flex-direction: column; gap: 12px; }
+        .podium-item {
+            display: flex; align-items: center; padding: 12px 16px; border-radius: 12px;
+            background: #f8fafc; border: 1px solid #e2e8f0; transition: all 0.2s;
         }
+        .podium-item:hover { border-color: #cbd5e1; background: #fff; transform: scale(1.01); }
 
-        /* Top 5 Podium */
-        .podium-section { margin-bottom: 2.5rem; }
-        .podium-title { font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-bottom: 1rem; border-left: 4px solid #3b82f6; padding-left: 0.5rem; }
-        .podium-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
-        .podium-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 1rem; transition: transform 0.2s; }
-        .podium-card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.05); border-color: #cbd5e1; }
-        .pos-badge { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem; flex-shrink: 0; }
-        .pos-1 { background-color: #fef08a; color: #713f12; border: 2px solid #eab308; }
-        .pos-2 { background-color: #e2e8f0; color: #334155; border: 2px solid #94a3b8; }
-        .pos-3 { background-color: #fed7aa; color: #7c2d12; border: 2px solid #fdba74; }
-        .pos-other { background-color: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
-        .podium-info { min-width: 0; }
-        .podium-team { font-weight: 600; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.95rem; }
-        .podium-time { font-family: monospace; color: #059669; font-weight: 600; font-size: 0.9rem; margin-top: 0.2rem; }
+        .pos-badge {
+            width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 1.1rem; margin-right: 15px;
+        }
+        .pos-1 { background: linear-gradient(135deg, #fef08a, #eab308); color: #713f12; box-shadow: 0 4px 10px rgba(234, 179, 8, 0.2); }
+        .pos-2 { background: linear-gradient(135deg, #e2e8f0, #94a3b8); color: #334155; }
+        .pos-3 { background: linear-gradient(135deg, #fed7aa, #f97316); color: #7c2d12; }
+        .pos-other { background: #f1f5f9; color: #64748b; }
 
-        /* Search Bar */
-        .search-container { margin-bottom: 1.5rem; position: relative; }
-        .search-input { width: 100%; padding: 0.8rem 1rem 0.8rem 2.8rem; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; font-size: 0.95rem; }
-        .search-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
-        .search-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+        .podium-details { flex: 1; min-width: 0; }
+        .podium-name { font-weight: 700; color: var(--text-main); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .podium-class { font-size: 0.8rem; color: var(--text-muted); }
+        .podium-time { font-family: 'Courier New', monospace; font-weight: 700; color: var(--success-color); font-size: 1.1rem; }
 
-        /* Actions */
-        .btn-delete { background: white; border: 1px solid #fecaca; color: #ef4444; border-radius: 6px; padding: 0.35rem 0.7rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-        .btn-delete:hover { background: #fee2e2; border-color: #fca5a5; }
-        .export-btn { background-color: #1e293b; color: white; border: none; font-weight: 500; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; font-size: 0.9rem; transition: background 0.2s; }
-        .export-btn:hover { background-color: #334155; color: white; }
+        /* --- TABLE --- */
+        .table-responsive { border-radius: 16px; overflow: hidden; border: 1px solid var(--border-color); background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
+        .table-custom { width: 100%; margin: 0; border-collapse: collapse; }
+        .table-custom th {
+            background-color: #f8fafc; color: var(--text-muted); font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.5px; font-size: 0.75rem; padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--border-color);
+        }
+        .table-custom td { padding: 1.2rem 1.5rem; vertical-align: middle; border-bottom: 1px solid #f1f5f9; color: var(--text-main); }
+        .table-custom tr:hover { background-color: #f8fafc; }
+
+        /* Avatares */
+        .team-cell { display: flex; align-items: center; gap: 15px; }
+        .avatar {
+            width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
+        }
+        .team-meta .t-name { font-weight: 600; margin-bottom: 2px; }
+        .team-meta .t-email { font-size: 0.8rem; color: var(--text-muted); }
+
+        /* Badges */
+        .status-pill {
+            display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;
+        }
+        .status-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .status-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .status-warning { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+
+        .time-display { font-family: monospace; font-weight: 600; font-size: 1rem; }
+        .text-live { color: var(--warning-color); }
+        
+        /* Botones Acción */
+        .btn-action {
+            width: 34px; height: 34px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center;
+            border: 1px solid transparent; cursor: pointer; transition: all 0.2s; color: var(--text-muted); background: #f1f5f9;
+        }
+        .btn-action:hover { background: #e2e8f0; color: var(--danger-color); }
+
+        .export-btn {
+            background: var(--text-main); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px;
+            font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s;
+        }
+        .export-btn:hover { background: #0f172a; color: white; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+
+        /* Buscador */
+        .search-wrapper { position: relative; margin-bottom: 1.5rem; max-width: 400px; }
+        .search-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.2rem; }
+        .search-input { width: 100%; padding: 0.8rem 1rem 0.8rem 2.8rem; border: 1px solid var(--border-color); border-radius: 12px; background: white; transition: all 0.3s; outline: none; }
+        .search-input:focus { border-color: var(--brand-accent); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
     </style>
-</head>
-<body>
-    <div class="dashboard-container">
-        <div class="dashboard-header">
-            <h1>Registro Activo de Equipos</h1>
-            <div style="display:flex; gap:1rem; align-items:center;">
-                <div class="dropdown">
-                    <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-weight: 600;">
-                        🛠️ Testear Pruebas
-                    </button>
-                    <ul class="dropdown-menu">
-                        @foreach($rutasPruebas as $prueba)
-                            <li><a class="dropdown-item" href="{{ $prueba['url'] }}" target="_blank">{{ $prueba['nombre'] }}</a></li>
-                        @endforeach
-                    </ul>
-                </div>
-                <a href="/admin/qrs" class="btn btn-sm btn-outline-primary" style="font-weight: 600;">📱 Gestionar QRs</a>
-                <a href="/admin/exportar-top20" class="export-btn" target="_blank">📄 Exportar Top 20 PDF</a>
-                <a href="/" class="btn btn-sm btn-outline-primary">← Salir</a>
+@endpush
+
+@section('admin-content')
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Visión General</h1>
+                <div class="page-subtitle">Monitorización en tiempo real de la actividad del Escape Room.</div>
+            </div>
+            <div>
+                <a href="/admin/exportar-top20" target="_blank" class="export-btn">
+                    <i class="ph ph-file-pdf"></i> Exportar Ranking Top 20
+                </a>
             </div>
         </div>
 
         @if(session('success'))
-            <div class="alert alert-success mt-3 mb-4" style="background:#d1fae5; border-color:#34d399; color:#065f46;">{{ session('success') }}</div>
+            <div class="alert alert-success d-flex align-items-center" style="background:#f0fdf4; border-color:#86efac; color:#166534; border-radius:12px; font-weight:500;">
+                <i class="ph ph-check-circle me-2" style="font-size:1.5rem;"></i> {{ session('success') }}
+            </div>
         @endif
         @if(session('error'))
-            <div class="alert alert-danger mt-3 mb-4" style="background:#fee2e2; border-color:#f87171; color:#991b1b;">{{ session('error') }}</div>
+            <div class="alert alert-danger d-flex align-items-center" style="background:#fef2f2; border-color:#fca5a5; color:#991b1b; border-radius:12px; font-weight:500;">
+                <i class="ph ph-warning me-2" style="font-size:1.5rem;"></i> {{ session('error') }}
+            </div>
         @endif
 
-        @if($top5->isNotEmpty())
-            <div class="podium-section">
-                <div class="podium-title">Top 5 Equipos Más Rápidos</div>
-                <div class="podium-grid">
-                    @foreach($top5 as $index => $ranking)
-                        <div class="podium-card">
-                            <div class="pos-badge 
-                                {{ $index == 0 ? 'pos-1' : ($index == 1 ? 'pos-2' : ($index == 2 ? 'pos-3' : 'pos-other')) }}">
-                                {{ $index + 1 }}º
-                            </div>
-                            <div class="podium-info">
-                                <div class="podium-team" title="{{ $ranking->nombre_equipo }}">{{ $ranking->nombre_equipo }}</div>
-                                <div class="podium-time">{{ floor((int)$ranking->tiempo_segundos / 60) }}m {{ (int)$ranking->tiempo_segundos % 60 }}s</div>
-                            </div>
-                        </div>
-                    @endforeach
+        <!-- TARJETAS DE MÉTRICAS (KPIs) -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-icon-wrap kpi-blue">
+                    <i class="ph ph-users-three"></i>
+                </div>
+                <div class="kpi-info">
+                    <h4>Equipos Inscritos</h4>
+                    <p>{{ $totalEquipos }}</p>
                 </div>
             </div>
-        @endif
-
-        @if($partidas->isEmpty())
-            <div class="empty-state">
-                <div style="font-size:2rem; margin-bottom:1rem; opacity:0.5">📊</div>
-                <div style="font-weight:500">Aún no hay equipos registrados en el sistema.</div>
-                <div style="font-size:0.85rem; margin-top:0.5rem">Los datos aparecerán aquí en tiempo real cuando inicien.</div>
+            <div class="kpi-card">
+                <div class="kpi-icon-wrap kpi-yellow">
+                    <i class="ph ph-activity"></i>
+                </div>
+                <div class="kpi-info">
+                    <h4>En Progreso</h4>
+                    <p>{{ $equiposActivos }}</p>
+                </div>
             </div>
-        @else
-            <div class="search-container">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="searchInput" class="search-input" placeholder="Buscar equipo por nombre o correo electrónico..." onkeyup="filterTable()">
+            <div class="kpi-card">
+                <div class="kpi-icon-wrap kpi-green">
+                    <i class="ph ph-flag-checkered"></i>
+                </div>
+                <div class="kpi-info">
+                    <h4>Completados</h4>
+                    <p>{{ $equiposFinalizados }}</p>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon-wrap kpi-purple">
+                    <i class="ph ph-timer"></i>
+                </div>
+                <div class="kpi-info">
+                    <h4>Promedio Éxito</h4>
+                    <p>
+                        @if($tiempoMedioSegundos > 0)
+                            {{ floor($tiempoMedioSegundos / 60) }}<span style="font-size:1rem; color:var(--text-muted)">m</span>
+                        @else
+                            --
+                        @endif
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- GRÁFICO Y PODIUM -->
+        <div class="mid-grid">
+            <!-- Gráfico Donut de Fases -->
+            <div class="glass-panel">
+                <div class="panel-heading"><i class="ph ph-chart-pie-slice"></i> Distribución por Fases</div>
+                <div class="chart-container">
+                    @if($totalEquipos > 0)
+                        <canvas id="fasesChart"></canvas>
+                    @else
+                        <div style="display:flex; align-items:center; justify-content:center; height:100%; color:#94a3b8; font-style:italic;">
+                            No hay datos suficientes
+                        </div>
+                    @endif
+                </div>
             </div>
 
-            <div class="table-responsive">
-                <table class="table-custom" id="mainTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Información del Equipo</th>
-                            <th>Clase</th>
-                            <th>Estado Actual</th>
-                            <th>Tiempo Registrado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($partidas as $index => $partida)
-                        <tr class="team-row">
-                            <td class="text-muted" style="font-weight:500">#{{ str_pad($index + 1, 3, '0', STR_PAD_LEFT) }}</td>
-                            <td>
-                                <div class="team-name">{{ $partida->nombre_equipo }}</div>
-                                <div class="team-email">{{ $partida->email }}</div>
-                            </td>
-                            <td><span style="background:#f1f5f9; padding:0.3rem 0.6rem; border-radius:4px; font-size:0.85rem; font-weight:500">{{ $partida->clase }}</span></td>
-                            
-                            <td>
-                                @if($partida->fase_actual === 'FINALIZADO')
-                                    <span class="badge badge-success">● COMPLETADO</span>
-                                @elseif($partida->fase_actual === 'FINALIZADO_TIMEOUT')
-                                    <span class="badge badge-danger">● TIEMPO AGOTADO</span>
-                                @else
-                                    <span class="badge badge-warning">● {{ strtoupper($partida->fase_actual) }}</span>
-                                @endif
-                            </td>
-
-                            <td class="time-text">
-                                @if($partida->fase_actual === 'FINALIZADO' || $partida->fase_actual === 'FINALIZADO_TIMEOUT')
-                                    <span class="{{ $partida->fase_actual === 'FINALIZADO' ? 'time-success' : 'time-danger' }}">
-                                        {{ floor((int)$partida->tiempo_segundos / 60) }}m {{ (int)$partida->tiempo_segundos % 60 }}s
-                                    </span>
-                                @else
-                                    {{-- Tiempo en vivo para equipos que aún están jugando --}}
-                                    @if($partida->inicio_juego)
-                                        @php
-                                            $segundos_jugando = abs(now()->diffInSeconds(\Carbon\Carbon::parse($partida->inicio_juego)));
-                                            $minutos_jugando = floor($segundos_jugando / 60);
-                                            $segs_jugando = $segundos_jugando % 60;
-                                        @endphp
-                                        <span class="time-playing">
-                                            {{ sprintf('%02d', $minutos_jugando) }}:{{ sprintf('%02d', $segs_jugando) }} (jugando)
-                                        </span>
-                                    @else
-                                        <span class="time-idle">--:-- (sin empezar)</span>
-                                    @endif
-                                @endif
-                            </td>
-                            <td>
-                                <form action="/admin/equipo/{{ $partida->id }}" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar a {{ $partida->nombre_equipo }}? Esta acción es irreversible.');" style="margin:0;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn-delete" title="Borrar Equipo">X Eliminar</button>
-                                </form>
-                            </td>
-                        </tr>
+            <!-- Top 5 Podium Rápido -->
+            <div class="glass-panel">
+                <div class="panel-heading"><i class="ph ph-trophy"></i> Salón de la Fama (Top 5)</div>
+                @if($top5->isNotEmpty())
+                    <div class="podium-list">
+                        @foreach($top5 as $index => $ranking)
+                            <div class="podium-item">
+                                <div class="pos-badge {{ $index == 0 ? 'pos-1' : ($index == 1 ? 'pos-2' : ($index == 2 ? 'pos-3' : 'pos-other')) }}">
+                                    {{ $index + 1 }}
+                                </div>
+                                <div class="podium-details">
+                                    <div class="podium-name">{{ $ranking->nombre_equipo }}</div>
+                                    <div class="podium-class">{{ $ranking->clase }}</div>
+                                </div>
+                                <div class="podium-time">
+                                    {{ floor((int)$ranking->tiempo_segundos / 60) }}m {{ str_pad((int)$ranking->tiempo_segundos % 60, 2, '0', STR_PAD_LEFT) }}s
+                                </div>
+                            </div>
                         @endforeach
-                    </tbody>
-                </table>
+                    </div>
+                @else
+                    <div style="text-align:center; padding: 2rem; color:#94a3b8;">
+                        <i class="ph ph-medal" style="font-size:3rem; opacity:0.5; margin-bottom:1rem;"></i>
+                        <p>Aún no hay equipos que hayan escapado del sistema.</p>
+                    </div>
+                @endif
             </div>
-        @endif
-    </div>
+        </div>
 
-    <!-- Live Search Script -->
+        <!-- TABLA PRINCIPAL DE EQUIPOS -->
+        <h2 style="font-size:1.3rem; font-weight:700; margin-bottom:1.2rem; color:var(--text-main);">Listado Completo de Equipos</h2>
+        
+        <div class="search-wrapper">
+            <i class="ph ph-magnifying-glass"></i>
+            <input type="text" id="searchInput" class="search-input" placeholder="Buscar por nombre, correo o clase..." onkeyup="filterTable()">
+        </div>
+
+        <div class="table-responsive">
+            <table class="table-custom" id="mainTable">
+                <thead>
+                    <tr>
+                        <th style="width: 5%">ID</th>
+                        <th style="width: 35%">Equipo & Contacto</th>
+                        <th style="width: 15%">Clase</th>
+                        <th style="width: 20%">Estado / Progreso</th>
+                        <th style="width: 15%">Tiempo</th>
+                        <th style="width: 10%; text-align:center;">Borrar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($partidas as $index => $partida)
+                    <tr class="team-row">
+                        <td style="color:var(--text-muted); font-weight:600;">#{{ str_pad($partida->id, 3, '0', STR_PAD_LEFT) }}</td>
+                        <td>
+                            <div class="team-cell">
+                                <div class="avatar">
+                                    {{ strtoupper(substr($partida->nombre_equipo, 0, 1)) }}
+                                </div>
+                                <div class="team-meta">
+                                    <div class="t-name">{{ $partida->nombre_equipo }}</div>
+                                    <div class="t-email">{{ $partida->email }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span style="background:#f1f5f9; padding:4px 10px; border-radius:6px; font-size:0.85rem; font-weight:600; color:var(--text-muted);">{{ $partida->clase }}</span></td>
+                        <td>
+                            @if($partida->fase_actual === 'FINALIZADO')
+                                <span class="status-pill status-success"><i class="ph-fill ph-check-circle"></i> COMPLETADO</span>
+                            @elseif($partida->fase_actual === 'FINALIZADO_TIMEOUT')
+                                <span class="status-pill status-danger"><i class="ph-fill ph-clock"></i> TIMEOUT</span>
+                            @else
+                                <span class="status-pill status-warning"><i class="ph-fill ph-spinner-gap" style="animation: spin 2s linear infinite;"></i> {{ strtoupper($partida->fase_actual) }}</span>
+                            @endif
+                        </td>
+                        <td class="time-display">
+                            @if($partida->fase_actual === 'FINALIZADO' || $partida->fase_actual === 'FINALIZADO_TIMEOUT')
+                                <span style="color:{{ $partida->fase_actual === 'FINALIZADO' ? 'var(--success-color)' : 'var(--danger-color)' }}">
+                                    {{ floor((int)$partida->tiempo_segundos / 60) }}m {{ str_pad((int)$partida->tiempo_segundos % 60, 2, '0', STR_PAD_LEFT) }}s
+                                </span>
+                            @else
+                                @if($partida->inicio_juego)
+                                    @php
+                                        $segs = abs(now()->diffInSeconds(\Carbon\Carbon::parse($partida->inicio_juego)));
+                                    @endphp
+                                    <span class="text-live">{{ floor($segs / 60) }}m {{ str_pad($segs % 60, 2, '0', STR_PAD_LEFT) }}s</span>
+                                @else
+                                    <span style="color:var(--text-muted)">--:--</span>
+                                @endif
+                            @endif
+                        </td>
+                        <td style="text-align:center;">
+                            <form action="/admin/equipo/{{ $partida->id }}" method="POST" onsubmit="return confirm('¿Borrar permanentemente el progreso de {{ $partida->nombre_equipo }}?');" style="margin:0;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn-action" title="Eliminar del sistema">
+                                    <i class="ph ph-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="6" style="text-align:center; padding: 4rem 2rem; color:var(--text-muted);">
+                            <i class="ph ph-ghost" style="font-size:3rem; opacity:0.3; margin-bottom:1rem; display:block;"></i>
+                            Sistema vacío. Esperando a que los alumnos se registren.
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+@endsection
+
+@push('scripts')
+    <!-- Chart.js para la Gráfica -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <script>
+        // Buscador reactivo
         function filterTable() {
-            let input = document.getElementById("searchInput");
-            let filter = input.value.toLowerCase();
+            let filter = document.getElementById("searchInput").value.toLowerCase();
             let rows = document.querySelectorAll(".team-row");
 
             rows.forEach(row => {
-                let teamName = row.querySelector(".team-name").innerText.toLowerCase();
-                let teamEmail = row.querySelector(".team-email").innerText.toLowerCase();
-                
-                if (teamName.includes(filter) || teamEmail.includes(filter)) {
-                    row.style.display = "";
-                } else {
-                    row.style.display = "none";
-                }
+                let textContent = row.innerText.toLowerCase();
+                row.style.display = textContent.includes(filter) ? "" : "none";
             });
         }
+
+        // Renderizado de Gráfica si hay datos
+        @if($totalEquipos > 0)
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('fasesChart').getContext('2d');
+            
+            const rawLabels = @json($chartData['labels']);
+            const rawData = @json($chartData['data']);
+            
+            // Simplificar etiquetas largas
+            const cleanLabels = rawLabels.map(l => l.replace('FINALIZADO_TIMEOUT', 'Timeout').replace('FINALIZADO', 'Éxito'));
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: cleanLabels,
+                    datasets: [{
+                        data: rawData,
+                        backgroundColor: [
+                            '#10b981', // Exito (verde)
+                            '#f59e0b', // Jugando (amarillo)
+                            '#3b82f6', // Otro
+                            '#8b5cf6', // Otro
+                            '#ef4444', // Timeout (rojo)
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 8, font: {family: 'Inter'} } }
+                    },
+                    cutout: '70%'
+                }
+            });
+        });
+        @endif
     </script>
-    <!-- Add Bootstrap JS for Dropdown -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+@endpush
