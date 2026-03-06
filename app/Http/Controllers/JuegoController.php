@@ -342,8 +342,8 @@ class JuegoController extends Controller
             'checksum' => 'required|string'
         ]);
 
-        $PALABRA_ESPEJO = "ZASIELX";
-        $input_normalizado = strtoupper(trim($request->checksum));
+        $PALABRA_ESPEJO = "zasielx";
+        $input_normalizado = strtolower(trim($request->checksum));
 
         if ($input_normalizado !== $PALABRA_ESPEJO) {
             return response()->json(['success' => false, 'message' => 'Palabra clave errónea']);

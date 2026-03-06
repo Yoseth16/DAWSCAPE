@@ -142,7 +142,6 @@
     outline: none;
     letter-spacing: 0.5em;
     text-align: center;
-    text-transform: uppercase;
     transition: border-color 0.2s;
   }
 
@@ -251,7 +250,7 @@
 
   <div class="terminal-box">
     <label class="terminal-label">Introduce la clave maestra de 5 caracteres:</label>
-    <input class="answer-input" id="answer-input" type="text" maxlength="5" placeholder="_ _ _ _ _" autocomplete="off" spellcheck="false" autofocus>
+    <input class="answer-input" id="answer-input" type="text" maxlength="5" placeholder="_ _ _ _ _" autocomplete="off" spellcheck="false" autocapitalize="off" autofocus>
     
     <div class="hint" id="system-hint">
         [PISTA DEL SISTEMA] — Los sectores de memoria forman el nombre de una mujer.
@@ -303,7 +302,7 @@ setInterval(actualizarTimer, 1000);
 
 // ── LÓGICA DE VALIDACIÓN ─────────────────────────────────────
 let failedAttempts = 0;
-const correctAnswer = "ROCIO";
+const correctAnswer = "rocio";
 const inputField = document.getElementById('answer-input');
 const consoleOut = document.getElementById('console-out');
 const hintBox = document.getElementById('system-hint');
@@ -312,7 +311,7 @@ let solved = false;
 
 inputField.addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && !solved) {
-        let val = this.value.trim().toUpperCase();
+        let val = this.value.trim().toLowerCase();
         
         // Remove spaces inside words
         val = val.replace(/\s+/g, '');

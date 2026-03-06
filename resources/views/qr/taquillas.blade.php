@@ -188,7 +188,6 @@
     letter-spacing: 0.1em;
     text-align: center;
     transition: all 0.2s;
-    text-transform: uppercase;
   }
   
   .answer-input::placeholder {
@@ -327,7 +326,7 @@
     
     <div class="form-group">
         <label style="font-size: 0.8rem; color: #445544; display:none;">// INPUT</label>
-        <input class="answer-input" id="checksum-input" type="text" placeholder="_______" autocomplete="off" spellcheck="false" maxlength="7">
+        <input class="answer-input" id="checksum-input" type="text" placeholder="_______" autocomplete="off" spellcheck="false" autocapitalize="off" maxlength="7">
         <div class="feedback" id="feedback-msg"></div>
         <button class="btn" id="btn-verificar" onclick="verificarChecksum()">DESCIFRAR NÚCLEO →</button>
     </div>
@@ -388,10 +387,7 @@ input.addEventListener('keypress', function (e) {
     }
 });
 
-// Force uppercase on input
-input.addEventListener('input', function() {
-    this.value = this.value.toUpperCase();
-});
+// Remove force uppercase
 
 function verificarChecksum() {
     if (isProcessing) return;

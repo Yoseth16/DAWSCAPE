@@ -225,7 +225,6 @@
     outline: none;
     letter-spacing: 0.15em;
     text-align: center;
-    text-transform: uppercase;
     transition: border-color 0.2s;
   }
 
@@ -353,7 +352,7 @@
 
   <div class="question-card" id="question-card" data-label="// ACERTIJO">
     <div class="riddle-box" id="riddle-box"></div>
-    <input class="answer-input" id="answer-input" type="text" placeholder="_ _ _ _ _ _ _" autocomplete="off" spellcheck="false">
+    <input class="answer-input" id="answer-input" type="text" placeholder="_ _ _ _ _ _ _" autocomplete="off" spellcheck="false" autocapitalize="off">
     <div class="feedback" id="feedback"></div>
     <br>
     <button id="verify-btn" class="btn" onclick="checkAnswer()" style="width:100%; margin-top:0.5rem">VERIFICAR →</button>
