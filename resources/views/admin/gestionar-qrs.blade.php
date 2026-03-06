@@ -157,8 +157,13 @@
                     <input type="text" name="nombre" class="form-control" placeholder="Ej: Máquina de café planta 1" required>
                 </div>
                 <div class="col-md-6 mb-3">
-                    <label class="form-label fw-bold">Fase Requerida (Anti-trampas)</label>
-                    <input type="text" name="fase_requerida" class="form-control" placeholder="Ej: Prueba 3 Cafe (dejar vacío si es público)">
+                    <label class="form-label fw-bold">Asignar Prueba (Enrutamiento y Anti-trampas)</label>
+                    <select name="fase_requerida" class="form-select" required>
+                        <option value="" disabled selected>Selecciona la prueba vinculada al QR...</option>
+                        <option value="Prueba 3 Angel">Prueba 3 (Máquina de Café)</option>
+                        <option value="Prueba 4 Arturo">Prueba 4 (Máquina Oasis Snacks)</option>
+                        <option value="Prueba 5 Eloy">Prueba 5 (Protocolo Espejo - Taquillas)</option>
+                    </select>
                 </div>
             </div>
             <div class="mb-4">
