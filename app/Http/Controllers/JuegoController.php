@@ -443,9 +443,10 @@ class JuegoController extends Controller
             'fase_requerida' => 'nullable|string|max:255'
         ]);
 
-        // Generamos un slug seguro a partir del nombre para la URL
+        // Generar URL completa forzando la base de APP_URL para evitar fallos de host/proxy en producción
+        $baseUrl = rtrim(config('app.url', 'https://dawscape.fun'), '/');
         $slug = \Illuminate\Support\Str::slug($request->nombre) . '-' . uniqid();
-        $url = url('/qr/' . $slug);
+        $url = $baseUrl . '/qr/' . $slug;
 
         \App\Models\Qr::create([
             'nombre' => $request->nombre,
