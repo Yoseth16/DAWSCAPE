@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Partida;
 use Barryvdh\DomPDF\Facade\Pdf;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use \App\Services\GameTimerService;
 use App\Http\Requests\EmpezarPartidaRequest;
 use App\Http\Requests\ValidarPrueba1Request;
@@ -26,7 +25,7 @@ class JuegoController extends Controller
 
 
     // --- LOGIN DE EQUIPO ---
-    public function empezar(EmpezarPartidaRequest $request)
+    public function empezarPartida(EmpezarPartidaRequest $request)
     {
         if (Partida::where('email', $request->email)->exists()) {
             return back()->with('error', 'ESTE EQUIPO YA HA JUGADO.');
@@ -55,7 +54,7 @@ class JuegoController extends Controller
     // =====================================================
     // PRUEBA 1 MARIO (Antigua Prueba 3: AULA 115)
     // =====================================================
-    public function mostrarPrueba1Mario()
+    public function mostrarPrueba1()
     {
 
         if ($this->timerService->verificarTimeout()) return redirect('/final')->with('timeout', true);
@@ -64,7 +63,7 @@ class JuegoController extends Controller
         return view('prueba1mario', compact('tiempo_transcurrido'));
     }
 
-    public function validarPrueba1Mario(ValidarPrueba1Request $request)
+    public function validarPrueba1(ValidarPrueba1Request $request)
     {
         if (!$request->completed) {
             return response()->json(['success' => false, 'message' => 'Validación fallida: Faltan acertijos por resolver'], 400);
@@ -116,7 +115,7 @@ class JuegoController extends Controller
     // =====================================================
     // PRUEBA 2: EL CLÚSTER FRAGMENTADO (Expendedoras)
     // =====================================================
-    public function mostrarPrueba2Yoseth()
+    public function mostrarPrueba2()
     {
 
         if ($this->timerService->verificarTimeout()) return redirect('/final')->with('timeout', true);
@@ -125,7 +124,7 @@ class JuegoController extends Controller
         return view('prueba2yoseth', compact('tiempo_transcurrido'));
     }
 
-    public function validarPrueba2Yoseth(Request $request)
+    public function validarPrueba2(Request $request)
     {
 
         // Validamos la respuesta aquí o lo podemos delegar puramente al check de JS también (como en prueba1).
@@ -156,7 +155,7 @@ class JuegoController extends Controller
     // =====================================================
     // PRUEBA 3: OPERACIÓN CAFEÍNA
     // =====================================================
-    public function mostrarPrueba3Angel()
+    public function mostrarPrueba3()
     {
 
         if ($this->timerService->verificarTimeout()) return redirect('/final')->with('timeout', true);
@@ -165,7 +164,7 @@ class JuegoController extends Controller
         return view('prueba3angel', compact('tiempo_transcurrido'));
     }
 
-    public function validarPrueba3Angel(ValidarPrueba3Request $request)
+    public function validarPrueba3(ValidarPrueba3Request $request)
     {
 
         $CHECKSUM_CORRECTO = 124; // 19 botones + 110 cents + 5 azucar
@@ -205,7 +204,7 @@ class JuegoController extends Controller
     // =====================================================
     // PRUEBA 4: OPERACIÓN REPUESTOS (Oasis)
     // =====================================================
-    public function mostrarPrueba4Arturo()
+    public function mostrarPrueba4()
     {
 
         if ($this->timerService->verificarTimeout()) return redirect('/final')->with('timeout', true);
@@ -214,7 +213,7 @@ class JuegoController extends Controller
         return view('prueba4arturo', compact('tiempo_transcurrido'));
     }
 
-    public function validarPrueba4Arturo(ValidarPrueba4Request $request)
+    public function validarPrueba4(ValidarPrueba4Request $request)
     {
 
         $CHECKSUM_OASIS = 141; // Ej: 6 filas + cod 128 cafe + 7 items A1 -> Total manual: 141
@@ -254,7 +253,7 @@ class JuegoController extends Controller
     // =====================================================
     // PRUEBA 5: PROTOCOLO ESPEJO (Taquillas)
     // =====================================================
-    public function mostrarPrueba5Eloy()
+    public function mostrarPrueba5()
     {
 
         if ($this->timerService->verificarTimeout()) return redirect('/final')->with('timeout', true);
@@ -263,7 +262,7 @@ class JuegoController extends Controller
         return view('prueba5eloy', compact('tiempo_transcurrido'));
     }
 
-    public function validarPrueba5Eloy(ValidarPrueba5Request $request)
+    public function validarPrueba5(ValidarPrueba5Request $request)
     {
 
         $PALABRA_ESPEJO = "zasielx";
@@ -304,7 +303,7 @@ class JuegoController extends Controller
     // =====================================================
     // PRUEBA 6: SOBRECARGA DEL SISTEMA (Mígue - Simon Dice Cooperativo)
     // =====================================================
-    public function mostrarPrueba6Migue()
+    public function mostrarPrueba6()
     {
 
         if ($this->timerService->verificarTimeout()) return redirect('/final')->with('timeout', true);
@@ -313,7 +312,7 @@ class JuegoController extends Controller
         return view('prueba6migue', compact('tiempo_transcurrido'));
     }
 
-    public function validarPrueba6Migue(ValidarPrueba6Request $request)
+    public function validarPrueba6(ValidarPrueba6Request $request)
     {
 
         if (!$request->completed) {
