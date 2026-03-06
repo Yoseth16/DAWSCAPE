@@ -164,4 +164,14 @@ Route::prefix('admin')->group(function () {
             ]);
         });
     });
+
+    Route::get('/prueba/prueba6migue', function () use ($authMiddleware) {
+        return $authMiddleware(request(), function() {
+            // Pasamos tiempo a 0 y forzamos sesión falsa en caso de no haber sesión de equipo
+            session(['nombre_equipo' => '[Modo Administrador]', 'clase' => 'Testing']);
+            return view('prueba6migue', [
+                'tiempo_transcurrido' => 0
+            ]);
+        });
+    });
 });
