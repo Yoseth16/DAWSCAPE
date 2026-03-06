@@ -31,6 +31,37 @@ Route::post('/prueba4arturo', [JuegoController::class, 'validarPrueba4Arturo']);
 Route::get('/prueba5eloy', [JuegoController::class, 'mostrarPrueba5Eloy']);
 Route::post('/prueba5eloy', [JuegoController::class, 'validarPrueba5Eloy']);
 
+// 4.1. PRUEBA 6: SOBRECARGA DEL SISTEMA (Mígue - Simon Dice Cooperativo)
+Route::get('/prueba6migue', [JuegoController::class, 'mostrarPrueba6Migue']);
+Route::post('/prueba6migue', [JuegoController::class, 'validarPrueba6Migue']);
+
+// RUTA PARA TESTEAR LA PRUEBA 6 DIRECTAMENTE (BYPASS)
+Route::get('/bypass-prueba6', function() {
+    session([
+        'email' => 'admin@estudiante.xtart.com',
+        'nombre_equipo' => 'Test',
+        'clase' => 'Profe',
+        'prueba1mario_superada' => true,
+        'prueba2yoseth_superada' => true,
+        'prueba3angel_superada' => true,
+        'prueba4arturo_superada' => true,
+        'prueba5eloy_superada' => true,
+    ]);
+    
+    \App\Models\Partida::firstOrCreate(
+        ['email' => 'admin@estudiante.xtart.com'],
+        [
+            'nombre_equipo' => 'Test',
+            'clase' => 'Profe',
+            'fase_actual' => 'Prueba 6 Migue',
+            'tiempo_segundos' => 0,
+            'inicio_juego' => \Carbon\Carbon::now()
+        ]
+    );
+
+    return redirect('/prueba6migue');
+});
+
 // 5. PANTALLA FINAL (Delegada al controlador para pasar datos de BBDD)
 Route::get('/final', [JuegoController::class , 'mostrarFinal']);
 

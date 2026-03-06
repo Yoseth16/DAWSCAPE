@@ -351,7 +351,52 @@ class JuegoController extends Controller
 
         session(['prueba5eloy_superada' => true]);
 
-        // AHORA SÍ, CÁLCULO FINAL Y CIERRE (Por ahora Prueba 5 es la última)
+        // AHORA SÍ, PASAMOS A LA PRUEBA 6 (MÍGUE)
+        $partida = $this->obtenerPartidaActiva();
+
+        if ($partida && $partida->inicio_juego) {
+            $partida->update([
+                'fase_actual'     => 'Prueba 6 Migue',
+            ]);
+        }
+
+        // Mensaje final desde Back
+        $mensajeFinal = "El orden ha sido restaurado. El sistema vuelve a reconocer el abecedario\noriginal. Pero el núcleo del DAWSCAPE está inestable...\nLa siguiente anomalía te espera en la terminal principal, donde\nse debe calibrar manualmente la sobrecarga.";
+
+        return response()->json([
+            'success' => true,
+            'mensaje' => $mensajeFinal
+        ]);
+    }
+
+    // =====================================================
+    // PRUEBA 6: SOBRECARGA DEL SISTEMA (Mígue - Simon Dice Cooperativo)
+    // =====================================================
+    public function mostrarPrueba6Migue()
+    {
+        // Require haber completado la 5
+        if (!session()->has('prueba5eloy_superada')) {
+            return redirect('/prueba5eloy');
+        }
+
+        if ($this->verificarTimeout()) return redirect('/final')->with('timeout', true);
+
+        $tiempo_transcurrido = $this->obtenerTiempoTranscurrido();
+        return view('prueba6migue', compact('tiempo_transcurrido'));
+    }
+
+    public function validarPrueba6Migue(Request $request)
+    {
+        // Require haber completado la 5
+        if (!session()->has('prueba5eloy_superada')) {
+            return response()->json(['success' => false, 'message' => 'Falta completar pruebas previas'], 403);
+        }
+
+        // La verificación de la secuencia se hace enteramente en el front, 
+        // así que si llegamos aquí, el usuario ha resuelto el puzzle.
+        session(['prueba6migue_superada' => true]);
+
+        // CÁLCULO FINAL Y CIERRE (Prueba 6 es la última)
         $partida = $this->obtenerPartidaActiva();
 
         if ($partida && $partida->inicio_juego) {
@@ -364,20 +409,17 @@ class JuegoController extends Controller
             ]);
         }
 
-        // Mensaje final desde Back
-        $mensajeFinal = "El orden ha sido restaurado. El sistema vuelve a reconocer el abecedario\noriginal. Pero el núcleo del DAWSCAPE aún no está completamente seguro…\nLa siguiente anomalía te espera donde los datos se cruzan y las\ndecisiones se ejecutan.";
-
         return response()->json([
             'success' => true,
-            'mensaje' => $mensajeFinal
+            'mensaje' => '¡NUCLEO ESTABILIZADO! Has escapado del DAWSCAPE.'
         ]);
     }
 
     // --- PANTALLA FINAL ---
     public function mostrarFinal()
     {
-        if (!session()->has('prueba5eloy_superada'))
-            return redirect('/prueba5eloy');
+        if (!session()->has('prueba6migue_superada'))
+            return redirect('/prueba6migue');
 
         // Traemos los datos REALES de la BBDD
         $partida = Partida::where('email', session('email'))->first();
