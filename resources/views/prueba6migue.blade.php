@@ -29,7 +29,7 @@
     <!-- Indicador de estado -->
     <div id="sys-status">SISTEMA A LA ESPERA</div>
 
-    <button id="btn-start" class="btn-start" onclick="startGame()">▶ INICIAR SECUENCIA</button>
+    <button id="btn-start" class="btn-start">▶ INICIAR SECUENCIA</button>
 
     <div class="hud" style="display:none;" id="hud-container">
         <div>FASE: <span id="ronda-val" style="color:var(--green);font-weight:bold;">1/5</span></div>
@@ -54,59 +54,14 @@
     <a href="/final" class="success-btn">COMPLETAR ESCAPE ROOM →</a>
 </div>
 
+<!-- Elemento oculto que pasa los datos del servidor al JS -->
+<div id="prueba6-config"
+     data-tiempo="{{ $tiempo_transcurrido ?? 0 }}"
+     data-sequence='@json(session("prueba6_sequence", []))'
+     style="display:none;">
+</div>
+
 @push('scripts')
 @vite(['resources/js/prueba6.js'])
-<script type="module">
-import { initAudio, buildSimonGame, lightUp } from '{{ Vite::asset('resources/js/prueba6.js') }}';
-
-// ── TIMER (Mismo de siempre) ──
-let tiempo = parseInt("{{ $tiempo_transcurrido ?? 0 }}");
-const timerDisplay = document.getElementById('cronometro');
-const MAX_MINUTOS = 90;
-
-function actualizarTimer() {
-  let minutos = parseInt(tiempo / 60, 10);
-  let segundos = parseInt(tiempo % 60, 10);
-  let m = minutos  < 10 ? "0" + minutos  : minutos;
-  let s = segundos < 10 ? "0" + segundos : segundos;
-  timerDisplay.textContent = m + ":" + s;
-  if (minutos >= MAX_MINUTOS) { window.location.href = '/final'; return; }
-  tiempo++;
-}
-actualizarTimer();
-setInterval(actualizarTimer, 1000);
-
-window.startGame = function() {
-    initAudio(); // Inicializamos el audio al primer click del usuario
-    document.getElementById('btn-start').style.display = 'none';
-    document.getElementById('hud-container').style.display = 'flex';
-    
-    // Obtenemos la secuencia segura generada por el backend almacenada en la sesión
-    const initialSequence = @json(session('prueba6_sequence', []));
-
-    buildSimonGame({
-        initialSequence: initialSequence,
-        onSuccess: function(playedSequence) {
-             winGame(playedSequence);
-        }
-    });
-}
-
-function winGame(sequencePlayed) {
-    document.getElementById('screen-game').style.display = 'none';
-    document.getElementById('screen-success').style.display = 'flex';
-
-    fetch("/prueba6migue", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
-        // Enviamos la secuencia para validarla en servidor
-        body: JSON.stringify({ completed: true, expected_sequence: sequencePlayed })
-    }).then(r => r.json()).then(res => {
-        if(res.success) {
-            console.log(res.mensaje);
-        }
-    });
-}
-</script>
 @endpush
 @endsection

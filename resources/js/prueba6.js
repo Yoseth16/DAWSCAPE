@@ -1,7 +1,14 @@
-// Web Audio API Synth Simple
+// =====================================================
+// PRUEBA 6 – SIMON SAYS COOPERATIVO (Auto-inicializable)
+// Este módulo se auto-ejecuta al cargarse via @vite.
+// Lee la configuración del DOM (data-attributes) y se
+// conecta a los elementos HTML directamente.
+// =====================================================
+
+// ── WEB AUDIO API ──
 let audioCtx;
 
-export function initAudio() {
+function initAudio() {
     if (!audioCtx) {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         audioCtx = new AudioContext();
@@ -11,166 +18,199 @@ export function initAudio() {
     }
 }
 
-export function playTone(freq, type = 'sine', duration = 0.3) {
+function playTone(freq, type = 'sine', duration = 0.3) {
     if (!audioCtx) return;
     const osc = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
-
     osc.type = type;
     osc.frequency.value = freq;
-
-    // Envelope
     gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
     gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.05);
     gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-
     osc.connect(gainNode);
     gainNode.connect(audioCtx.destination);
-
     osc.start();
     osc.stop(audioCtx.currentTime + duration);
 }
 
-// Frecuencias (Rojo, Verde, Azul, Amarillo, Error, Éxito)
-export const FREQS = [329.63, 261.63, 220.00, 164.81]; // E4, C4, A3, E3
-export const S_ERR = 110.00; // A2
-export const S_OK = 880.00;  // A5
+// Frecuencias por sector
+const FREQS = [329.63, 261.63, 220.00, 164.81];
+const S_ERR = 110.00;
+const S_OK = 880.00;
 
-// ── LOGICA SIMON SAYS COOPERATIVO ──
-export let sequence = [];
-export let playerStep = 0;
-export let roundLengths = [4, 6, 9, 12, 15]; // Rondas exigentes
-export let currentRound = 0;
-export let isPlaying = false;
+// ── SIMON GAME STATE ──
+let sequence = [];
+let playerStep = 0;
+let roundLengths = [4, 6, 9, 12, 15];
+let currentRound = 0;
+let isPlaying = false;
 
-// DOM refs (se inicializan dentro de buildSimonGame, cuando el DOM ya existe)
-let statusTxt, rondaVal, pasosVal;
+// DOM refs
+let statusTxt, rondaVal, pasosVal, board;
 
-export function lightUp(sectorId, isPlayer = false) {
+function lightUp(sectorId, isPlayer = false) {
     const btn = document.getElementById('btn-' + sectorId);
     if (!btn) return;
-
     btn.classList.add('lit');
     playTone(FREQS[sectorId], isPlayer ? 'square' : 'sine', 0.4);
-
-    setTimeout(() => {
-        btn.classList.remove('lit');
-    }, 450); // Mantiene destello poco mas de medio segundo
+    setTimeout(() => btn.classList.remove('lit'), 450);
 }
 
-export function buildSimonGame({ initialSequence, onSuccess }) {
-    // Inicializar refs del DOM aquí (el DOM ya existe cuando se llama a esta función)
-    statusTxt = document.getElementById('sys-status');
-    rondaVal = document.getElementById('ronda-val');
-    pasosVal = document.getElementById('pasos-val');
+function playRound() {
+    isPlaying = false;
+    if (board) board.classList.remove('active');
+    playerStep = 0;
 
-    sequence = initialSequence;
-    let maxSteps = sequence.length;
+    if (rondaVal) rondaVal.innerText = (currentRound + 1) + "/" + roundLengths.length;
+    let targetSteps = roundLengths[currentRound];
+    if (pasosVal) pasosVal.innerText = targetSteps;
 
-    // Desglosar rondas dinámicamente si la longitud es distinta, o dejar el default
-    // Solo para asegurarse que el backend manda lo esperado (15 por defecto)
-    if (maxSteps > 0) {
-        roundLengths = [4, 6, 9, 12, maxSteps];
+    if (statusTxt) {
+        statusTxt.innerText = "// MEMORIZANDO PATRÓN...";
+        statusTxt.className = 'status-info';
+        statusTxt.style.color = '';
     }
 
-    currentRound = 0;
-
-    const board = document.getElementById('board');
-    if (!board) return;
-
-    // Attach local touch functions
-    window.touchSector = (sectorId) => {
-        // Evita doble triggering por eventos simultáneos de touch y click si fuera necesario,
-        // o clics cuando no toca jugar.
-        if (!isPlaying) return;
-
-        // Efecto visual instantaneo
-        lightUp(sectorId, true);
-
-        // Comprobar logica
-        let targetSteps = roundLengths[currentRound];
-
-        if (sectorId === sequence[playerStep]) {
-            // Correcto
-            playerStep++;
-
-            if (playerStep === targetSteps) {
-                // Completó la ronda!
-                isPlaying = false;
-                board.classList.remove('active');
-                if (statusTxt) {
-                    statusTxt.innerText = "[OK] FASE ESTABILIZADA";
-                    statusTxt.className = 'status-ok';
-                }
-                playTone(S_OK, 'triangle', 0.5);
-
+    let i = 0;
+    setTimeout(() => {
+        let interval = setInterval(() => {
+            lightUp(sequence[i]);
+            i++;
+            if (i >= targetSteps) {
+                clearInterval(interval);
                 setTimeout(() => {
-                    currentRound++;
-                    if (currentRound >= roundLengths.length) {
-                        if (onSuccess) onSuccess(sequence);
-                    } else {
-                        playRound();
+                    if (statusTxt) {
+                        statusTxt.innerText = "INTRODUCE LA SECUENCIA REQUERIDA";
+                        statusTxt.className = '';
                     }
-                }, 1500);
+                    isPlaying = true;
+                    if (board) board.classList.add('active');
+                }, 500);
             }
-        } else {
-            // Falló
+        }, 800);
+    }, 1000);
+}
+
+function handleSectorTouch(sectorId) {
+    if (!isPlaying) return;
+    lightUp(sectorId, true);
+
+    let targetSteps = roundLengths[currentRound];
+
+    if (sectorId === sequence[playerStep]) {
+        playerStep++;
+        if (playerStep === targetSteps) {
             isPlaying = false;
-            board.classList.remove('active');
-            board.style.animation = 'shake 0.4s';
-
+            if (board) board.classList.remove('active');
             if (statusTxt) {
-                statusTxt.innerText = "[ERROR] DESINCRONIZACIÓN. REINICIANDO FASE...";
-                statusTxt.className = 'status-info';
-                statusTxt.style.color = 'var(--red)';
+                statusTxt.innerText = "[OK] FASE ESTABILIZADA";
+                statusTxt.className = 'status-ok';
             }
-
-            playTone(S_ERR, 'sawtooth', 0.8);
+            playTone(S_OK, 'triangle', 0.5);
 
             setTimeout(() => {
-                board.style.animation = '';
-                // repite la misma ronda
-                playRound();
-            }, 2000);
-        }
-    }
-
-    playRound();
-
-    function playRound() {
-        isPlaying = false;
-        board.classList.remove('active'); // Bloquea clics
-        playerStep = 0;
-
-        if (rondaVal) rondaVal.innerText = (currentRound + 1) + "/" + roundLengths.length;
-        let targetSteps = roundLengths[currentRound];
-        if (pasosVal) pasosVal.innerText = targetSteps;
-
-        if (statusTxt) {
-            statusTxt.innerText = "// MEMORIZANDO PATRÓN...";
-            statusTxt.className = 'status-info';
-        }
-
-        // Reproducir secuencia parcial hasta el límite de la ronda
-        let i = 0;
-        // Un pequeño delay inicial
-        setTimeout(() => {
-            let interval = setInterval(() => {
-                lightUp(sequence[i]);
-                i++;
-                if (i >= targetSteps) {
-                    clearInterval(interval);
-                    // Dar control al jugador
-                    setTimeout(() => {
-                        if (statusTxt) {
-                            statusTxt.innerText = "INTRODUCE LA SECUENCIA REQUERIDA";
-                            statusTxt.className = '';
-                        }
-                        isPlaying = true;
-                        board.classList.add('active');
-                    }, 500);
+                currentRound++;
+                if (currentRound >= roundLengths.length) {
+                    winGame();
+                } else {
+                    playRound();
                 }
-            }, 800); // 800ms de velocidad base.
-        }, 1000);
+            }, 1500);
+        }
+    } else {
+        isPlaying = false;
+        if (board) board.classList.remove('active');
+        if (board) board.style.animation = 'shake 0.4s';
+        if (statusTxt) {
+            statusTxt.innerText = "[ERROR] DESINCRONIZACIÓN. REINICIANDO FASE...";
+            statusTxt.className = 'status-info';
+            statusTxt.style.color = 'var(--red)';
+        }
+        playTone(S_ERR, 'sawtooth', 0.8);
+        setTimeout(() => {
+            if (board) board.style.animation = '';
+            playRound();
+        }, 2000);
     }
 }
+
+function winGame() {
+    document.getElementById('screen-game').style.display = 'none';
+    document.getElementById('screen-success').style.display = 'flex';
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (!csrfToken) return;
+
+    fetch("/prueba6migue", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken.getAttribute('content')
+        },
+        body: JSON.stringify({ completed: true, expected_sequence: sequence })
+    }).then(r => r.json()).then(res => {
+        if (res.success) console.log(res.mensaje);
+    }).catch(err => console.error('Error al validar:', err));
+}
+
+
+// =====================================================
+// AUTO-INICIALIZACIÓN (se ejecuta cuando el módulo carga)
+// =====================================================
+document.addEventListener('DOMContentLoaded', function () {
+    // ── TIMER ──
+    const configEl = document.getElementById('prueba6-config');
+    const timerDisplay = document.getElementById('cronometro');
+    const MAX_MINUTOS = 90;
+
+    if (configEl && timerDisplay) {
+        let tiempo = parseInt(configEl.dataset.tiempo || '0', 10);
+
+        function actualizarTimer() {
+            let minutos = parseInt(tiempo / 60, 10);
+            let segundos = parseInt(tiempo % 60, 10);
+            let m = minutos < 10 ? "0" + minutos : minutos;
+            let s = segundos < 10 ? "0" + segundos : segundos;
+            timerDisplay.textContent = m + ":" + s;
+            if (minutos >= MAX_MINUTOS) { window.location.href = '/final'; return; }
+            tiempo++;
+        }
+        actualizarTimer();
+        setInterval(actualizarTimer, 1000);
+    }
+
+    // ── GAME START ──
+    const btnStart = document.getElementById('btn-start');
+    if (btnStart) {
+        btnStart.addEventListener('click', function () {
+            initAudio();
+
+            btnStart.style.display = 'none';
+            const hudContainer = document.getElementById('hud-container');
+            if (hudContainer) hudContainer.style.display = 'flex';
+
+            // Leer la secuencia del backend desde el data-attribute
+            const configEl = document.getElementById('prueba6-config');
+            const initialSequence = configEl ? JSON.parse(configEl.dataset.sequence || '[]') : [];
+
+            // Init DOM refs
+            statusTxt = document.getElementById('sys-status');
+            rondaVal = document.getElementById('ronda-val');
+            pasosVal = document.getElementById('pasos-val');
+            board = document.getElementById('board');
+
+            // Init game state
+            sequence = initialSequence;
+            let maxSteps = sequence.length;
+            if (maxSteps > 0) {
+                roundLengths = [4, 6, 9, 12, maxSteps];
+            }
+            currentRound = 0;
+
+            playRound();
+        });
+    }
+
+    // ── SECTOR TOUCH (registrar en window para los onclick inline del HTML) ──
+    window.touchSector = handleSectorTouch;
+});
