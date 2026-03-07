@@ -43,9 +43,8 @@ export let roundLengths = [4, 6, 9, 12, 15]; // Rondas exigentes
 export let currentRound = 0;
 export let isPlaying = false;
 
-const statusTxt = document.getElementById('sys-status');
-const rondaVal = document.getElementById('ronda-val');
-const pasosVal = document.getElementById('pasos-val');
+// DOM refs (se inicializan dentro de buildSimonGame, cuando el DOM ya existe)
+let statusTxt, rondaVal, pasosVal;
 
 export function lightUp(sectorId, isPlayer = false) {
     const btn = document.getElementById('btn-' + sectorId);
@@ -60,6 +59,11 @@ export function lightUp(sectorId, isPlayer = false) {
 }
 
 export function buildSimonGame({ initialSequence, onSuccess }) {
+    // Inicializar refs del DOM aquí (el DOM ya existe cuando se llama a esta función)
+    statusTxt = document.getElementById('sys-status');
+    rondaVal = document.getElementById('ronda-val');
+    pasosVal = document.getElementById('pasos-val');
+
     sequence = initialSequence;
     let maxSteps = sequence.length;
 
