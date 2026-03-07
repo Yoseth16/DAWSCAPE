@@ -8,43 +8,33 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class AdminController extends Controller
 {
+    protected $statsService;
+
+    public function __construct(\App\Services\AdminStatsService $statsService)
+    {
+        $this->statsService = $statsService;
+    }
+
     public function adminPanel()
     {
-        // Top 5 finalizados (podio)
-        $top5 = Partida::where('fase_actual', 'FINALIZADO')
-            ->orderBy('tiempo_segundos', 'asc')
-            ->limit(5)
-            ->get();
+        // 1. Obtener Top 5
+        $top5 = $this->statsService->getTop5();
 
-        // Orden de la tabla: 1. Finalizados 2. Timeouts 3. Jugando
-        $partidas = Partida::orderByRaw("
-            CASE 
-                WHEN fase_actual = 'FINALIZADO' THEN 0 
-                WHEN fase_actual = 'FINALIZADO_TIMEOUT' THEN 1
-                ELSE 2 
-            END")
-            ->orderBy('tiempo_segundos', 'asc')
-            ->get();
+        // 2. Obtener la lista general
+        $partidas = $this->statsService->getPartidasOrdered();
             
-        // KPI METRICS
-        $totalEquipos = $partidas->count();
-        $equiposFinalizados = $partidas->where('fase_actual', 'FINALIZADO')->count();
-        $equiposTimeout = $partidas->where('fase_actual', 'FINALIZADO_TIMEOUT')->count();
-        $equiposActivos = $totalEquipos - $equiposFinalizados - $equiposTimeout;
-        
-        $tiempoMedioSegundos = 0;
-        if ($equiposFinalizados > 0) {
-            $tiempoMedioSegundos = $partidas->where('fase_actual', 'FINALIZADO')->avg('tiempo_segundos');
-        }
+        // 3. Obtener Métricas (Ahora optimizadas desde BBDD)
+        $metrics = $this->statsService->getMetrics();
+        $totalEquipos =      $metrics['total'];
+        $equiposFinalizados =$metrics['finalizados'];
+        $equiposActivos =    $metrics['activos'];
+        $equiposTimeout =    $metrics['timeout'];
+        $promedioSegundos =  $metrics['promedio_sec'];
 
-        // CHART DATA (Distribución de Fases)
-        $fasesGroup = $partidas->groupBy('fase_actual')->map->count();
-        $chartData = [
-            'labels' => $fasesGroup->keys()->toArray(),
-            'data' => $fasesGroup->values()->toArray()
-        ];
+        // 4. Obtener Chart Data
+        $chartData = $this->statsService->getChartData();
 
-        // Autodescubrimiento de rutas de pruebas para el menú Admin
+        // 5. Autodescubrimiento de rutas de pruebas para el menú Admin
         $rutasPruebas = collect(\Illuminate\Support\Facades\Route::getRoutes()->getRoutes())
             ->filter(function ($route) {
                 return str_starts_with($route->getName(), 'admin.prueba.');
@@ -61,8 +51,8 @@ class AdminController extends Controller
 
         return view('admin', compact(
             'partidas', 'top5', 'rutasPruebas', 
-            'totalEquipos', 'equiposFinalizados', 'equiposActivos', 'equiposTimeout', 'tiempoMedioSegundos', 'chartData'
-        ));
+            'totalEquipos', 'equiposFinalizados', 'equiposActivos', 'equiposTimeout', 'chartData'
+        ))->with('tiempoMedioSegundos', $promedioSegundos);
     }
 
     public function eliminarEquipo($uuid)
@@ -85,43 +75,22 @@ class AdminController extends Controller
         $pdf = Pdf::loadView('ranking-pdf', compact('top20'));
         return $pdf->download('Ranking_Top_20_DAWSCAPE.pdf');
     }
+    
     public function apiStats()
     {
-        $partidas = Partida::orderByRaw("
-            CASE 
-                WHEN fase_actual = 'FINALIZADO' THEN 0 
-                WHEN fase_actual = 'FINALIZADO_TIMEOUT' THEN 1
-                ELSE 2 
-            END")
-            ->orderBy('tiempo_segundos', 'asc')
-            ->get();
+        $partidas = $this->statsService->getPartidasOrdered();
+        $metrics = $this->statsService->getMetrics();
+        $chartData = $this->statsService->getChartData();
 
-        $totalEquipos = $partidas->count();
-        $equiposFinalizados = $partidas->where('fase_actual', 'FINALIZADO')->count();
-        $equiposTimeout = $partidas->where('fase_actual', 'FINALIZADO_TIMEOUT')->count();
-        $equiposActivos = $totalEquipos - $equiposFinalizados - $equiposTimeout;
-        
-        $tiempoMedioSegundos = 0;
-        if ($equiposFinalizados > 0) {
-            $tiempoMedioSegundos = $partidas->where('fase_actual', 'FINALIZADO')->avg('tiempo_segundos');
-        }
-
-        $fasesGroup = $partidas->groupBy('fase_actual')->map->count();
-
-        // Renderizamos solo la tabla para enviarla como HTML parcial (opcional pero más rápido para el front)
-        // O enviamos JSON puro y reconstruimos en JS. Para esta app, JSON es más "Serie A".
-        
+        // Limpieza drástica del método, delegando a la capa Controller solo el Response JSON.
         return response()->json([
             'metrics' => [
-                'total' => $totalEquipos,
-                'finalizados' => $equiposFinalizados,
-                'activos' => $equiposActivos,
-                'promedio' => $tiempoMedioSegundos > 0 ? floor($tiempoMedioSegundos / 60) . 'm' : '--'
+                'total' =>       $metrics['total'],
+                'finalizados' => $metrics['finalizados'],
+                'activos' =>     $metrics['activos'],
+                'promedio' =>    $metrics['promedio']
             ],
-            'chart' => [
-                'labels' => $fasesGroup->keys()->toArray(),
-                'data' => $fasesGroup->values()->toArray()
-            ],
+            'chart' => $chartData,
             'partidas' => $partidas->map(function($p) {
                 $segsLive = 0;
                 if ($p->fase_actual !== 'FINALIZADO' && $p->fase_actual !== 'FINALIZADO_TIMEOUT' && $p->inicio_juego) {
