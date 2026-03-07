@@ -72,4 +72,21 @@ class GameTimerService
         
         return false;
     }
+
+    /**
+     * Avanza de fase y registra el hito en la base de datos automáticamente.
+     */
+    public function avanzarFase(Partida $partida, string $siguienteFase, string $mensajeHito): void
+    {
+        $partida->update([
+            'fase_actual' => $siguienteFase,
+        ]);
+
+        \App\Models\HitoFase::create([
+            'partida_id' => $partida->id,
+            'fase' => $mensajeHito,
+            'segundos_transcurridos' => $this->obtenerTiempoTranscurrido(),
+            'alcanzado_at' => Carbon::now()
+        ]);
+    }
 }

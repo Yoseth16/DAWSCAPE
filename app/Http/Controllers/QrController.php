@@ -23,7 +23,7 @@ class QrController extends Controller
     // SISTEMA DE QRs (MÓDULO VERSIÓN BBDD DINÁMICA)
     // =====================================================
 
-    public function gestionarQrs()
+    public function mostrarGestor()
     {
         $qrs = \App\Models\Qr::orderBy('created_at', 'desc')->get();
         return view('admin.gestionar-qrs', compact('qrs'));
@@ -92,23 +92,20 @@ class QrController extends Controller
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $titulo_prueba = $qr->nombre;
         
-        // Si es el QR especial de la máquina de café (para la prueba 3)
-        // Lo verificamos por el identificador o si contiene 'cafe' para más seguridad
-        if (str_contains(strtolower($identificador), 'cafe') || str_contains(strtolower($qr->nombre), 'cafe')) {
-            return view('qr.maquina-cafe', compact('tiempo_transcurrido', 'titulo_prueba', 'identificador'));
-        }
-
-        // Si es el QR especial de la máquina Oasis (para la prueba 4)
-        if (str_contains(strtolower($identificador), 'snacks') || str_contains(strtolower($qr->nombre), 'oasis')) {
-            return view('qr.maquina-snacks', compact('tiempo_transcurrido', 'titulo_prueba', 'identificador'));
-        }
-
-        // Si es el QR especial de las taquillas (para la prueba 5)
-        if (str_contains(strtolower($identificador), 'taquilla') || str_contains(strtolower($qr->nombre), 'taquilla')) {
-            return view('qr.taquillas', compact('tiempo_transcurrido', 'titulo_prueba', 'identificador'));
-        }
+        // Si el identificador mapea a una vista especial (Open/Closed Principle - OCP)
+        $identificadorNormalizado = strtolower($identificador);
+        $nombreQrNormalizado = strtolower($qr->nombre);
         
-        // Si no es especial, cargamos la vista de plantilla-pista genérica
-        return view('qr.plantilla-pista', compact('tiempo_transcurrido', 'titulo_prueba', 'identificador'));
+        $vistaEspecial = match(true) {
+            str_contains($identificadorNormalizado, 'cafe') || str_contains($nombreQrNormalizado, 'cafe') 
+                => 'qr.maquina-cafe',
+            str_contains($identificadorNormalizado, 'snacks') || str_contains($nombreQrNormalizado, 'oasis') 
+                => 'qr.maquina-snacks',
+            str_contains($identificadorNormalizado, 'taquilla') || str_contains($nombreQrNormalizado, 'taquilla') 
+                => 'qr.taquillas',
+            default => 'qr.plantilla-pista'
+        };
+
+        return view($vistaEspecial, compact('tiempo_transcurrido', 'titulo_prueba', 'identificador'));
     }
 }

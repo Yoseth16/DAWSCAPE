@@ -10,4 +10,19 @@ return [
         'Prueba 6 Migue' => 'Presta atención a la secuencia de luces y sonidos. La cooperación entre el equipo es vital.',
     ],
     'penalizacion_pista' => 180, // 3 minutos por pista
+
+    'respuestas' => [
+        'prueba1' => [
+            ['115', 'aula 115'],
+            ['16', 'dieciseis'],
+            ['32', 'treinta y dos'],
+            ['14', 'catorce'],
+            ['5x0lh8bx100127t'],
+            ['201', 'doscientos uno']
+        ],
+        // La prueba 2 la maneja el front-end con un anagrama "ROCIO"
+        'prueba3' => 124, // Checksum: 19 botones + 110 cents + 5 azucar
+        'prueba4' => 141, // Checksum Oasis: 6 filas + cod 128 cafe + 7 items A1
+        'prueba5' => 'zasielx', // Palabra espejo
+    ],
 ];

@@ -63,7 +63,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/admin/ticker', [Top10Controller::class, 'updateTicker'])->name('admin.ticker');
 
     // Gestión de QRs Dinámicos
-    Route::get('/admin/qrs', [QrController::class, 'gestionarQrs'])->name('admin.qrs');
+    Route::get('/admin/qrs', [QrController::class, 'mostrarGestor'])->name('admin.qrs');
     Route::post('/admin/qrs', [QrController::class, 'generarQr']);
     Route::delete('/admin/qrs/{id}', [QrController::class, 'eliminarQr']);
 

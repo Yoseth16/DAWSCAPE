@@ -48,7 +48,7 @@ class JuegoController extends Controller
             'clase' => $request->clase
         ]);
 
-        return redirect('/prueba1mario');
+        return redirect()->route('prueba1');
     }
 
     // =====================================================
@@ -57,7 +57,7 @@ class JuegoController extends Controller
     public function mostrarPrueba1()
     {
 
-        if ($this->timerService->verificarTimeout()) return redirect('/final')->with('timeout', true);
+        if ($this->timerService->verificarTimeout()) return redirect()->route('final')->with('timeout', true);
 
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         return view('prueba1mario', compact('tiempo_transcurrido'));
@@ -70,14 +70,7 @@ class JuegoController extends Controller
         }
 
         // Respuestas correctas normalizadas esperadas (ordenadas por acertijo)
-        $respuestas_correctas = [
-            ['115', 'aula 115'],
-            ['16', 'dieciseis'],
-            ['32', 'treinta y dos'],
-            ['14', 'catorce'],
-            ['5x0lh8bx100127t'],
-            ['201', 'doscientos uno']
-        ];
+        $respuestas_correctas = config('escape.respuestas.prueba1');
 
         foreach ($request->answers as $index => $answer) {
             if (!isset($respuestas_correctas[$index])) {
@@ -95,17 +88,7 @@ class JuegoController extends Controller
         $partida = $this->timerService->obtenerPartidaActiva();
 
         if ($partida) {
-            $partida->update([
-                'fase_actual' => 'Prueba 2 Yoseth',
-            ]);
-
-            // REGISTRO DE HITO (FASE 6 V2)
-            \App\Models\HitoFase::create([
-                'partida_id' => $partida->id,
-                'fase' => 'Prueba 1 Mario Superada',
-                'segundos_transcurridos' => $this->timerService->obtenerTiempoTranscurrido(),
-                'alcanzado_at' => Carbon::now()
-            ]);
+            $this->timerService->avanzarFase($partida, 'Prueba 2 Yoseth', 'Prueba 1 Mario Superada');
         }
 
         // Devolvemos un OK en formato JSON
@@ -118,7 +101,7 @@ class JuegoController extends Controller
     public function mostrarPrueba2()
     {
 
-        if ($this->timerService->verificarTimeout()) return redirect('/final')->with('timeout', true);
+        if ($this->timerService->verificarTimeout()) return redirect()->route('final')->with('timeout', true);
 
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         return view('prueba2yoseth', compact('tiempo_transcurrido'));
@@ -136,17 +119,7 @@ class JuegoController extends Controller
         $partida = $this->timerService->obtenerPartidaActiva();
 
         if ($partida && $partida->inicio_juego) {
-            $partida->update([
-                'fase_actual'     => 'Prueba 3 Angel',
-            ]);
-
-            // REGISTRO DE HITO (FASE 6 V2)
-            \App\Models\HitoFase::create([
-                'partida_id' => $partida->id,
-                'fase' => 'Prueba 2 Yoseth Superada',
-                'segundos_transcurridos' => $this->timerService->obtenerTiempoTranscurrido(),
-                'alcanzado_at' => Carbon::now()
-            ]);
+            $this->timerService->avanzarFase($partida, 'Prueba 3 Angel', 'Prueba 2 Yoseth Superada');
         }
 
         return response()->json(['success' => true]);
@@ -158,7 +131,7 @@ class JuegoController extends Controller
     public function mostrarPrueba3()
     {
 
-        if ($this->timerService->verificarTimeout()) return redirect('/final')->with('timeout', true);
+        if ($this->timerService->verificarTimeout()) return redirect()->route('final')->with('timeout', true);
 
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         return view('prueba3angel', compact('tiempo_transcurrido'));
@@ -167,7 +140,7 @@ class JuegoController extends Controller
     public function validarPrueba3(ValidarPrueba3Request $request)
     {
 
-        $CHECKSUM_CORRECTO = 124; // 19 botones + 110 cents + 5 azucar
+        $CHECKSUM_CORRECTO = config('escape.respuestas.prueba3'); // 19 botones + 110 cents + 5 azucar
 
         if ((int)$request->checksum !== $CHECKSUM_CORRECTO) {
             return response()->json(['success' => false, 'message' => 'Checksum erróneo']);
@@ -179,17 +152,7 @@ class JuegoController extends Controller
         $partida = $this->timerService->obtenerPartidaActiva();
 
         if ($partida && $partida->inicio_juego) {
-            $partida->update([
-                'fase_actual'     => 'Prueba 4 Arturo',
-            ]);
-
-            // REGISTRO DE HITO (FASE 6 V2)
-            \App\Models\HitoFase::create([
-                'partida_id' => $partida->id,
-                'fase' => 'Prueba 3 Angel Superada',
-                'segundos_transcurridos' => $this->timerService->obtenerTiempoTranscurrido(),
-                'alcanzado_at' => Carbon::now()
-            ]);
+            $this->timerService->avanzarFase($partida, 'Prueba 4 Arturo', 'Prueba 3 Angel Superada');
         }
 
         // Mensaje final desde Back
@@ -207,7 +170,7 @@ class JuegoController extends Controller
     public function mostrarPrueba4()
     {
 
-        if ($this->timerService->verificarTimeout()) return redirect('/final')->with('timeout', true);
+        if ($this->timerService->verificarTimeout()) return redirect()->route('final')->with('timeout', true);
 
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         return view('prueba4arturo', compact('tiempo_transcurrido'));
@@ -216,7 +179,7 @@ class JuegoController extends Controller
     public function validarPrueba4(ValidarPrueba4Request $request)
     {
 
-        $CHECKSUM_OASIS = 141; // Ej: 6 filas + cod 128 cafe + 7 items A1 -> Total manual: 141
+        $CHECKSUM_OASIS = config('escape.respuestas.prueba4'); // Ej: 6 filas + cod 128 cafe + 7 items A1 -> Total manual: 141
 
         if ((int)$request->checksum !== $CHECKSUM_OASIS) {
             return response()->json(['success' => false, 'message' => 'Checksum erróneo']);
@@ -228,17 +191,7 @@ class JuegoController extends Controller
         $partida = $this->timerService->obtenerPartidaActiva();
 
         if ($partida && $partida->inicio_juego) {
-            $partida->update([
-                'fase_actual'     => 'Prueba 5 Eloy',
-            ]);
-
-            // REGISTRO DE HITO (FASE 6 V2)
-            \App\Models\HitoFase::create([
-                'partida_id' => $partida->id,
-                'fase' => 'Prueba 4 Arturo Superada',
-                'segundos_transcurridos' => $this->timerService->obtenerTiempoTranscurrido(),
-                'alcanzado_at' => Carbon::now()
-            ]);
+            $this->timerService->avanzarFase($partida, 'Prueba 5 Eloy', 'Prueba 4 Arturo Superada');
         }
 
         // Mensaje final desde Back
@@ -256,7 +209,7 @@ class JuegoController extends Controller
     public function mostrarPrueba5()
     {
 
-        if ($this->timerService->verificarTimeout()) return redirect('/final')->with('timeout', true);
+        if ($this->timerService->verificarTimeout()) return redirect()->route('final')->with('timeout', true);
 
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         return view('prueba5eloy', compact('tiempo_transcurrido'));
@@ -265,7 +218,7 @@ class JuegoController extends Controller
     public function validarPrueba5(ValidarPrueba5Request $request)
     {
 
-        $PALABRA_ESPEJO = "zasielx";
+        $PALABRA_ESPEJO = config('escape.respuestas.prueba5');
         $input_normalizado = strtolower(trim($request->checksum));
 
         if ($input_normalizado !== $PALABRA_ESPEJO) {
@@ -278,17 +231,7 @@ class JuegoController extends Controller
         $partida = $this->timerService->obtenerPartidaActiva();
 
         if ($partida && $partida->inicio_juego) {
-            $partida->update([
-                'fase_actual'     => 'Prueba 6 Migue',
-            ]);
-
-            // REGISTRO DE HITO (FASE 6 V2)
-            \App\Models\HitoFase::create([
-                'partida_id' => $partida->id,
-                'fase' => 'Prueba 5 Eloy Superada',
-                'segundos_transcurridos' => $this->timerService->obtenerTiempoTranscurrido(),
-                'alcanzado_at' => Carbon::now()
-            ]);
+            $this->timerService->avanzarFase($partida, 'Prueba 6 Migue', 'Prueba 5 Eloy Superada');
         }
 
         // Mensaje final desde Back
@@ -306,7 +249,17 @@ class JuegoController extends Controller
     public function mostrarPrueba6()
     {
 
-        if ($this->timerService->verificarTimeout()) return redirect('/final')->with('timeout', true);
+        if ($this->timerService->verificarTimeout()) return redirect()->route('final')->with('timeout', true);
+
+        // Generar secuencia en el backend (ej: 15 pasos)
+        $maxSteps = 15;
+        $sequence = [];
+        for ($i = 0; $i < $maxSteps; $i++) {
+            $sequence[] = rand(0, 3);
+        }
+        
+        // Guardar secuencia en sesión
+        session(['prueba6_sequence' => $sequence]);
 
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         return view('prueba6migue', compact('tiempo_transcurrido'));
@@ -315,8 +268,14 @@ class JuegoController extends Controller
     public function validarPrueba6(ValidarPrueba6Request $request)
     {
 
-        if (!$request->completed) {
-            return response()->json(['success' => false, 'message' => 'Validación fallida: Secuencia no completada.'], 400);
+        if (!$request->completed || !is_array($request->expected_sequence)) {
+            return response()->json(['success' => false, 'message' => 'Validación fallida: Datos incompletos.'], 400);
+        }
+
+        $sessionSequence = session('prueba6_sequence', []);
+
+        if (empty($sessionSequence) || $request->expected_sequence !== $sessionSequence) {
+            return response()->json(['success' => false, 'message' => 'Validación fallida: Secuencia incorrecta o manipulada.'], 400);
         }
 
         session(['prueba6migue_superada' => true]);
