@@ -5,6 +5,10 @@
 # Entorno: AlmaLinux, Nginx, PHP-FPM, MariaDB, Laravel + Vite
 # ==============================================================================
 
+# ── FIX: Asegurar que sudo hereda las rutas de los binarios ──
+# Cuando se ejecuta con "sudo", el PATH puede perder /usr/local/bin, ~/.composer, etc.
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH"
+
 # Variables de entorno
 APP_DIR="/var/www/DAWSCAPE"
 LARAVEL_USER="nginx" # o "www-data", depende de cómo se ejecute Nginx en AlmaLinux
