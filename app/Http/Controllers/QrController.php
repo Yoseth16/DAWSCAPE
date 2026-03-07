@@ -23,7 +23,7 @@ class QrController extends Controller
     // SISTEMA DE QRs (MÓDULO VERSIÓN BBDD DINÁMICA)
     // =====================================================
 
-    public function gestionarQrs()
+    public function mostrarGestor()
     {
         $qrs = \App\Models\Qr::orderBy('created_at', 'desc')->get();
         return view('admin.gestionar-qrs', compact('qrs'));
