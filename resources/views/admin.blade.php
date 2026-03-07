@@ -165,9 +165,17 @@
                 <h1 class="page-title">Visión General</h1>
                 <div class="page-subtitle">Monitorización en tiempo real de la actividad del Escape Room.</div>
             </div>
-            <div>
+            <div style="display:flex; gap: 15px; align-items:center;">
+                <button onclick="window.location.reload()" class="export-btn" style="background:var(--surface-hover); color:var(--text-main); border: 1px solid var(--border-color);">
+                    <i class="ph ph-arrows-clockwise"></i> Recargar
+                </button>
+
+                <a href="{{ route('top10') }}" target="_blank" class="export-btn" style="background:#a855f7;">
+                    <i class="ph ph-monitor-play"></i> Ver Top 10
+                </a>
+
                 <a href="/admin/exportar-top20" target="_blank" class="export-btn">
-                    <i class="ph ph-file-pdf"></i> Exportar Ranking Top 20
+                    <i class="ph ph-file-pdf"></i> Exportar Top 20
                 </a>
             </div>
         </div>
@@ -260,7 +268,7 @@
                                     <div class="podium-class">{{ $ranking->clase }}</div>
                                 </div>
                                 <div class="podium-time">
-                                    {{ floor((int)$ranking->tiempo_segundos / 60) }}m {{ str_pad((int)$ranking->tiempo_segundos % 60, 2, '0', STR_PAD_LEFT) }}s
+                                    {{ floor((int)($ranking->tiempo_segundos ?? 0) / 60) }}m {{ str_pad((int)($ranking->tiempo_segundos ?? 0) % 60, 2, '0', STR_PAD_LEFT) }}s
                                 </div>
                             </div>
                         @endforeach
@@ -321,8 +329,11 @@
                         </td>
                         <td class="time-display">
                             @if($partida->fase_actual === 'FINALIZADO' || $partida->fase_actual === 'FINALIZADO_TIMEOUT')
-                                <span style="color:{{ $partida->fase_actual === 'FINALIZADO' ? 'var(--success-color)' : 'var(--danger-color)' }}">
-                                    {{ floor((int)$partida->tiempo_segundos / 60) }}m {{ str_pad((int)$partida->tiempo_segundos % 60, 2, '0', STR_PAD_LEFT) }}s
+                                @php
+                                    $colorClass = $partida->fase_actual === 'FINALIZADO' ? 'text-success' : 'text-danger';
+                                @endphp
+                                <span class="{{ $colorClass }}">
+                                    {{ floor((int)($partida->tiempo_segundos ?? 0) / 60) }}m {{ str_pad((int)($partida->tiempo_segundos ?? 0) % 60, 2, '0', STR_PAD_LEFT) }}s
                                 </span>
                             @else
                                 @if($partida->inicio_juego)
@@ -356,6 +367,14 @@
                 </tbody>
             </table>
         </div>
+@push('scripts')
+<script>
+    // Auto recarga cada 10 segundos
+    setTimeout(() => {
+        window.location.reload();
+    }, 10000);
+</script>
+@endpush
 @endsection
 
 @push('scripts')

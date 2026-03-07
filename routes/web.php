@@ -56,13 +56,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'adminPanel'])->name('dashboard');
     Route::get('/admin', function() { return redirect('/dashboard'); }); // Alias por costumbre
 
-    // Gestión de Partidas
+    // Gestión de Partidas y Ticker Live
     Route::get('/admin/api/stats', [AdminController::class, 'apiStats']);
     Route::delete('/admin/equipo/{uuid}', [AdminController::class, 'eliminarEquipo']);
     Route::get('/admin/exportar-top20', [AdminController::class, 'exportarTop20PDF']);
+    Route::post('/admin/ticker', [Top10Controller::class, 'updateTicker'])->name('admin.ticker');
 
     // Gestión de QRs Dinámicos
-    Route::get('/admin/qrs', [QrController::class, 'mostrarGestor'])->name('admin.qrs');
+    Route::get('/admin/qrs', [QrController::class, 'gestionarQrs'])->name('admin.qrs');
     Route::post('/admin/qrs', [QrController::class, 'generarQr']);
     Route::delete('/admin/qrs/{id}', [QrController::class, 'eliminarQr']);
 
@@ -80,5 +81,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Importar rutas de Laravel Auth
+use App\Http\Controllers\Top10Controller;
+
+// ==========================================
+// PANTALLA PÚBLICA TOP 10 (LIVE)
+// ==========================================
+Route::get('/top10', [Top10Controller::class, 'index'])->name('top10');
+Route::get('/api/top10', [Top10Controller::class, 'apiData']);
+
+// Rutas de Laravel Auth
 require __DIR__.'/auth.php';

@@ -12,7 +12,7 @@ class AdminSeeder extends Seeder
         User::updateOrCreate(
             ['email' => '1daw@dawscape.com'],
             [
-                'name' => '1DAW Admin',
+                'name' => '1daw',
                 'password' => bcrypt('1daw'),
                 'email_verified_at' => now(),
             ]
