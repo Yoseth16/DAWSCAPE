@@ -15,6 +15,10 @@ class HitoFase extends Model
         'alcanzado_at'
     ];
 
+    protected $casts = [
+        'alcanzado_at' => 'datetime',
+    ];
+
     public function partida()
     {
         return $this->belongsTo(Partida::class);
