@@ -83,4 +83,51 @@ class AdminStatsService
             'data' => $fases->values()->toArray()
         ];
     }
+
+    /**
+     * Calcula la media de segundos invertidos en cada fase para detectar los Cuellos de Botella (Prueba más Letal).
+     * @return array
+     */
+    public function getBottlenecks()
+    {
+        $hitos = \App\Models\HitoFase::orderBy('partida_id')->orderBy('segundos_transcurridos', 'asc')->get();
+        
+        $tiemposPorFase = [];
+        $lastSegundos = [];
+
+        foreach ($hitos as $hito) {
+            $pid = $hito->partida_id;
+            
+            // Extraer el nombre de la prueba real removiendo sufijos (Ej: "Prueba 1 Mario Superada" -> "Prueba 1 Mario")
+            $faseName = str_replace(' Superada', '', $hito->fase);
+            $currentSecs = (int) $hito->segundos_transcurridos;
+            
+            $prevSecs = $lastSegundos[$pid] ?? 0;
+            $delta = $currentSecs - $prevSecs;
+            
+            if (!isset($tiemposPorFase[$faseName])) {
+                $tiemposPorFase[$faseName] = ['total' => 0, 'count' => 0];
+            }
+            
+            $tiemposPorFase[$faseName]['total'] += $delta;
+            $tiemposPorFase[$faseName]['count']++;
+            
+            $lastSegundos[$pid] = $currentSecs;
+        }
+
+        $resultados = [];
+        foreach ($tiemposPorFase as $fase => $data) {
+            $resultados[] = [
+                'fase' => $fase,
+                'media_segundos' => round($data['total'] / $data['count']),
+                'media_minutos' => round(($data['total'] / $data['count']) / 60, 1)
+            ];
+        }
+
+        usort($resultados, function($a, $b) {
+            return $b['media_segundos'] <=> $a['media_segundos'];
+        });
+
+        return $resultados;
+    }
 }

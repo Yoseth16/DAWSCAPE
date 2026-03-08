@@ -24,7 +24,9 @@ class EmpezarPartidaRequest extends FormRequest
                 },
             ],
             'nombre_equipo' => 'required|min:2',
-            'clase' => 'required'
+            'clase' => 'required',
+            'color_hex' => 'nullable|string|max:7',
+            'icono' => 'nullable|string|max:50'
         ];
     }
 }

@@ -1,134 +1,115 @@
-<div align="center">
-  <img src="https://laravel.com/img/logomark.min.svg" width="100" alt="Laravel Logo">
-  <h1>🚀 DAWSCAPE: Escape Room Web App</h1>
-  <p><strong>Plataforma integral para gestión y desarrollo de un Escape Room técnico y educativo.</strong></p>
-</div>
+# DAWSCAPE: Educational Escape Room
+
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+
+DAWSCAPE es un **Escape Room Educativo interactivo** diseñado para dinamizar sesiones de formación combinando retos físicos en el mundo real con una potente aplicación web, integrando enigmas lógicos, escaneo de Códigos QR, y tableros de puntuación en tiempo real.
+
+El juego sitúa a los alumnos en un escenario donde deben burlar el cortafuegos de un edificio corporativo resolviendo una serie de pruebas lineales y dinámicas para escapar antes de que el contador de seguridad (40 minutos) llegue a cero.
 
 ---
 
-## 📖 Descripción del Proyecto
+## 🚀 1. Descripción General del Flujo
 
-**DAWSCAPE** es una aplicación web interactiva desarrollada para gestionar sesiones inmersivas de un Escape Room. La plataforma se encarga tanto de la experiencia de los jugadores (gestión del tiempo real, validación de puzles, escaneo de códigos QR dinámicos) como de la administración por parte de los Game Masters (panel en vivo con analíticas de progreso, penalizaciones y clasificaciones).
-
-### 🛠️ Stack Tecnológico
-- **Backend:** PHP 8.2+ / Laravel 11
-- **Base de Datos:** MariaDB
-- **Frontend:** HTML5, Vanilla CSS avanzado, JavaScript (ES6+), Blade Templates
-- **Asset Manager:** Vite (Módulos JS y CSS Hot Reload)
-- **Despliegue/Servidor:** AlmaLinux 9, Nginx, PHP-FPM, CI/CD Scripted
+1. **Pantalla de Inicio y Login**: Los alumnos acceden a la aplicación y registran el nombre de su equipo y su clase (para las mecánicas de ranking). Una vez entran, el temporizador global arranca en el servidor.
+2. **Desarrollo Lineal de Pruebas**: Los equipos se enfrentan a pruebas secuenciales (1 a 7). Cada prueba contiene un desafío específico (lógica, matemáticas, geografía, deducción).
+3. **Integración con QRs Físicos**: Las Pruebas 3, 4 y 5 invitan al jugador a levantarse del asiento, explorar el aula o edificio y escanear códigos QR que están escondidos físicamente en máquinas de café, taquillas u otros lugares reales.
+4. **Validación Segura**: Cada respuesta introducida en la interfaz (simulando una terminal hacker) se valida silenciosamente en el backend contra la base de datos (omitiendo espacios, mayúsculas y acentos automáticamnete). Las pistas no bloquean el juego, pero añaden penalizaciones de tiempo invisibles.
+5. **Cortafuegos Final**: La Prueba 7 inyecta aleatoriamente al cliente 5 acertijos o preguntas extraídas de una base de datos gestionada por el profesor.
+6. **Reporte Final**: Una vez superada la última barrera, la app congela sus cronómetros y emite su Informe de Rendimiento para que los jugadores observen cuánto tiempo les costó cada reto.
 
 ---
 
-## ⚙️ Requisitos Previos
+## 🧩 2. Inventario Oficial de Pruebas y Respuestas
 
-Para ejecutar y colaborar en este proyecto localmente, necesitas tener instalados los siguientes componentes en tu sistema:
+Cada prueba fue desarrollada por un miembro distinto. A continuación la ruta canónica y las llaves maestras:
 
-- **PHP** >= 8.2
-- **Composer** (Gestor de dependencias de PHP)
-- **Node.js** >= 18 y **npm** (Para compilar los recursos front-end)
-- **MySQL** o **MariaDB** instalado y ejecutándose localmente
-- **Git**
-
----
-
-## 🚀 Instalación en Local
-
-Sigue estos pasos para arrancar el entorno de desarrollo en tu máquina:
-
-**1. Clonar el repositorio**
-```bash
-git clone https://github.com/tu-usuario/DAWSCAPE.git
-cd DAWSCAPE
-```
-
-**2. Instalar dependencias de PHP (Composer)**
-```bash
-composer install
-```
-
-**3. Instalar dependencias de Frontend (NPM) y compilar**
-```bash
-npm install
-npm run build
-```
-
-**4. Configurar el entorno**
-Copia el archivo de ejemplo para crear tu configuración local y genera la clave de cifrado:
-```bash
-cp .env.example .env
-php artisan key:generate
-```
-
-**5. Configurar la Base de Datos**
-Abre tu archivo `.env` recién creado y asegúrate de que los credenciales de la base de datos coincidan con los tuyos locales:
-```env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=dawscape
-DB_USERNAME=root
-DB_PASSWORD=
-```
-
-**6. Ejecutar migraciones y seeders**
-Crea la base de datos vacía en tu gestor (ej. phpMyAdmin o DBeaver) y ejecuta:
-```bash
-php artisan migrate --seed
-```
-*(El seeder creará los datos de prueba y administradores iniciales si están configurados).*
-
-**7. Levantar el servidor de desarrollo**
-Inicia el servidor backend de Laravel:
-```bash
-php artisan serve
-```
-Y **en otra terminal auxiliar**, levanta Vite para el *Hot-Reload* del frontend:
-```bash
-npm run dev
-```
-
-La app estará disponible en: `http://localhost:8000`
+| Prueba / Subsistema                  | Autor   | Tipo de Reto             | Master Key (Respuesta Esperada)         |
+| ------------------------------------ | ------- | ------------------------ | --------------------------------------- |
+| **Prueba 1: Secuencia Lógica**       | Mario   | Digital                  | `115, 16, 32, 14, 5x0lh8bx100127t, 201` |
+| **Prueba 2: El Clúster Fragmentado** | Yoseth  | Lógico / Deducción       | `ROCIO`                                 |
+| **Prueba 3: Operación Cafeína**      | Angel   | Físico (Código QR)       | `124` _(botones+110+5)_                 |
+| **Prueba 4: Operación Repuestos**    | Arturo  | Físico (Código QR)       | `141` _(filas+nº prod+Oasis)_           |
+| **Prueba 5: Protocolo Espejo**       | Eloy    | Físico (Código QR)       | `ZASIELX`                               |
+| **Prueba 6: Sobrecarga del Sistema** | Miguel  | Digital                  | -                                       |
+| **Prueba 7: Cortafuegos Dinámico**   | Creador | Preguntas Variables BBDD | _(Aleatorio según B. de Preguntas)_     |
 
 ---
 
-## 🌍 Despliegue en Producción (CI/CD)
+## 🛠️ 3. Stack Tecnológico
 
-El proyecto cuenta con un sistema de **Despliegue Continuo (Continuous Deployment)** preparado para el servidor AlmaLinux de producción.
+DAWSCAPE se apoya en un stack moderno de backend y estilos híbridos:
 
-Hemos creado el script de automatización `./deploy.sh` ubicado en la raíz del proyecto. Este script se encarga de:
-1. Poner la aplicación en modo mantenimiento (`php artisan down`).
-2. Actualizar las ramas de Git.
-3. Instalar dependencias (Composer/NPM) de forma limpia.
-4. Compilar los assets empaquetados mediante Vite (`npm run build`).
-5. Ejecutar migraciones pendientes a la base de datos de manera segura.
-6. Limpiar y reconstruir las cachés de Laravel (Config, Rutas, Vistas).
-7. Ajustar y asegurar los permisos correctos (`chown -R nginx:nginx`).
-8. Reiniciar los servicios `php-fpm` y `nginx`.
-
-### ¿Cómo actualizar el servidor tras publicar un cambio?
-Ya no tienes que picar decenas de comandos, simplemente entra a tu servidor de producción (SSH) y dentro de la carpeta del proyecto ejecuta:
-
-```bash
-sudo ./deploy.sh
-```
-
-*(Nota: Está configurado un Hook en GitHub (`post-merge`) de forma que si realizas un `git pull` en el servidor, este llamará al `deploy.sh` automáticamente).*
+- **Backend / Framework**: Laravel (PHP 8+)
+- **Base de Datos**: MySQL (Eloquent ORM)
+- **Motor de Plantillas**: Laravel Blade
+- **Estilos UI**: Tailwind CSS (CDN/Vite) combinado con CSS Vainilla (`Glassmorphism` themes) y Google Fonts (Orbitron / Share Tech Mono).
+- **Generación de QRs**: `simplesoftwareio/simple-qrcode`.
+- **Generación de PDFs**: `barryvdh/laravel-dompdf` (Para exportar la clasificación).
 
 ---
 
-## 🗄️ Estructura de la Base de Datos
+## 💾 4. Instalación y Despliegue
 
-La lógica transaccional de **DAWSCAPE** es gestionada de manera robusta usando Eloquent ORM. Sus principales entidades son:
+### Requisitos Previos
 
-- `users` : Almacena las cuentas maestras (Profesores / Game Masters) con acceso al dashboard analítico.
-- `partidas` : Tabla central. Gestiona la sesión de un equipo completo, su UUID para seguridad, fase actual, tiempo consumido penalizaciones por errores y estado (Activo/Completado).
-- `jugadores` : Miembros individuales adscritos a una partida en concreto.
-- `puzzles` & `intentos`: Registran las interacciones, repuestas e intentos fallidos a los distintos retos proporcionados en el Escape Room.
-- `qrs` : Enlaces y metadatos de los códigos QR dinámicos repartidos físicamente en el entorno, que enrutan al participante a diferentes retos in-game.
-- `hitos_fases`: Tabla intermedia histórica para almacenar el *timestamp* exacto en el que un equipo alcanza una nueva fase / checkpoint.
+- PHP >= 8.2
+- Composer
+- MySQL o MariaDB
+- Node.js & NPM
+
+### Instrucciones en Local (Desarrollo)
+
+1. **Clonar Repositorio**: `git clone <repo_url>`
+2. **Instalar Dependencias de PHP**: `composer install`
+3. **Instalar Dependencias de Node**: `npm install`
+4. **Configurar Entorno**: Renombrar `.env.example` a `.env`.
+5. **BBDD**: Crear una base de datos local y configurar las credenciales en el `.env` (`DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`).
+6. **Generar Clave de APP**: Ejecutar `php artisan key:generate`.
+7. **Migrar e Iniciar Tablas**: Ejecutar `php artisan migrate:fresh --seed`. Esto inyectará el administrador por defecto y el banco de preguntas inicial.
+8. **Generar Assets**: `npm run build`
+9. **Desplegar Servidor Local**: `php artisan serve`.
+
+### Instrucciones en Producción (Hosting Común)
+
+Repite los pasos anteriores vía SSH, pero asegurándote de:
+
+- Configurar adecuadamente a `production` y cambiar `APP_DEBUG=false`.
+- Habilitar las extensiones de PHP requeridas: **GD** (Para QRs y PDF) e **Imagick** si se demanda en dependencias secundarias.
+- Enlazar la carpeta Storage de cara al público: `php artisan storage:link`.
+- Borrar y regenerar caché: `php artisan optimize:clear` y `php artisan optimize`.
 
 ---
 
-<div align="center">
-  <i>Desarrollado con ❤️ para llevar los Escape Rooms al siguiente nivel técnico.</i>
-</div>
+## 🏢 5. Panel de Control del Game Master (Administrador)
+
+Puedes acceder al cuartel general como profesor dirigiéndote a `/login` e ingresando las credenciales predeterminadas sembradas en base de datos.
+
+Este potente Dashboard ofrece:
+
+- **Monitorización en Tiempo Real**: Tarjetas KPI que muestran el total de equipos en juego, cuántos han colapsado (timeout) y el tiempo promedio de toda la clase.
+- **Gráficos (Chart.js)**: Distribución visual del progreso (cuántos equipos están estancados en cada fase).
+- **Control Total**: Una tabla donde puedes eliminar a equipos (si iniciaron sesión sin querer), o seguir el progreso al milímetro en formato "Live".
+- **Exportación a Papel**: El botón `[Exportar Top 20]` compilará un documento PDF listo para imprimir para entregar insignias físicas o publicar en el corcho del aula.
+- **Banco de Preguntas Remoto**: Sección dedicada para meter, sacar y banear (ocultar) acertijos específicos de cultura general que impactan directamente a la aleatoriedad de la `Prueba 7`.
+- **Testing Rápido (Bypass)**: Una columna lateral lista los botones de prueba para ejecutar cada uno de los retos desde el punto de vista del usuario _sin necesidad de escanear los QRs por los pasillos_, ideal para comprobar que la lógica o las resoluciones correctas operan adecuadamente tras actualizar el juego.
+
+---
+
+## 📸 6. El Sistema de QRs Dinámicos
+
+Para las pruebas semi-físicas (Pruebas 3, 4 y 5) Dawscape evita hardcodear las rutas en el código:
+
+1. El profesor abre la vista del "Gestor de QRs" (`/admin/qrs`).
+2. Se rellena un formulario básico ("Nombre de pista", y "Fase obligatoria").
+3. El sistema genera instantáneamente una imagen limpia QR vinculada a un slug indetectable (Ej: `dawscape.fun/qr/maquina-de-snacks-60abcde123`).
+4. El profesor puede descargar la imagen SVG del QR pulsando e imprimirla en hojas perforables, colgándolas por el instituto.
+5. **Enrutamiento Inteligente**: Si un alumno intenta listar todos los QRs de golpe de forma ilícita, el sistema validará si su estado en la tabla `partidas` coincide o se "merecen" leer ese QR ahora mismo, saltándoles un error irónico en caso de fraude ("¡Aún no estáis en esta fase!").
+
+---
+
+## 🌍 7. Url de Producción Pública
+
+Actualmente DAWSCAPE opera desde el servidor en vivo:
+🔗 [**https://dawscape.fun**](https://dawscape.fun)
+
+_(También accesible en la ruta `/top10` para proyectores o televisiones en la sala principal habilitados para emitir la música de tensión y rotación asíncrona de los podios durante el turno del juego)._

@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     <!-- ICONOS -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    @vite(['resources/js/app.js'])
     <style>
         :root {
             /* Modo Oscuro (Por defecto) */
@@ -383,6 +384,44 @@
         /* CONFETTI CANVAS */
         #confetti { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10000; }
 
+        /* ===== TV / LARGE SCREEN OPTIMIZATION (40-55") ===== */
+        @media (min-width: 1400px) {
+            .header h1 { font-size: 3.5rem; letter-spacing: 4px; }
+            .main-container { max-width: 1600px; gap: 3.5rem; padding: 2.5rem 2rem 7rem 2rem; }
+            .section-title { font-size: 2.8rem; margin-bottom: 1.5rem; }
+
+            /* Podio escalado */
+            .podium-container { height: 550px; gap: 2.5rem; }
+            .p1 { height: 420px; } .p2 { height: 300px; } .p3 { height: 220px; }
+            .podium-rank { font-size: 6rem; }
+            .podium-name { font-size: 2.6rem; }
+            .p1-card .podium-name { font-size: 3rem; }
+            .podium-time { font-size: 2.6rem; }
+            .podium-phase { font-size: 1.2rem; }
+            .p1-badge { font-size: 1.1rem; padding: 8px 22px; }
+            .podium-card { padding: 2rem; }
+
+            /* Lista 4-10 */
+            .list-item { padding: 1.8rem; border-radius: 16px; gap: 2rem; }
+            .list-pos { font-size: 3rem; width: 60px; }
+            .list-info h4 { font-size: 2rem; }
+            .list-phase { font-size: 1.3rem; }
+            .list-time { font-size: 2.2rem; }
+            .progress-wrapper { height: 10px; margin-top: 12px; }
+
+            /* Finalizados */
+            .finisher-name { font-size: 1.8rem; }
+            .finisher-time { font-size: 1.8rem; }
+            .finisher-pos { font-size: 1.6rem; }
+            .finishers-panel { padding: 2rem; }
+            .finisher-item { padding: 1.4rem; }
+
+            /* Celebration overlay */
+            .celeb-title { font-size: 6rem; }
+            .celeb-team { font-size: 9rem; }
+            .celeb-time { font-size: 4.5rem; }
+        }
+
     </style>
 </head>
 <body>
@@ -566,6 +605,19 @@
             const listContainer = document.getElementById('list-container');
             document.getElementById('activos-title').innerHTML = `<i class="ph-fill ph-users-three"></i> PERSIGUIENDO (Top 4-10)`;
             
+            // Helper for medals
+            const renderMedals = (logros) => {
+                if(!logros || logros.length === 0) return '';
+                let html = '<div style="display:inline-flex; gap:5px; margin-left:10px; vertical-align:middle;">';
+                logros.forEach(logro => {
+                    if (logro === 'speedrunner_ninja') html += '<i class="ph-fill ph-lightning" title="Speedrunner Ninja" style="color:#eab308; font-size:1.4rem; filter: drop-shadow(0 0 5px #eab308);"></i>';
+                    if (logro === 'cerebro_intacto') html += '<i class="ph-fill ph-brain" title="Cerebro Intacto" style="color:#ec4899; font-size:1.4rem; filter: drop-shadow(0 0 5px #ec4899);"></i>';
+                    if (logro === 'hackerman') html += '<i class="ph-fill ph-terminal-window" title="Hackerman" style="color:#10b981; font-size:1.4rem; filter: drop-shadow(0 0 5px #10b981);"></i>';
+                });
+                html += '</div>';
+                return html;
+            };
+
             let listHTML = '';
             remaining.forEach((team, index) => {
                 const rank = index + 4;
@@ -575,10 +627,11 @@
                 else if(rank > oldRank) animClass = 'move-down';
 
                 listHTML += `
-                <div class="list-item ${animClass}" ${team.abandonado ? 'style="opacity:0.5; filter:grayscale(1);"' : ''}>
+                <div class="list-item ${animClass}" ${team.abandonado ? 'style="opacity:0.5; filter:grayscale(1);"' : ''} style="border-left: 4px solid ${team.color_hex};">
                     <div class="list-pos">${rank}</div>
+                    <div style="font-size: 2rem; color: ${team.color_hex};"><i class="ph ${team.icono}"></i></div>
                     <div class="list-info">
-                        <h4>${team.nombre_equipo} ${team.abandonado ? '(TIMEOUT)' : ''}</h4>
+                        <h4 style="color: ${team.color_hex};">${team.nombre_equipo} ${renderMedals(team.logros)} ${team.abandonado ? '(TIMEOUT)' : ''}</h4>
                         <div class="list-phase">
                             <i class="ph-fill ${team.abandonado ? 'ph-x-circle' : 'ph-spinner-gap ph-spin'}"></i> 
                             ${team.nombre_prueba}
@@ -646,7 +699,9 @@
             <div class="podium-slot" style="${opacity}">
                 <div class="podium-card ${rank===1 ? 'p1-card' : ''}">
                     ${badge}
-                    <div class="podium-name">${team.nombre_equipo}</div>
+                    <div style="font-size: 3rem; margin-bottom: 5px; color: ${team.color_hex}; filter: drop-shadow(0 0 10px ${team.color_hex}80);"><i class="ph ${team.icono}"></i></div>
+                    <div class="podium-name" style="color: ${rank===1 ? '#eab308' : team.color_hex};">${team.nombre_equipo}</div>
+                    <div style="margin-bottom: 10px;">${renderMedals(team.logros)}</div>
                     <div class="podium-time">${team.tiempo_formateado}</div>
                     ${gap}
                     <div class="podium-phase">${team.nombre_prueba} ${titleStatus}</div>
@@ -662,7 +717,21 @@
 
         // Init Polling
         fetchTop10();
-        setInterval(fetchTop10, 5000); // 5 segundos
+        setInterval(fetchTop10, 5000); // Polling permanente como Fallback robusto
+
+        // Escuchar eventos en vivo desde Reverb
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.Echo) {
+                window.Echo.channel('top10')
+                    .listen('Top10Updated', (e) => {
+                        console.log('Top 10 Update Received from Reverb', e);
+                        fetchTop10();
+                    });
+            } else {
+                console.error("Laravel Echo is not loaded. Fallback to polling.");
+                setInterval(fetchTop10, 5000);
+            }
+        });
 
     </script>
 </body>

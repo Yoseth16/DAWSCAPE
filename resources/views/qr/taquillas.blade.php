@@ -405,7 +405,7 @@ function verificarChecksum() {
     feedback.textContent = "Analizando bloque de datos...";
     feedback.className = "feedback";
 
-    fetch('/prueba5eloy', {
+    fetch('/prueba5', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @push('styles')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
@@ -54,11 +55,11 @@
             font-weight: 800;
             margin: 0;
             letter-spacing: 1px;
-            color: #f8fafc;
+            color: transparent;
             font-size: 1.5rem;
-            background: -webkit-linear-gradient(45deg, #60a5fa, #a78bfa);
+            background: linear-gradient(45deg, #60a5fa, #a78bfa);
             -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .sidebar-menu {
@@ -150,8 +151,13 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="/admin/qrs" class="nav-link {{ request()->is('admin/qrs') ? 'active' : '' }}">
+                    <a href="{{ route('admin.qrs') }}" class="nav-link {{ request()->routeIs('admin.qrs') ? 'active' : '' }}">
                         <i class="ph ph-qr-code"></i> Gestor de QRs
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('admin.preguntas') }}" class="nav-link {{ request()->routeIs('admin.preguntas') ? 'active' : '' }}">
+                        <i class="ph ph-exam"></i> B. Preguntas
                     </a>
                 </li>
             </ul>

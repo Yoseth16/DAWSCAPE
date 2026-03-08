@@ -56,7 +56,7 @@
       <div class="term-line" id="l3">[OK] Acceso concedido al núcleo del sistema.</div>
       <div class="term-line narrative" id="l4">-- NO MESSAGE --</div>
       <div class="term-line" id="l5" style="margin-top: 2rem; text-align: center;">
-          <a href="/prueba4arturo" class="btn" style="text-decoration:none; display:inline-block;">PASAR A LA SIGUIENTE PRUEBA →</a>
+          <a href="{{ route('prueba4') }}" class="btn" style="text-decoration:none; display:inline-block;">PASAR A LA SIGUIENTE PRUEBA →</a>
       </div>
   </div>
 </div>
@@ -111,7 +111,7 @@ function verificarChecksum() {
     feedback.textContent = "Verificando firmas locales...";
     feedback.className = "feedback";
 
-    fetch('/prueba3angel', {
+    fetch('/prueba3', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

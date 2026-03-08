@@ -14,7 +14,19 @@ class Partida extends Model
         'inicio_juego', 
         'fase_actual',
         'uuid',
-        'penalizacion_segundos'
+        'penalizacion_segundos',
+        'color_hex',
+        'icono',
+        'logros',
+        'estado',
+        'tiempo_pausado_segundos',
+        'ultima_pausa_at'
+    ];
+
+    protected $casts = [
+        'logros' => 'array',
+        'inicio_juego' => 'datetime',
+        'ultima_pausa_at' => 'datetime'
     ];
 
     /**
@@ -30,8 +42,13 @@ class Partida extends Model
         });
     }
 
-    public function hitos()
+    public function hitosFases()
     {
         return $this->hasMany(HitoFase::class);
+    }
+
+    public function logs()
+    {
+        return $this->hasMany(LogJuego::class);
     }
 }

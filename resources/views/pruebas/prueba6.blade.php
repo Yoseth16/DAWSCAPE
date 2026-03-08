@@ -65,3 +65,5 @@
 @vite(['resources/js/prueba6.js'])
 @endpush
 @endsection
+
+@include('components.live-listener')

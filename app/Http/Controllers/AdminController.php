@@ -49,7 +49,7 @@ class AdminController extends Controller
             })
             ->values();
 
-        return view('admin', compact(
+        return view('admin.dashboard', compact(
             'partidas', 'top5', 'rutasPruebas', 
             'totalEquipos', 'equiposFinalizados', 'equiposActivos', 'equiposTimeout', 'chartData'
         ))->with('tiempoMedioSegundos', $promedioSegundos);
@@ -65,6 +65,15 @@ class AdminController extends Controller
         return back()->with('error', 'El equipo no existe.');
     }
 
+    public function mostrarLogs($uuid)
+    {
+        $partida = Partida::with(['logs' => function($query) {
+            $query->orderBy('created_at', 'asc');
+        }])->where('uuid', $uuid)->firstOrFail();
+
+        return view('admin.logs', compact('partida'));
+    }
+
     public function exportarTop20PDF()
     {
         $top20 = Partida::where('fase_actual', 'FINALIZADO')
@@ -75,12 +84,16 @@ class AdminController extends Controller
         $pdf = Pdf::loadView('ranking-pdf', compact('top20'));
         return $pdf->download('Ranking_Top_20_DAWSCAPE.pdf');
     }
-    
+
+
+
+
     public function apiStats()
     {
         $partidas = $this->statsService->getPartidasOrdered();
         $metrics = $this->statsService->getMetrics();
         $chartData = $this->statsService->getChartData();
+        $bottlenecks = $this->statsService->getBottlenecks();
 
         // Limpieza drástica del método, delegando a la capa Controller solo el Response JSON.
         return response()->json([
@@ -91,6 +104,7 @@ class AdminController extends Controller
                 'promedio' =>    $metrics['promedio']
             ],
             'chart' => $chartData,
+            'bottlenecks' => $bottlenecks,
             'partidas' => $partidas->map(function($p) {
                 $segsLive = 0;
                 if ($p->fase_actual !== 'FINALIZADO' && $p->fase_actual !== 'FINALIZADO_TIMEOUT' && $p->inicio_juego) {
@@ -105,9 +119,55 @@ class AdminController extends Controller
                     'fase_actual' => $p->fase_actual,
                     'tiempo_segundos' => (int)$p->tiempo_segundos,
                     'tiempo_live' => $segsLive,
+                    'color_hex' => $p->color_hex ?? '#3b82f6',
+                    'icono' => $p->icono ?? 'ph-user-focus',
+                    'logros' => $p->logros ?? [],
                     'avatar' => strtoupper(substr($p->nombre_equipo, 0, 1))
                 ];
             })
         ]);
+    }
+
+    // ==========================================
+    // MÓDULO: CREADOR DINÁMICO DE PRUEBAS
+    // ==========================================
+    public function gestionarPreguntas()
+    {
+        $preguntas = \App\Models\PreguntaDinamica::orderBy('created_at', 'desc')->get();
+        return view('admin.gestionar-preguntas', compact('preguntas'));
+    }
+
+    public function guardarPregunta(Request $request)
+    {
+        $request->validate([
+            'enunciado' => 'required|string',
+            'respuesta_correcta' => 'required|string|max:255'
+        ]);
+
+        \App\Models\PreguntaDinamica::create([
+            'enunciado' => $request->enunciado,
+            'respuesta_correcta' => $request->respuesta_correcta,
+            'activa' => true
+        ]);
+
+        return back()->with('success', 'Pregunta guardada correctamente.');
+    }
+
+    public function togglePregunta($id)
+    {
+        $pregunta = \App\Models\PreguntaDinamica::findOrFail($id);
+        $pregunta->activa = !$pregunta->activa;
+        $pregunta->save();
+        
+        $estado = $pregunta->activa ? 'activada' : 'desactivada';
+        return back()->with('success', "Pregunta $estado exitosamente.");
+    }
+
+    public function eliminarPregunta($id)
+    {
+        $pregunta = \App\Models\PreguntaDinamica::findOrFail($id);
+        $pregunta->delete();
+        
+        return back()->with('success', 'Pregunta eliminada del sistema.');
     }
 }

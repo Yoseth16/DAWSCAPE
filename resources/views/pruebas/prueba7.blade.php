@@ -4,7 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<title>ESCAPE ROOM — AULA 115 | DAWSCAPE</title>
+<title>CORTAFUEGOS | DAWSCAPE</title>
+<meta name="quiz-data" content="{{ $preguntasAsignadas->map(function($pregunta, $index) {
+    return [
+        'label' => '// PROTOCOLO ' . str_pad($index + 1, 2, '0', STR_PAD_LEFT),
+        'riddle' => $pregunta->enunciado,
+        'answer' => $pregunta->respuesta_correcta
+    ];
+})->toJson() }}">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
 
@@ -74,7 +81,7 @@
 
   .logo {
     font-family: 'Orbitron', sans-serif;
-    font-size: clamp(2.2rem, 6vw, 4.5rem);
+    font-size: clamp(2rem, 5vw, 4rem);
     font-weight: 900;
     color: var(--green);
     text-shadow: 0 0 20px var(--green), 0 0 60px #00ff8840;
@@ -101,7 +108,7 @@
   }
 
   .intro-text::before {
-    content: '// MISIÓN';
+    content: '// MISIÓN FINAL';
     position: absolute;
     top: -0.7rem; left: 1rem;
     background: var(--bg);
@@ -309,6 +316,20 @@
     90% { opacity: 0.3; }
     100% { opacity: 0; transform: translateY(-10vh); }
   }
+
+  /* MOBILE */
+  .btn { min-height: 52px; -webkit-tap-highlight-color: transparent; }
+  @media (max-width: 600px) {
+    #screen-quiz, .hud, .progress-bar { max-width: 100%; }
+    .screen.active { padding-left: 1rem; padding-right: 1rem; padding-top: 5.5rem; }
+    .game-header { padding: 0.6rem 1rem; }
+    .team-info { font-size: 0.7rem; }
+    .header-timer { font-size: 1.1rem; }
+    .riddle-box { font-size: 0.95rem; }
+    .answer-input { font-size: max(16px, 1.1rem); }
+    .btn { font-size: 0.8rem; letter-spacing: 0.1em; padding: 0.8rem 1rem; }
+    .intro-text { font-size: 0.95rem; }
+  }
 </style>
 </head>
 <body>
@@ -326,31 +347,31 @@
 
 <!-- INTRO -->
 <div class="screen active" id="screen-intro">
-  <div class="logo">AULA 115</div>
-  <div class="subtitle">// Sistema de Escape · Nivel Clasificado</div>
+  <div class="logo">CORTAFUEGOS</div>
+  <div class="subtitle">// BARRERA INTELECTUAL</div>
   <div class="intro-text">
-    <p>Agente, el sistema de seguridad del <strong style="color:var(--green)">Aula de Informática</strong> ha sido activado.</p>
+    <p>Agente, estás a un paso de recuperar el código fuente central del escape room.</p>
     <br>
-    <p>Para desbloquear la salida, deberás resolver <strong style="color:var(--green)">6 acertijos</strong> ocultos en esta sala. Observa bien cada rincón.</p>
+    <p>El sistema de seguridad final requiere que demuestres tus conocimientos humanos fundamentales para diferenciarte de las IAs extractoras.</p>
     <br>
-    <p style="color:#445544">Sin pistas. Sin ayuda. Solo tus ojos y tu ingenio.</p>
+    <p style="color:#445544">Supera el interrogatorio y las puertas se abrirán.</p>
   </div>
-  <button class="btn" onclick="startGame()">▶ COMENZAR</button>
+  <button class="btn" onclick="startGame()">▶ INICIAR CONEXIÓN</button>
 </div>
 
 <!-- QUIZ -->
 <div class="screen" id="screen-quiz">
   <div class="hud" style="width:100%; max-width:680px;">
     <div>
-      <div class="hud-label">Prueba</div>
-      <div class="hud-val" id="q-counter">1 / 6</div>
+      <div class="hud-label">Pregunta</div>
+      <div class="hud-val" id="q-counter">1 / 5</div>
     </div>
   </div>
   <div style="width:100%; max-width:680px;">
     <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
   </div>
 
-  <div class="question-card" id="question-card" data-label="// ACERTIJO">
+  <div class="question-card" id="question-card" data-label="// ANALIZANDO...">
     <div class="riddle-box" id="riddle-box"></div>
     <input class="answer-input" id="answer-input" type="text" placeholder="_ _ _ _ _ _ _" autocomplete="off" spellcheck="false" autocapitalize="off">
     <div class="feedback" id="feedback"></div>
@@ -362,78 +383,40 @@
 <!-- WIN -->
 <div class="screen" id="screen-win">
   <div style="font-size:3.5rem">🔓</div>
-  <div class="win-title">ACCESO CONCEDIDO</div>
-  <div class="subtitle">// Todos los sistemas desbloqueados</div>
+  <div class="win-title">ACCESO MAESTRO CONCEDIDO</div>
+  <div class="subtitle">// Firewall Colapsado Integrado</div>
   <div class="result-panel" id="win-stats"></div>
-  <a href="/prueba2yoseth" class="btn">PASAR A LA SIGUIENTE PRUEBA →</a>
+  <a href="/final" class="btn">FINALIZAR ESCAPE ROOM →</a>
 </div>
 
 <script>
-// ── TIMER DESDE BBDD ────────────────────────────────────────
-let tiempo = parseInt("{{ $tiempo_transcurrido ?? 0 }}");
+// ── INYECCIÓN PREGUNTAS BBDD ────────────────────────────────
+const questions = JSON.parse(document.querySelector('meta[name="quiz-data"]').getAttribute('content'));
 
+// ── TIMER DESDE BBDD ────────────────────────────────────────
+let tiempoInicial = parseInt("{{ $tiempo_transcurrido ?? 0 }}");
+const loadTimeMs = Date.now();
 const timerDisplay = document.getElementById('cronometro');
 const MAX_MINUTOS = 90;
 
 function actualizarTimer() {
+  let tiempo = tiempoInicial + Math.floor((Date.now() - loadTimeMs) / 1000);
   let minutos = parseInt(tiempo / 60, 10);
   let segundos = parseInt(tiempo % 60, 10);
 
   let m = minutos  < 10 ? "0" + minutos  : minutos;
   let s = segundos < 10 ? "0" + segundos : segundos;
 
-  timerDisplay.textContent = m + ":" + s;
+  if(timerDisplay) timerDisplay.textContent = m + ":" + s;
 
   if (minutos >= MAX_MINUTOS) {
       window.location.href = '/final';
       return;
   }
-
-  tiempo++;
 }
 
-actualizarTimer(); // Ejecutar inmediatamente para mostrar el timer
+actualizarTimer();
 setInterval(actualizarTimer, 1000);
-
-// ── PREGUNTAS ────────────────────────────────────────────────
-const questions = [
-  {
-    label: "// ACERTIJO 01",
-    riddle: `Soy un número de tres cifras.\nSoy la puerta de entrada a esta sala.\nNo soy el cien, ni el doscientos,\npero aquí dentro guardo todos tus momentos.\n\n¿Cuál es mi número?`,
-    answer: "115",
-    alt: ["aula 115"]
-  },
-  {
-    label: "// ACERTIJO 02",
-    riddle: `Tengo cuerpo pero no huesos.\nProceso datos, no tengo voz.\nSomos un grupo par y exacto en esta sala.\n\n¿Cuántos somos?`,
-    answer: "16",
-    alt: ["dieciséis", "dieciseis"]
-  },
-  {
-    label: "// ACERTIJO 03",
-    riddle: `Mostramos mundos que no existen,\nsomos el doble de nuestros compañeros.\nAlgunas van en parejas, otras solas,\npero juntas sumamos un número certero.\n\n¿Cuántas somos en total?`,
-    answer: "32",
-    alt: ["treinta y dos"]
-  },
-  {
-    label: "// ACERTIJO 04",
-    riddle: `Vivo en el techo, nunca en el suelo.\nSin mí esta sala estaría a oscuras.\nSomos pares como alas de un pájaro,\ny alumbramos cada rincón con frescura.\n\n¿Cuántos somos?`,
-    answer: "14",
-    alt: ["catorce"]
-  },
-  {
-    label: "// ACERTIJO 05",
-    riddle: `Soy el guardián del aula.\nMe encuentras en el lugar más visible de todos,\npresidiendo la pizarra, mirando a todos.\n\nNo soy un número ni una palabra,\nsino una cadena de caracteres que nació en fábrica.\n\nEncuéntrame. Léeme. Introdúceme.\n\n¿Cuál es mi código?`,
-    answer: "5x0lh8bx100127t",
-    alt: ["5x0lh8bx100127t"]
-  },
-  {
-    label: "// ACERTIJO FINAL",
-    riddle: `Has llegado lejos, agente.\nPero el último candado requiere lógica pura.\n\nSuma todos los números que has descubierto:\nla sala, las máquinas, las pantallas y las luces.\n\nAhora, extrae todos los dígitos ocultos en el código de serie\ny súmalos entre sí.\n\nEl resultado final es la suma de ambos valores.\n\n¿Cuál es el código de salida?`,
-    answer: "201",
-    alt: ["doscientos uno"]
-  }
-];
 
 // ── ESTADO ───────────────────────────────────────────────────
 let currentQ = 0;
@@ -490,20 +473,19 @@ function loadQuestion() {
   document.getElementById('q-counter').textContent = `${currentQ + 1} / ${questions.length}`;
   document.getElementById('progress-fill').style.width = (currentQ / questions.length * 100) + '%';
 
-  // Solo se bindea cuando el componente está libre
   inp.onkeydown = e => { 
       if (e.key === 'Enter') {
-          e.preventDefault(); // Evitamos acciones nativas
+          e.preventDefault();
           checkAnswer(); 
       }
   };
   inp.focus();
   
-  isTransitioning = false; // Liberamos el candado
+  isTransitioning = false;
 }
 
 function checkAnswer() {
-  if (isTransitioning) return; // IGNORAR CUALQUIER CLICK O ENTER SI HAY TRANSICIÓN
+  if (isTransitioning) return;
 
   const input = document.getElementById('answer-input');
   const btn = document.getElementById('verify-btn');
@@ -517,38 +499,37 @@ function checkAnswer() {
         input.classList.remove('wrong');
         document.getElementById('feedback').textContent = '';
       }, 1500);
-      return; // IMPIDE AVANZAR SI ESTÁ VACÍO
+      return;
   }
 
   const q = questions[currentQ];
   const userAns = normalize(val);
   const correct = normalize(q.answer);
-  const alts = (q.alt || []).map(normalize);
 
-  if (userAns === correct || alts.includes(userAns)) {
-    isTransitioning = true; // ACTIVAMOS CANDADO
-    input.disabled = true;  // BLOQUEO TOTAL DE INPUT
-    input.onkeydown = null; // ELIMINAMOS FLUSHING
+  if (userAns === correct) {
+    isTransitioning = true;
+    input.disabled = true;
+    input.onkeydown = null;
     if(btn) btn.disabled = true;
 
-    userAnswers.push(userAns);
+    userAnswers.push(val); // Enviamos el raw al back tal cual
 
     input.classList.add('correct');
     document.getElementById('feedback').className = 'feedback ok';
-    document.getElementById('feedback').textContent = '[OK] Respuesta aceptada — Cortafuegos superado';
+    document.getElementById('feedback').textContent = '[OK] Parámetro válido — Nodos activados';
     setTimeout(() => {
       currentQ++;
       if (currentQ >= questions.length) showWin();
       else loadQuestion();
     }, 1500);
   } else {
-    isTransitioning = true; // BLOQUEO TEMPORAL DURANTE EL ERROR
+    isTransitioning = true;
     input.disabled = true;
     if(btn) btn.disabled = true;
     
     input.classList.add('wrong');
     document.getElementById('feedback').className = 'feedback err';
-    document.getElementById('feedback').textContent = '[ERROR] Respuesta incorrecta. Inténtalo de nuevo.';
+    document.getElementById('feedback').textContent = '[ERROR] Acceso denegado. Intuitiva incorrecta.';
     setTimeout(() => {
       input.classList.remove('wrong');
       input.value = '';
@@ -564,12 +545,11 @@ function checkAnswer() {
 function showWin() {
   document.getElementById('progress-fill').style.width = '100%';
   document.getElementById('win-stats').innerHTML =
-    `Acertijos logicos eludidos: <span>${questions.length} / ${questions.length}</span><br><br>` +
-    `<span style="font-size:0.8rem; color:#445544">// SISTEMA DESBLOQUEADO — PUEDES SALIR</span>`;
+    `Niveles de Conocimiento comprobados: <span>${questions.length} / ${questions.length}</span><br><br>` +
+    `<span style="font-size:0.8rem; color:#445544">// ENVIANDO HASH DE VALIDACIÓN AL BACKEND...</span>`;
   showScreen('screen-win');
 
-// Notificar al servidor que se completó el escape room
-  fetch("/prueba1mario", {
+  fetch("/prueba7", {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -577,12 +557,11 @@ function showWin() {
     },
     body: JSON.stringify({
       completed: true,
-      answers: userAnswers
+      respuestas_usuario: userAnswers
     })
   }).then(response => {
       if(response.ok) {
-          // Si el servidor lo guarda bien, no redirigimos automáticamente.
-          // El usuario pulsará el botón para pasar de prueba y se le llevará a la prueba2yoseth.
+          // Todo correcto, el botón de "FINALIZAR ESCAPE ROOM" los llevará fuera.
       }
   }).catch(err => console.error('Error al notificar al servidor:', err));
 }

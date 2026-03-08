@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Partida;
 use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
+use App\Events\Top10Updated;
 
 class Top10Controller extends Controller
 {
@@ -61,6 +62,9 @@ class Top10Controller extends Controller
                 'terminado' => ($partida->fase_actual === 'FINALIZADO'),
                 'abandonado' => ($partida->fase_actual === 'FINALIZADO_TIMEOUT'),
                 'hora_fin' => $partida->updated_at ? $partida->updated_at->format('H:i') : '--:--',
+                'color_hex' => $partida->color_hex ?? '#3b82f6',
+                'icono' => $partida->icono ?? 'ph-user-focus',
+                'logros' => $partida->logros ?? []
             ];
         });
 
@@ -105,13 +109,4 @@ class Top10Controller extends Controller
         ]);
     }
 
-    public function updateTicker(Request $request)
-    {
-        $request->validate([
-            'mensaje' => 'required|string|max:255'
-        ]);
-
-        Cache::put('top10_ticker', $request->mensaje, now()->addHours(24));
-
-    }
 }

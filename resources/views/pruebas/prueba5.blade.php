@@ -135,6 +135,16 @@
     0%, 100% { text-shadow: 0 0 20px var(--green), 0 0 50px #00ff8860; }
     50% { text-shadow: 0 0 40px var(--green), 0 0 90px #00ff8840; }
   }
+
+  /* MOBILE */
+  @media (max-width: 600px) {
+    .screen { padding-left: 1rem; padding-right: 1rem; padding-top: 5.5rem; }
+    .game-header { padding: 0.6rem 1rem; }
+    .team-info { font-size: 0.7rem; }
+    .header-timer { font-size: 1.1rem; }
+    .intro-text { font-size: 0.95rem !important; padding: 1.2rem 1rem; }
+    .logo { font-size: clamp(1.5rem, 7vw, 3rem) !important; letter-spacing: 0.05em; }
+  }
 </style>
 </head>
 <body>
@@ -163,25 +173,25 @@
 </div>
 
 <script>
-let tiempo = parseInt("{{ $tiempo_transcurrido ?? 0 }}");
+let tiempoInicial = parseInt("{{ $tiempo_transcurrido ?? 0 }}");
+const loadTimeMs = Date.now();
 const timerDisplay = document.getElementById('cronometro');
 const MAX_MINUTOS = 90;
 
 function actualizarTimer() {
+  let tiempo = tiempoInicial + Math.floor((Date.now() - loadTimeMs) / 1000);
   let minutos = parseInt(tiempo / 60, 10);
   let segundos = parseInt(tiempo % 60, 10);
 
   let m = minutos  < 10 ? "0" + minutos  : minutos;
   let s = segundos < 10 ? "0" + segundos : segundos;
 
-  timerDisplay.textContent = m + ":" + s;
+  if(timerDisplay) timerDisplay.textContent = m + ":" + s;
 
   if (minutos >= MAX_MINUTOS) {
       window.location.href = '/final';
       return;
   }
-
-  tiempo++;
 }
 
 actualizarTimer();
@@ -189,3 +199,5 @@ setInterval(actualizarTimer, 1000);
 </script>
 </body>
 </html>
+
+@include('components.live-listener')

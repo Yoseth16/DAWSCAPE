@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DAWSCAPE | Escape Room - AULA 115</title>
+<!-- ICONOS -->
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
 
@@ -109,13 +111,13 @@
     border-bottom: 2px solid #00ff8840;
     color: var(--green);
     font-family: 'Share Tech Mono', monospace;
-    font-size: 1.1rem;
+    font-size: max(16px, 1.1rem); /* Prevents iOS zoom on focus */
     padding: 0.8rem 0.5rem;
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
   }
 
-  .form-control::placeholder { color: #00ff8830; }
+  .form-control::placeholder { color: #88ccaa60; } /* Better WCAG contrast */
   .form-control:focus { border-bottom-color: var(--green); box-shadow: 0 4px 15px -10px var(--green); }
 
   .helper-text { display: block; margin-top: 0.4rem; color: #445544; font-size: 0.7rem; letter-spacing: 0.05em; }
@@ -157,6 +159,20 @@
   
   .checkbox-label { font-size: 0.85rem; color: #669977; line-height: 1.5; cursor: pointer; }
 
+  /* Customization Selectors */
+  .grid-selector { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8rem; margin-top: 0.5rem; }
+  .color-btn {
+    aspect-ratio: 1; border-radius: 50%; border: 2px solid var(--panel); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .color-btn:hover { transform: scale(1.1); }
+  .color-btn.active { border-color: var(--text); box-shadow: 0 0 15px currentColor; transform: scale(1.1); }
+  
+  .icon-btn {
+    aspect-ratio: 1; border-radius: 8px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; cursor: pointer; transition: all 0.2s; color: var(--green); background: rgba(0, 255, 136, 0.05);
+  }
+  .icon-btn:hover { background: rgba(0, 255, 136, 0.2); }
+  .icon-btn.active { background: var(--green); color: var(--bg); border-color: var(--green); box-shadow: 0 0 15px var(--green); }
+
   .btn {
     font-family: 'Orbitron', sans-serif;
     font-size: 1rem;
@@ -186,6 +202,7 @@
 
   .btn:hover::before { left: 0; }
   .btn:hover { color: var(--bg); box-shadow: 0 0 20px var(--green); }
+  .btn { min-height: 52px; -webkit-tap-highlight-color: transparent; }
 
   .error-feedback { color: var(--red); text-align: center; font-size: 0.85rem; margin-bottom: 1.5rem; letter-spacing: 0.08em; border: 1px dashed var(--red); padding: 0.8rem; background: rgba(255, 34, 68, 0.05); }
 
@@ -209,6 +226,16 @@
     10% { opacity: 0.5; }
     90% { opacity: 0.3; }
     100% { opacity: 0; transform: translateY(-10vh); }
+  }
+
+  /* MOBILE */
+  @media (max-width: 600px) {
+    .screen { padding: 1rem; padding-top: 1.5rem; }
+    .login-card { padding: 1.2rem 1rem; }
+    .grid-selector { grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
+    .icon-btn { font-size: 1.4rem; }
+    .form-control { font-size: max(16px, 1rem); }
+    .btn { font-size: 0.85rem; letter-spacing: 0.15em; }
   }
 </style>
 </head>
@@ -246,6 +273,38 @@
         <input type="text" name="clase" class="form-control" placeholder="Ej: 1DAW" required autocomplete="off">
       </div>
 
+      <!-- PERSONALIZACIÓN -->
+      <div class="form-group">
+        <label class="form-label">COLOR DEL EQUIPO</label>
+        <input type="hidden" name="color_hex" id="input_color" value="#00ff88">
+        <div class="grid-selector">
+            <div class="color-btn active" data-color="#00ff88" style="background:#00ff88; color:#00ff88;"></div>
+            <div class="color-btn" data-color="#3b82f6" style="background:#3b82f6; color:#3b82f6;"></div>
+            <div class="color-btn" data-color="#f43f5e" style="background:#f43f5e; color:#f43f5e;"></div>
+            <div class="color-btn" data-color="#a855f7" style="background:#a855f7; color:#a855f7;"></div>
+            <div class="color-btn" data-color="#eab308" style="background:#eab308; color:#eab308;"></div>
+            <div class="color-btn" data-color="#06b6d4" style="background:#06b6d4; color:#06b6d4;"></div>
+            <div class="color-btn" data-color="#f97316" style="background:#f97316; color:#f97316;"></div>
+            <div class="color-btn" data-color="#ec4899" style="background:#ec4899; color:#ec4899;"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">AVATAR DEL EQUIPO</label>
+        <input type="hidden" name="icono" id="input_icono" value="ph-first-aid">
+        <div class="grid-selector" id="icons-grid">
+            <div class="icon-btn active" data-icon="ph-first-aid" title="Primeros Auxilios (Sanidad)"><i class="ph ph-first-aid"></i></div>
+            <div class="icon-btn" data-icon="ph-heartbeat" title="Cardiología (Sanidad)"><i class="ph ph-heartbeat"></i></div>
+            <div class="icon-btn" data-icon="ph-tooth" title="Odontólogo (Dentistas)"><i class="ph ph-tooth"></i></div>
+            <div class="icon-btn" data-icon="ph-pill" title="Farmacia (Parafarmacia)"><i class="ph ph-pill"></i></div>
+            <div class="icon-btn" data-icon="ph-fire-extinguisher" title="Extintor (Emergencias)"><i class="ph ph-fire-extinguisher"></i></div>
+            <div class="icon-btn" data-icon="ph-siren" title="Ambulancia (Protección Civil)"><i class="ph ph-siren"></i></div>
+            <div class="icon-btn" data-icon="ph-megaphone" title="Megáfono (Marketing)"><i class="ph ph-megaphone"></i></div>
+            <div class="icon-btn" data-icon="ph-chart-line-up" title="Crecimiento (Marketing)"><i class="ph ph-chart-line-up"></i></div>
+        </div>
+      </div>
+      <!-- FIN PERSONALIZACIÓN -->
+
       <div class="checkbox-group">
         <input type="checkbox" id="checkHonestidad" required>
         <label class="checkbox-label" for="checkHonestidad">
@@ -272,6 +331,31 @@
     c.appendChild(p);
   }
 })();
+// Lógica Selectores
+const colorBtns = document.querySelectorAll('.color-btn');
+const inputColor = document.getElementById('input_color');
+const iconBtns = document.querySelectorAll('.icon-btn');
+const inputIcono = document.getElementById('input_icono');
+
+colorBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        colorBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        inputColor.value = btn.dataset.color;
+        
+        // Efecto visual: cambiar el verde principal temporalmente
+        document.documentElement.style.setProperty('--green', btn.dataset.color);
+    });
+});
+
+iconBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        iconBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        inputIcono.value = btn.dataset.icon;
+    });
+});
+
 </script>
 </body>
 </html>

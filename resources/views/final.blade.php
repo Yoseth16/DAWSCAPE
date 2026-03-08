@@ -135,6 +135,39 @@
         text-transform: uppercase;
       }
 
+      .breakdown-panel {
+          margin-top: 1rem;
+          margin-bottom: 2rem;
+          background: rgba(0, 255, 136, 0.05);
+          border-left: 3px solid var(--green);
+          padding: 1.5rem;
+          text-align: left;
+      }
+
+      .breakdown-panel h4 {
+        color: var(--green);
+        font-size: 0.85rem;
+        letter-spacing: 0.2em;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+      }
+
+      .breakdown-list {
+          list-style: none;
+          padding: 0;
+          font-size: 0.95rem;
+          line-height: 2;
+          color: #88ccaa;
+      }
+
+      .breakdown-list li {
+          display: flex;
+          justify-content: space-between;
+          border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+          padding-bottom: 0.3rem;
+          margin-bottom: 0.3rem;
+      }
+
       .ranking-list {
         list-style-type: decimal;
         padding-left: 1.5rem;
@@ -210,6 +243,16 @@
         90% { opacity: 0.3; }
         100% { opacity: 0; transform: translateY(-10vh); }
       }
+
+      /* MOBILE */
+      .btn { min-height: 52px; -webkit-tap-highlight-color: transparent; }
+      @media (max-width: 600px) {
+        .screen { padding: 1rem; }
+        .victory-box { padding: 1.2rem 1rem; }
+        .breakdown-list { font-size: 0.85rem; }
+        .subtitle-txt { font-size: 0.95rem; }
+        .ranking-list { font-size: 0.9rem; }
+      }
     </style>
 </head>
 <body>
@@ -255,6 +298,22 @@
         <div style="color: #f59e0b; font-size: 0.9rem; margin-top: -10px; margin-bottom: 20px;">
           (Incluye {{ floor($partida->penalizacion_segundos / 60) }}m de penalización por pistas)
         </div>
+      @endif
+      
+      @if(isset($hitos) && count($hitos) > 0)
+          <div class="breakdown-panel">
+            <h4>>> INFORME DE RENDIMIENTO (POR FASE)_</h4>
+            <ul class="breakdown-list">
+              @foreach($hitos as $hito)
+                  <li>
+                      <span>{{ $hito['fase'] }}</span>
+                      <span style="color:var(--green); font-family: 'Orbitron', sans-serif;">
+                          {{ floor($hito['segundos_invertidos'] / 60) }}m {{ $hito['segundos_invertidos'] % 60 }}s
+                      </span>
+                  </li>
+              @endforeach
+            </ul>
+          </div>
       @endif
   @endif
 

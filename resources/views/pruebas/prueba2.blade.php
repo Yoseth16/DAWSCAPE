@@ -137,7 +137,7 @@
     border-bottom: 2px solid var(--green);
     color: var(--green);
     font-family: 'Share Tech Mono', monospace;
-    font-size: clamp(1.4rem, 6vw, 1.8rem);
+    font-size: max(16px, clamp(1.4rem, 6vw, 1.8rem)); /* Prevents iOS zoom on focus */
     padding: 0.8rem 0.5rem;
     outline: none;
     letter-spacing: 0.5em;
@@ -146,7 +146,7 @@
   }
 
   .answer-input:focus { box-shadow: 0 2px 10px #00ff8820; }
-  .answer-input::placeholder { color: #00ff8830; letter-spacing: 0.5em; }
+  .answer-input::placeholder { color: #88ccaa80; letter-spacing: 0.5em; } /* Better WCAG placeholder contrast */
 
   /* HINT AREA */
   .hint {
@@ -174,11 +174,36 @@
   .out-ok { color: var(--green); }
   .out-err { color: var(--red); }
 
+  .submit-btn {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.95rem;
+    letter-spacing: 0.15em;
+    padding: 0.9rem 1.5rem;
+    min-height: 52px;
+    border: 2px solid var(--green);
+    background: rgba(0,255,136,0.07);
+    color: var(--green);
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    margin-top: 1.2rem;
+    text-align: center;
+    display: block; /* Always visible on mobile */
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .submit-btn:active { background: var(--green); color: var(--bg); }
+  .submit-btn:hover { background: var(--green); color: var(--bg); box-shadow: 0 0 15px var(--green); }
+
   .btn {
     font-family: 'Orbitron', sans-serif;
     font-size: 0.9rem;
     letter-spacing: 0.2em;
     padding: 1rem 2.5rem;
+    min-height: 52px;
     border: 2px solid var(--green);
     background: transparent;
     color: var(--green);
@@ -192,9 +217,19 @@
     margin-top: 1rem;
     text-align: center;
     display: none;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .btn.visible { display: block; }
+
+  @media (max-width: 600px) {
+    .alert-box, .terminal-box, .console-out { max-width: 100% !important; }
+    .screen { padding-top: 5.5rem; padding-left: 1rem; padding-right: 1rem; }
+    .game-header { padding: 0.6rem 1rem; }
+    .team-info { font-size: 0.7rem; }
+    .header-timer { font-size: 1.1rem; }
+    .answer-input { letter-spacing: 0.3em; }
+  }
   .btn::before {
     content: '';
     position: absolute;
@@ -250,8 +285,8 @@
 
   <div class="terminal-box">
     <label class="terminal-label">Introduce la clave maestra de 5 caracteres:</label>
-    <input class="answer-input" id="answer-input" type="text" maxlength="5" placeholder="_ _ _ _ _" autocomplete="off" spellcheck="false" autocapitalize="off" autofocus>
-    
+    <input class="answer-input" id="answer-input" type="text" maxlength="5" placeholder="_ _ _ _ _" autocomplete="off" spellcheck="false" autocapitalize="characters" inputmode="text">
+    <button class="submit-btn" id="submit-btn" onclick="submitAnswer()">▶ ENVIAR RESPUESTA</button>
     <div class="hint" id="system-hint">
         [PISTA DEL SISTEMA] — Los sectores de memoria forman el nombre de una mujer.
     </div>
@@ -259,30 +294,31 @@
 
   <div class="console-out" id="console-out"></div>
   
-  <a href="/prueba3angel" class="btn" id="next-btn">PASAR A LA SIGUIENTE PRUEBA →</a>
+  <a href="{{ route('prueba3') }}" class="btn" id="next-btn">PASAR A LA SIGUIENTE PRUEBA →</a>
 
 </div>
 
 <script>
 // ── TIMER DESDE BBDD ────────────────────────────────────────
-let tiempo = parseInt("{{ $tiempo_transcurrido ?? 0 }}");
+let tiempoInicial = parseInt("{{ $tiempo_transcurrido ?? 0 }}");
+const loadTimeMs = Date.now();
 const timerDisplay = document.getElementById('cronometro');
 const MAX_MINUTOS = 90;
 
 function actualizarTimer() {
+  let tiempo = tiempoInicial + Math.floor((Date.now() - loadTimeMs) / 1000);
   let minutos = parseInt(tiempo / 60, 10);
   let segundos = parseInt(tiempo % 60, 10);
 
   let m = minutos  < 10 ? "0" + minutos  : minutos;
   let s = segundos < 10 ? "0" + segundos : segundos;
 
-  timerDisplay.textContent = m + ":" + s;
+  if(timerDisplay) timerDisplay.textContent = m + ":" + s;
 
   if (minutos >= MAX_MINUTOS) {
       window.location.href = '/final';
       return;
   }
-  tiempo++;
 }
 actualizarTimer();
 setInterval(actualizarTimer, 1000);
@@ -309,31 +345,33 @@ const hintBox = document.getElementById('system-hint');
 const nextBtn = document.getElementById('next-btn');
 let solved = false;
 
-inputField.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && !solved) {
-        let val = this.value.trim().toLowerCase();
-        
-        // Remove spaces inside words
-        val = val.replace(/\s+/g, '');
-        
-        if (val.length !== 5) {
-            printError("[ERROR] Sintaxis inválida. La clave debe tener exactamente 5 caracteres.");
-            return;
-        }
+function submitAnswer() {
+    if (solved) return;
 
-        if (validateWord(val)) {
-            solved = true;
-            inputField.disabled = true;
-            printSuccess();
-            notifyServer();
-        } else {
-            failedAttempts++;
-            printError("[ERROR] Clave no reconocida. Verificad los sectores de memoria.");
-            if (failedAttempts >= 5) {
-                hintBox.style.display = 'block';
-            }
+    let val = inputField.value.trim().toLowerCase().replace(/\s+/g, '');
+
+    if (val.length !== 5) {
+        printError("[ERROR] Sintaxis inválida. La clave debe tener exactamente 5 caracteres.");
+        return;
+    }
+
+    if (validateWord(val)) {
+        solved = true;
+        inputField.disabled = true;
+        document.getElementById('submit-btn').disabled = true;
+        printSuccess();
+        notifyServer();
+    } else {
+        failedAttempts++;
+        printError("[ERROR] Clave no reconocida. Verificad los sectores de memoria.");
+        if (failedAttempts >= 5) {
+            hintBox.style.display = 'block';
         }
     }
+}
+
+inputField.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); submitAnswer(); }
 });
 
 function validateWord(word) {
@@ -359,7 +397,7 @@ function printSuccess() {
 }
 
 function notifyServer() {
-    fetch("/prueba2yoseth", {
+    fetch("/prueba2", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -371,3 +409,5 @@ function notifyServer() {
 </script>
 </body>
 </html>
+
+@include('components.live-listener')

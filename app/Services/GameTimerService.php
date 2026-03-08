@@ -39,7 +39,15 @@ class GameTimerService
         $inicio = Carbon::parse($partida->inicio_juego);
         $ahora = Carbon::now();
 
-        return (int) abs($ahora->diffInSeconds($inicio));
+        $tiempoTotal = (int) abs($ahora->diffInSeconds($inicio));
+        
+        $segundosDesdePausa = 0;
+        if ($partida->estado === 'pausado' && $partida->ultima_pausa_at) {
+            $segundosDesdePausa = (int) abs($ahora->diffInSeconds(Carbon::parse($partida->ultima_pausa_at)));
+        }
+
+        $elapsed = $tiempoTotal - ($partida->tiempo_pausado_segundos ?? 0) - $segundosDesdePausa;
+        return max(0, $elapsed) + ($partida->penalizacion_segundos ?? 0);
     }
 
     /**

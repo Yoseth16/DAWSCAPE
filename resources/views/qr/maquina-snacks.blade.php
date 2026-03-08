@@ -312,7 +312,7 @@
       <div class="term-line" id="l3">[OK] Acceso concedido al núcleo del sistema DAW.</div>
       <div class="term-line narrative" id="l4">-- NO MESSAGE --</div>
       <div class="term-line" id="l5" style="margin-top: 2rem; text-align: center;">
-          <a href="/prueba5eloy" class="btn" style="text-decoration:none; display:block;">PASAR A LA SIGUIENTE PRUEBA →</a>
+          <a href="{{ route('prueba5') }}" class="btn" style="text-decoration:none; display:block;">PASAR A LA SIGUIENTE PRUEBA →</a>
       </div>
   </div>
 </div>
@@ -369,7 +369,7 @@ function verificarChecksum() {
     feedback.textContent = "Analizando bloque de datos...";
     feedback.className = "feedback";
 
-    fetch('/prueba4arturo', {
+    fetch('/prueba4', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

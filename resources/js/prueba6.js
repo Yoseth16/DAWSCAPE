@@ -13,12 +13,12 @@ function initAudio() {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         audioCtx = new AudioContext();
     }
-    if (audioCtx.state === 'suspended') {
+    if (audioCtx.state === "suspended") {
         audioCtx.resume();
     }
 }
 
-function playTone(freq, type = 'sine', duration = 0.3) {
+function playTone(freq, type = "sine", duration = 0.3) {
     if (!audioCtx) return;
     const osc = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
@@ -26,7 +26,10 @@ function playTone(freq, type = 'sine', duration = 0.3) {
     osc.frequency.value = freq;
     gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
     gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.05);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    gainNode.gain.exponentialRampToValueAtTime(
+        0.001,
+        audioCtx.currentTime + duration,
+    );
     osc.connect(gainNode);
     gainNode.connect(audioCtx.destination);
     osc.start();
@@ -34,9 +37,9 @@ function playTone(freq, type = 'sine', duration = 0.3) {
 }
 
 // Frecuencias por sector
-const FREQS = [329.63, 261.63, 220.00, 164.81];
-const S_ERR = 110.00;
-const S_OK = 880.00;
+const FREQS = [329.63, 261.63, 220.0, 164.81];
+const S_ERR = 110.0;
+const S_OK = 880.0;
 
 // ── SIMON GAME STATE ──
 let sequence = [];
@@ -49,26 +52,27 @@ let isPlaying = false;
 let statusTxt, rondaVal, pasosVal, board;
 
 function lightUp(sectorId, isPlayer = false) {
-    const btn = document.getElementById('btn-' + sectorId);
+    const btn = document.getElementById("btn-" + sectorId);
     if (!btn) return;
-    btn.classList.add('lit');
-    playTone(FREQS[sectorId], isPlayer ? 'square' : 'sine', 0.4);
-    setTimeout(() => btn.classList.remove('lit'), 450);
+    btn.classList.add("lit");
+    playTone(FREQS[sectorId], isPlayer ? "square" : "sine", 0.4);
+    setTimeout(() => btn.classList.remove("lit"), 450);
 }
 
 function playRound() {
     isPlaying = false;
-    if (board) board.classList.remove('active');
+    if (board) board.classList.remove("active");
     playerStep = 0;
 
-    if (rondaVal) rondaVal.innerText = (currentRound + 1) + "/" + roundLengths.length;
+    if (rondaVal)
+        rondaVal.innerText = currentRound + 1 + "/" + roundLengths.length;
     let targetSteps = roundLengths[currentRound];
     if (pasosVal) pasosVal.innerText = targetSteps;
 
     if (statusTxt) {
         statusTxt.innerText = "// MEMORIZANDO PATRÓN...";
-        statusTxt.className = 'status-info';
-        statusTxt.style.color = '';
+        statusTxt.className = "status-info";
+        statusTxt.style.color = "";
     }
 
     let i = 0;
@@ -80,11 +84,12 @@ function playRound() {
                 clearInterval(interval);
                 setTimeout(() => {
                     if (statusTxt) {
-                        statusTxt.innerText = "INTRODUCE LA SECUENCIA REQUERIDA";
-                        statusTxt.className = '';
+                        statusTxt.innerText =
+                            "INTRODUCE LA SECUENCIA REQUERIDA";
+                        statusTxt.className = "";
                     }
                     isPlaying = true;
-                    if (board) board.classList.add('active');
+                    if (board) board.classList.add("active");
                 }, 500);
             }
         }, 800);
@@ -101,12 +106,12 @@ function handleSectorTouch(sectorId) {
         playerStep++;
         if (playerStep === targetSteps) {
             isPlaying = false;
-            if (board) board.classList.remove('active');
+            if (board) board.classList.remove("active");
             if (statusTxt) {
                 statusTxt.innerText = "[OK] FASE ESTABILIZADA";
-                statusTxt.className = 'status-ok';
+                statusTxt.className = "status-ok";
             }
-            playTone(S_OK, 'triangle', 0.5);
+            playTone(S_OK, "triangle", 0.5);
 
             setTimeout(() => {
                 currentRound++;
@@ -119,85 +124,95 @@ function handleSectorTouch(sectorId) {
         }
     } else {
         isPlaying = false;
-        if (board) board.classList.remove('active');
-        if (board) board.style.animation = 'shake 0.4s';
+        if (board) board.classList.remove("active");
+        if (board) board.style.animation = "shake 0.4s";
         if (statusTxt) {
-            statusTxt.innerText = "[ERROR] DESINCRONIZACIÓN. REINICIANDO FASE...";
-            statusTxt.className = 'status-info';
-            statusTxt.style.color = 'var(--red)';
+            statusTxt.innerText =
+                "[ERROR] DESINCRONIZACIÓN. REINICIANDO FASE...";
+            statusTxt.className = "status-info";
+            statusTxt.style.color = "var(--red)";
         }
-        playTone(S_ERR, 'sawtooth', 0.8);
+        playTone(S_ERR, "sawtooth", 0.8);
         setTimeout(() => {
-            if (board) board.style.animation = '';
+            if (board) board.style.animation = "";
             playRound();
         }, 2000);
     }
 }
 
 function winGame() {
-    document.getElementById('screen-game').style.display = 'none';
-    document.getElementById('screen-success').style.display = 'flex';
+    document.getElementById("screen-game").style.display = "none";
+    document.getElementById("screen-success").style.display = "flex";
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]');
     if (!csrfToken) return;
 
     fetch("/prueba6migue", {
-        method: 'POST',
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken.getAttribute('content')
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": csrfToken.getAttribute("content"),
         },
-        body: JSON.stringify({ completed: true, expected_sequence: sequence })
-    }).then(r => r.json()).then(res => {
-        if (res.success) console.log(res.mensaje);
-    }).catch(err => console.error('Error al validar:', err));
+        body: JSON.stringify({ completed: true, expected_sequence: sequence }),
+    })
+        .then((r) => r.json())
+        .then((res) => {
+            if (res.success) console.log(res.mensaje);
+        })
+        .catch((err) => console.error("Error al validar:", err));
 }
-
 
 // =====================================================
 // AUTO-INICIALIZACIÓN (se ejecuta cuando el módulo carga)
 // =====================================================
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener("DOMContentLoaded", function () {
     // ── TIMER ──
-    const configEl = document.getElementById('prueba6-config');
-    const timerDisplay = document.getElementById('cronometro');
+    const configEl = document.getElementById("prueba6-config");
+    const timerDisplay = document.getElementById("cronometro");
     const MAX_MINUTOS = 90;
 
     if (configEl && timerDisplay) {
-        let tiempo = parseInt(configEl.dataset.tiempo || '0', 10);
+        let tiempoInicial = parseInt(configEl.dataset.tiempo || "0", 10);
+        const loadTimeMs = Date.now();
 
         function actualizarTimer() {
+            let tiempo =
+                tiempoInicial + Math.floor((Date.now() - loadTimeMs) / 1000);
             let minutos = parseInt(tiempo / 60, 10);
             let segundos = parseInt(tiempo % 60, 10);
             let m = minutos < 10 ? "0" + minutos : minutos;
             let s = segundos < 10 ? "0" + segundos : segundos;
-            timerDisplay.textContent = m + ":" + s;
-            if (minutos >= MAX_MINUTOS) { window.location.href = '/final'; return; }
-            tiempo++;
+            if (timerDisplay) timerDisplay.textContent = m + ":" + s;
+            if (minutos >= MAX_MINUTOS) {
+                window.location.href = "/final";
+                return;
+            }
         }
         actualizarTimer();
         setInterval(actualizarTimer, 1000);
     }
 
     // ── GAME START ──
-    const btnStart = document.getElementById('btn-start');
+    const btnStart = document.getElementById("btn-start");
     if (btnStart) {
-        btnStart.addEventListener('click', function () {
+        btnStart.addEventListener("click", function () {
             initAudio();
 
-            btnStart.style.display = 'none';
-            const hudContainer = document.getElementById('hud-container');
-            if (hudContainer) hudContainer.style.display = 'flex';
+            btnStart.style.display = "none";
+            const hudContainer = document.getElementById("hud-container");
+            if (hudContainer) hudContainer.style.display = "flex";
 
             // Leer la secuencia del backend desde el data-attribute
-            const configEl = document.getElementById('prueba6-config');
-            const initialSequence = configEl ? JSON.parse(configEl.dataset.sequence || '[]') : [];
+            const configEl = document.getElementById("prueba6-config");
+            const initialSequence = configEl
+                ? JSON.parse(configEl.dataset.sequence || "[]")
+                : [];
 
             // Init DOM refs
-            statusTxt = document.getElementById('sys-status');
-            rondaVal = document.getElementById('ronda-val');
-            pasosVal = document.getElementById('pasos-val');
-            board = document.getElementById('board');
+            statusTxt = document.getElementById("sys-status");
+            rondaVal = document.getElementById("ronda-val");
+            pasosVal = document.getElementById("pasos-val");
+            board = document.getElementById("board");
 
             // Init game state
             sequence = initialSequence;
