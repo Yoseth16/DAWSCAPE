@@ -4,434 +4,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DAWSCAPE | Inscripción de Equipos</title>
-    <!-- ICONOS -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+    <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 
-        :root {
-            --green: #00ff88;
-            --red: #ff2244;
-            --bg: #020c06;
-            --panel: #041a0e;
-            --border: #00ff8840;
-            --text: #c8ffdf;
-            --accent: #00ffff;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: linear-gradient(135deg, var(--bg) 0%, #0a1810 100%);
-            color: var(--text);
-            font-family: 'Share Tech Mono', monospace;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* Efecto de escaneo */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 2px,
-                rgba(0, 255, 136, 0.013) 2px,
-                rgba(0, 255, 136, 0.013) 4px
-            );
-            pointer-events: none;
-            z-index: 1000;
-        }
-
-        .screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 2rem;
-            position: relative;
-            z-index: 10;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 600px;
-            animation: slideIn 0.6s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 2.5rem;
-            animation: glitch 2s infinite;
-        }
-
-        .logo {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: var(--green);
-            text-shadow: 0 0 10px var(--green), 0 0 20px var(--green);
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            letter-spacing: 0.2em;
-        }
-
-        .title {
-            font-size: 1.8rem;
-            color: var(--accent);
-            text-shadow: 0 0 10px var(--accent);
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            letter-spacing: 0.1em;
-        }
-
-        .subtitle {
-            font-size: 0.9rem;
-            color: var(--green);
-            margin-bottom: 1.5rem;
-            line-height: 1.6;
-            text-shadow: 0 0 5px var(--green);
-        }
-
-        /* Caja de descripción */
-        .description-box {
-            background: rgba(4, 26, 14, 0.8);
-            border: 2px solid var(--border);
-            border-radius: 5px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
-            animation: pulse 3s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
-            }
-            50% {
-                box-shadow: 0 0 25px rgba(0, 255, 136, 0.4);
-            }
-        }
-
-        .description-title {
-            color: var(--green);
-            font-size: 1.1rem;
-            margin-bottom: 0.8rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .description-text {
-            color: var(--text);
-            line-height: 1.8;
-            font-size: 0.95rem;
-        }
-
-        .description-text strong {
-            color: var(--accent);
-            text-shadow: 0 0 5px var(--accent);
-        }
-
-        /* Formulario */
-        .form-group {
-            margin-bottom: 1.5rem;
-            animation: slideIn 0.8s ease-out backwards;
-        }
-
-        .form-group:nth-child(1) { animation-delay: 0.1s; }
-        .form-group:nth-child(2) { animation-delay: 0.2s; }
-        .form-group:nth-child(3) { animation-delay: 0.3s; }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--green);
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            letter-spacing: 0.05em;
-        }
-
-        input {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 2px solid var(--border);
-            background: rgba(0, 0, 0, 0.8);
-            color: var(--text);
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 1rem;
-            border-radius: 3px;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 5px rgba(0, 255, 136, 0.1);
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--green);
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
-            background: rgba(0, 255, 136, 0.05);
-        }
-
-        input::placeholder {
-            color: rgba(200, 255, 223, 0.5);
-        }
-
-        /* Mensajes de error */
-        .errors {
-            background: rgba(255, 34, 68, 0.1);
-            border: 2px solid var(--red);
-            border-radius: 3px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            animation: shake 0.3s ease;
-        }
-
-        .errors ul {
-            list-style: none;
-            margin: 0;
-        }
-
-        .errors li {
-            color: var(--red);
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-        }
-
-        .errors li:before {
-            content: '*';
-            margin-right: 0.5rem;
-            font-weight: bold;
-        }
-
-        .errors li:last-child {
-            margin-bottom: 0;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-
-        /* Mensaje de éxito */
-        .success-message {
-            background: rgba(0, 255, 136, 0.1);
-            border: 2px solid var(--green);
-            border-radius: 3px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            color: var(--green);
-            text-align: center;
-            animation: slideIn 0.6s ease-out;
-            font-weight: 700;
-            text-shadow: 0 0 5px var(--green);
-        }
-
-        /* Botón */
-        .btn-container {
-            display: flex;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        button, .btn {
-            flex: 1;
-            padding: 0.9rem 1.5rem;
-            border: 2px solid var(--border);
-            background: rgba(0, 255, 136, 0.1);
-            color: var(--green);
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 1rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            cursor: pointer;
-            border-radius: 3px;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
-        }
-
-        button:hover, .btn:hover {
-            background: rgba(0, 255, 136, 0.3);
-            border-color: var(--green);
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
-            transform: scale(1.02);
-        }
-
-        button:active {
-            transform: scale(0.98);
-        }
-
-        .btn-secondary {
-            background: rgba(0, 0, 0, 0.3);
-            color: var(--text);
-            border-color: var(--text);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(200, 255, 223, 0.15);
-            box-shadow: 0 0 20px rgba(200, 255, 223, 0.3);
-        }
-
-        /* Responsive */
-        @media (max-width: 600px) {
-            .screen {
-                padding: 1rem;
-            }
-
-            .logo {
-                font-size: 2rem;
-            }
-
-            .title {
-                font-size: 1.4rem;
-            }
-
-            .subtitle {
-                font-size: 0.85rem;
-            }
-
-            .description-box {
-                padding: 1rem;
-            }
-
-            .btn-container {
-                flex-direction: column;
-            }
-        }
-
-        /* Efecto glitch */
-        @keyframes glitch {
-            0%, 100% {
-                text-shadow: 0 0 10px var(--green), 0 0 20px var(--green);
-            }
-            50% {
-                text-shadow: -2px 0 var(--red), 2px 0 var(--accent), 0 0 10px var(--green);
-            }
-        }
-    </style>
+    <!-- Vite CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body>
-    <div class="screen">
-        <div class="container">
+<body class="bg-gray-900 text-gray-200 font-sans antialiased">
+    <div class="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6">
+        <div class="w-full max-w-2xl mx-auto bg-gray-800/50 backdrop-blur-sm border border-green-500/20 rounded-2xl shadow-lg shadow-green-500/5">
+
             <!-- Header -->
-            <div class="header">
-                <div class="logo">⟨DAWSCAPE⟩</div>
-                <div class="title">SISTEMA DE INSCRIPCIÓN</div>
-                <div class="subtitle">Pre-Registro de Equipos</div>
+            <div class="border-b border-green-500/20 p-6 sm:p-8 text-center">
+                <h1 class="text-4xl sm:text-5xl font-bold text-green-400 font-orbitron tracking-wider">⟨DAWSCAPE⟩</h1>
+                <p class="mt-2 text-lg text-green-300/80">Sistema de Inscripción de Equipos</p>
             </div>
 
-            <!-- Descripción de la experiencia -->
-            <div class="description-box">
-                <div class="description-title">BIENVENIDO A DAWSCAPE</div>
-                <div class="description-text">
-                    Estáis a punto de entrar en un <strong>Escape Room lleno de misterios</strong> donde tendréis que resolver acertijos, descifrar códigos y trabajar en equipo para escapar a tiempo.
-                    <br><br>
-                    Cada prueba os acercará más a la salida. ¿Conseguiréis resolver todos los enigmas antes de que se agote el tiempo?
+            <div class="p-6 sm:p-8">
+                <!-- Description Box -->
+                <div class="mb-8 text-center bg-gray-900/60 p-6 rounded-lg border border-green-500/10">
+                    <h2 class="text-xl font-bold text-green-400 mb-3">Bienvenido al Desafío</h2>
+                    <p class="text-gray-300 leading-relaxed">
+                        Estás a punto de entrar en un <strong>Escape Room digital</strong> lleno de misterios. Resuelve acertijos, descifra códigos y trabaja en equipo para escapar a tiempo. ¿Aceptas el reto?
+                    </p>
                 </div>
+
+                <!-- Success/Error Messages -->
+                @if (session('success'))
+                    <div class="mb-6 bg-green-500/10 border border-green-500/30 text-green-300 px-4 py-3 rounded-lg text-center" role="alert">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="mb-6 bg-red-500/10 border border-red-500/30 text-red-300 px-4 py-3 rounded-lg" role="alert">
+                        <p class="font-bold mb-2">Se encontraron los siguientes errores:</p>
+                        <ul class="list-disc list-inside">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <!-- Registration Form -->
+                <form method="POST" action="{{ route('inscripcion.guardar') }}" class="space-y-6">
+                    @csrf
+
+                    <div>
+                        <label for="nombre_equipo" class="block text-sm font-medium text-green-400 mb-2">Nombre del Equipo</label>
+                        <input type="text" id="nombre_equipo" name="nombre_equipo"
+                               class="w-full bg-gray-900/50 border border-green-500/30 rounded-lg py-3 px-4 text-gray-200 focus:ring-2 focus:ring-green-400 focus:border-green-400 transition"
+                               placeholder="Ej: Los Detectives Digitales" value="{{ old('nombre_equipo') }}" required maxlength="60">
+                    </div>
+
+                    <div>
+                        <label for="correo" class="block text-sm font-medium text-green-400 mb-2">Correo Electrónico</label>
+                        <input type="email" id="correo" name="correo"
+                               class="w-full bg-gray-900/50 border border-green-500/30 rounded-lg py-3 px-4 text-gray-200 focus:ring-2 focus:ring-green-400 focus:border-green-400 transition"
+                               placeholder="equipo@ejemplo.com" value="{{ old('correo') }}" required maxlength="120">
+                    </div>
+
+                    <div>
+                        <label for="clase" class="block text-sm font-medium text-green-400 mb-2">Clase / Grupo</label>
+                        <input type="text" id="clase" name="clase"
+                               class="w-full bg-gray-900/50 border border-green-500/30 rounded-lg py-3 px-4 text-gray-200 focus:ring-2 focus:ring-green-400 focus:border-green-400 transition"
+                               placeholder="Ej: 2º DAW" value="{{ old('clase') }}" required maxlength="20">
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                        <button type="submit"
+                                class="w-full bg-green-500 hover:bg-green-600 text-gray-900 font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105">
+                            Registrar Equipo
+                        </button>
+                        <a href="{{ route('inicio') }}"
+                           class="w-full text-center bg-gray-700 hover:bg-gray-600 text-gray-200 font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105">
+                            Volver
+                        </a>
+                    </div>
+                </form>
             </div>
-
-            <!-- Mensajes de éxito -->
-            @if (session('success'))
-                <div class="success-message">
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            <!-- Errores de validación -->
-            @if ($errors->any())
-                <div class="errors">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
-            <!-- Formulario -->
-            <form method="POST" action="{{ route('inscripcion.guardar') }}" class="form">
-                @csrf
-
-                <!-- Nombre del Equipo -->
-                <div class="form-group">
-                    <label for="nombre_equipo">Nombre del Equipo</label>
-                    <input
-                        type="text"
-                        id="nombre_equipo"
-                        name="nombre_equipo"
-                        placeholder="Ej: Los Detectives Digitales"
-                        value="{{ old('nombre_equipo') }}"
-                        required
-                        maxlength="60"
-                    />
-                </div>
-
-                <!-- Correo Electrónico -->
-                <div class="form-group">
-                    <label for="correo">Correo Electrónico</label>
-                    <input
-                        type="email"
-                        id="correo"
-                        name="correo"
-                        placeholder="equipo@ejemplo.com"
-                        value="{{ old('correo') }}"
-                        required
-                        maxlength="120"
-                    />
-                </div>
-
-                <!-- Clase / Grupo -->
-                <div class="form-group">
-                    <label for="clase">Clase / Grupo</label>
-                    <input
-                        type="text"
-                        id="clase"
-                        name="clase"
-                        placeholder="Ej: 2º DAW"
-                        value="{{ old('clase') }}"
-                        maxlength="20"
-                        required
-                    />
-                </div>
-
-                <!-- Botones -->
-                <div class="btn-container">
-                    <button type="submit">
-                        <span>REGISTRAR EQUIPO</span>
-                    </button>
-                    <a href="{{ route('inicio') }}" class="btn btn-secondary">
-                        VOLVER
-                    </a>
-                </div>
-            </form>
         </div>
     </div>
 </body>

@@ -58,30 +58,6 @@ class JuegoController extends Controller
         return false;
     }
 
-    /**
-     * Normaliza y valida una respuesta numérica
-     * Elimina espacios en blanco y valida el tipo de dato
-     *
-     * @param mixed $respuesta Respuesta del usuario (puede tener espacios)
-     * @return int|null Respuesta normalizada como integer, o null si es inválida
-     */
-    private function normalizarRespuestaNumerica($respuesta)
-    {
-        if (is_null($respuesta) || $respuesta === '') {
-            return null;
-        }
-
-        // Trim para eliminar espacios al inicio y final
-        $respuesta = trim((string)$respuesta);
-
-        // Validar que solo contiene dígitos (y opcionalmente signo negativo)
-        if (!preg_match('/^-?\d+$/', $respuesta)) {
-            return null;
-        }
-
-        return (int)$respuesta;
-    }
-
 
     // --- LOGIN DE EQUIPO ---
     public function empezarPartida(EmpezarPartidaRequest $request)
