@@ -214,7 +214,7 @@ class JuegoController extends Controller
     public function validarPrueba3(ValidarPrueba3Request $request)
     {
 
-        $CHECKSUM_CORRECTO = config('escape.respuestas.prueba3'); // 19 botones + 110 cents + 5 azucar
+        $CHECKSUM_CORRECTO = config('escape.respuestas.prueba3'); // 18 botones + 80 cents + 5 azucar
         $partida = $this->timerService->obtenerPartidaActiva();
 
         if ((int)$request->checksum !== $CHECKSUM_CORRECTO) {
