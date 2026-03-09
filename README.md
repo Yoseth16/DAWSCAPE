@@ -27,7 +27,7 @@ Cada prueba fue desarrollada por un miembro distinto. A continuación la ruta ca
 | ------------------------------------ | ------- | ------------------------ | --------------------------------------- |
 | **Prueba 1: Secuencia Lógica**       | Mario   | Digital                  | `115, 16, 32, 14, 5x0lh8bx100127t, 201` |
 | **Prueba 2: El Clúster Fragmentado** | Yoseth  | Lógico / Deducción       | `ROCIO`                                 |
-| **Prueba 3: Operación Cafeína**      | Angel   | Físico (Código QR)       | `124` _(botones+110+5)_                 |
+| **Prueba 3: Operación Cafeína**      | Angel   | Físico (Código QR)       | `103` _(botones+80+5)_                 |
 | **Prueba 4: Operación Repuestos**    | Arturo  | Físico (Código QR)       | `141` _(filas+nº prod+Oasis)_           |
 | **Prueba 5: Protocolo Espejo**       | Eloy    | Físico (Código QR)       | `ZASIELX`                               |
 | **Prueba 6: Sobrecarga del Sistema** | Miguel  | Digital                  | -                                       |

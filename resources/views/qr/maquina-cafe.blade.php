@@ -21,14 +21,14 @@
 <div class="screen active" id="screen-hacking">
   <div class="logo">PANEL DE MANTENIMIENTO</div>
   <div class="intro-text">
-    <p style="color:var(--red)">Acceso al núcleo denegado.</p> 
-    <p>El cortafuegos físico requiere una suma de verificación (checksum) basada en los parámetros de suministro actuales.</p>
+    <p style="color:var(--red)">No puedes entrar al sistema.</p> 
+    <p>La seguridad física necesita una clave especial que se crea con los datos actuales de la máquina.</p>
     <br>
-    <p>Para generar el código de bypass, combina estos tres factores de la unidad de infusión:</p>
+    <p>Para conseguir esa clave, mezcla estos tres datos del equipo:</p>
     
     <ul class="term-list">
-        <li>El censo total de disparadores táctiles (botones) de la interfaz.</li>
-        <li>El valor nominal en céntimos de la esencia de cítricos (Té al Limón).</li>
+        <li>El censo total de disparadores táctiles (botones) de la máquina.</li>
+        <li>El valor nominal (en céntimos) de la esencia de cítricos (Té al Limón).</li>
         <li>El umbral de saturación de glucosa (nivel máximo de azúcar).</li>
     </ul>
 
