@@ -66,7 +66,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // Gestión de QRs Dinámicos
     Route::get('/admin/qrs', [QrController::class, 'mostrarGestor'])->name('admin.qrs');
-    Route::post('/admin/qrs', [QrController::class, 'generarQr']);
+    Route::post('/admin/qrs', [QrController::class, 'guardarQr']);
     Route::delete('/admin/qrs/{id}', [QrController::class, 'eliminarQr']);
 
     // Rutas de Testing Directo (Bypass para el profesor)

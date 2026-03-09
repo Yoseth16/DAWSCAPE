@@ -62,30 +62,48 @@ class JuegoController extends Controller
     // --- LOGIN DE EQUIPO ---
     public function empezarPartida(EmpezarPartidaRequest $request)
     {
-        if (Partida::where('email', $request->email)->exists()) {
-            return back()->with('error', 'ESTE EQUIPO YA HA JUGADO.');
+        $redirDestino = $request->input('redirect_to');
+
+        // ── RECONEXIÓN: el equipo ya existe, solo restauramos la sesión ────
+        $partidaExistente = Partida::where('email', $request->email)->first();
+        if ($partidaExistente) {
+            // Verificamos que el nombre de equipo coincide (seguridad mínima)
+            if (strtolower(trim($partidaExistente->nombre_equipo)) !== strtolower(trim($request->nombre_equipo))) {
+                return back()->with('error', 'NOMBRE DE EQUIPO NO COINCIDE CON EL REGISTRO EXISTENTE.');
+            }
+
+            // Restauramos la sesión con los datos de la partida guardados en BBDD
+            session([
+                'email'        => $partidaExistente->email,
+                'nombre_equipo' => $partidaExistente->nombre_equipo,
+                'clase'        => $partidaExistente->clase,
+            ]);
+
+            // Redirigimos al QR (o a prueba1 como fallback)
+            $destino = ($redirDestino && str_starts_with($redirDestino, '/')) ? $redirDestino : route('prueba1');
+            return redirect($destino);
         }
 
-        // GUARDAMOS EN BBDD LA HORA EXACTA DE INICIO
+        // ── REGISTRO NUEVO ────────────────────────────────────────────────
         Partida::create([
-            'email' => $request->email,
-            'nombre_equipo' => $request->nombre_equipo,
-            'clase' => $request->clase,
-            'color_hex' => $request->color_hex ?? '#3b82f6', // Default blue si no eligen
-            'icono' => $request->icono ?? 'ph-user-focus', // Avatar default
-            'fase_actual' => 'Prueba 1 Mario',
+            'email'          => $request->email,
+            'nombre_equipo'  => $request->nombre_equipo,
+            'clase'          => $request->clase,
+            'color_hex'      => $request->color_hex ?? '#3b82f6',
+            'icono'          => $request->icono ?? 'ph-user-focus',
+            'fase_actual'    => 'Prueba 1 Mario',
             'tiempo_segundos' => 0,
-            'inicio_juego' => Carbon::now() // <--- RELOJ MAESTRO
+            'inicio_juego'   => Carbon::now()
         ]);
 
-        // Guardamos sesión solo para identificar al usuario
         session([
-            'email' => $request->email,
+            'email'         => $request->email,
             'nombre_equipo' => $request->nombre_equipo,
-            'clase' => $request->clase
+            'clase'         => $request->clase,
         ]);
 
-        return redirect()->route('prueba1');
+        $destino = ($redirDestino && str_starts_with($redirDestino, '/')) ? $redirDestino : route('prueba1');
+        return redirect($destino);
     }
 
     // =====================================================

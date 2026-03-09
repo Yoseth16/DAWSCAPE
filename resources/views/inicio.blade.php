@@ -251,6 +251,8 @@
   <div class="login-card">
     <form action="/empezar" method="POST">
       @csrf
+      {{-- Preserva el destino cuando se llega desde un QR sin sesión --}}
+      <input type="hidden" name="redirect_to" value="{{ request('redirect_to') }}">
 
       @if(session('error'))
         <div class="error-feedback">✖ {{ session('error') }}</div>

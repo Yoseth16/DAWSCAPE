@@ -57,25 +57,27 @@ class QrController extends Controller
 
     public function escanearQR($identificador)
     {
-        // Paso 1 - Autenticación
+        // ── GUARD: solo equipos con sesión activa pueden acceder (anti-trampas) ──
         if (!session()->has('email')) {
-            return redirect('/')->with('error', 'Inicia sesión con tu equipo para ver esta pista.');
+            return redirect('/')
+                ->with('error', '⚠️ Acceso denegado. Escanea el QR con el mismo navegador donde empezasteis a jugar.');
         }
 
-        // Buscamos el QR en la BBDD por su URL final que termina en ese identificador
+        // Buscamos el QR en la BBDD
         $qr = \App\Models\Qr::where('url', 'LIKE', '%/qr/' . $identificador)->first();
 
         if (!$qr) {
             abort(404, 'Código QR no reconocido en el sistema.');
         }
 
+        // Recuperamos la partida — tiempo calculado en el servidor (no manipulable)
         $partida = $this->timerService->obtenerPartidaActiva();
 
         if (!$partida) {
-            return redirect('/')->with('error', 'Inicia sesión con tu equipo para ver esta pista.');
+            return redirect('/')->with('error', 'No se encontró una partida activa para este equipo.');
         }
 
-        // Paso 2 - Validación de fase (Solo si el QR tiene una fase_requerida)
+        // ── Validamos que estén en la fase correcta ──
         if (!empty($qr->fase_requerida)) {
             if (trim(strtolower($partida->fase_actual)) !== trim(strtolower($qr->fase_requerida))) {
                 $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
@@ -86,9 +88,12 @@ class QrController extends Controller
             }
         }
 
-        if ($this->timerService->verificarTimeout()) return redirect('/final')->with('timeout', true);
+        // ── Si el tiempo expiró, cerramos la prueba ──
+        if ($this->timerService->verificarTimeout()) {
+            return redirect('/final')->with('timeout', true);
+        }
 
-        // Paso 3 - Éxito
+        // ── ÉXITO: tiempo calculado en servidor, no en cliente ──
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $titulo_prueba = $qr->nombre;
         
