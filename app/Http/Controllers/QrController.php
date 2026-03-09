@@ -93,22 +93,24 @@ class QrController extends Controller
             return redirect('/final')->with('timeout', true);
         }
 
-        // ── ÉXITO: tiempo calculado en servidor, no en cliente ──
+        // ── ÉXITO: renderizar el reto QR (igual que el admin tester, pero con tiempo real) ──
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $titulo_prueba = $qr->nombre;
-        
-        // Si el identificador mapea a una vista especial (Open/Closed Principle - OCP)
+
+        $fase = strtolower(trim($qr->fase_requerida ?? ''));
         $identificadorNormalizado = strtolower($identificador);
         $nombreQrNormalizado = strtolower($qr->nombre);
-        
+
         $vistaEspecial = match(true) {
-            str_contains($identificadorNormalizado, 'cafe') || str_contains($nombreQrNormalizado, 'cafe') 
-                => 'qr.maquina-cafe',
-            str_contains($identificadorNormalizado, 'snacks') || str_contains($nombreQrNormalizado, 'oasis') 
-                => 'qr.maquina-snacks',
-            str_contains($identificadorNormalizado, 'taquilla') || str_contains($nombreQrNormalizado, 'taquilla') 
-                => 'qr.taquillas',
-            default => 'qr.plantilla-pista'
+            // Por fase_requerida (el campo más fiable)
+            str_contains($fase, 'angel')  || str_contains($fase, 'prueba 3') => 'qr.maquina-cafe',
+            str_contains($fase, 'arturo') || str_contains($fase, 'prueba 4') => 'qr.maquina-snacks',
+            str_contains($fase, 'eloy')   || str_contains($fase, 'prueba 5') => 'qr.taquillas',
+            // Fallback por nombre/slug
+            str_contains($identificadorNormalizado, 'cafe')     || str_contains($nombreQrNormalizado, 'cafe')    => 'qr.maquina-cafe',
+            str_contains($identificadorNormalizado, 'snacks')   || str_contains($nombreQrNormalizado, 'oasis')   => 'qr.maquina-snacks',
+            str_contains($identificadorNormalizado, 'taquilla') || str_contains($nombreQrNormalizado, 'taquilla') => 'qr.taquillas',
+            default => 'qr.maquina-cafe'
         };
 
         return view($vistaEspecial, compact('tiempo_transcurrido', 'titulo_prueba', 'identificador'));
