@@ -46,9 +46,9 @@ class JuegoController extends Controller
         if (!in_array($logroId, $logrosActuales)) {
             $logrosActuales[] = $logroId;
             $partida->update(['logros' => $logrosActuales]);
-            
+
             $this->logAccion($partida, $partida->fase_actual, 'Logro Desbloqueado', ['logro' => $logroId]);
-            
+
             $pendientes = session('nuevos_logros', []);
             $pendientes[] = $logroId;
             session(['nuevos_logros' => $pendientes]);
@@ -56,6 +56,30 @@ class JuegoController extends Controller
             return true;
         }
         return false;
+    }
+
+    /**
+     * Normaliza y valida una respuesta numérica
+     * Elimina espacios en blanco y valida el tipo de dato
+     *
+     * @param mixed $respuesta Respuesta del usuario (puede tener espacios)
+     * @return int|null Respuesta normalizada como integer, o null si es inválida
+     */
+    private function normalizarRespuestaNumerica($respuesta)
+    {
+        if (is_null($respuesta) || $respuesta === '') {
+            return null;
+        }
+
+        // Trim para eliminar espacios al inicio y final
+        $respuesta = trim((string)$respuesta);
+
+        // Validar que solo contiene dígitos (y opcionalmente signo negativo)
+        if (!preg_match('/^-?\d+$/', $respuesta)) {
+            return null;
+        }
+
+        return (int)$respuesta;
     }
 
 
@@ -148,7 +172,7 @@ class JuegoController extends Controller
         // SOLO actualizamos la fase_actual, NO paramos el reloj maestro de BBDD.
         if ($partida) {
             $this->logAccion($partida, 'Prueba 1 Mario', 'Prueba superada');
-            
+
             // LOGRO 1: Speedrunner Ninja (Prueba 1 superada en menos de 2 minutos sin penalizaciones)
             $tiempo = $this->timerService->obtenerTiempoTranscurrido();
             if ($tiempo < 120) {
@@ -182,7 +206,7 @@ class JuegoController extends Controller
 
         // Validamos la respuesta aquí o lo podemos delegar puramente al check de JS también (como en prueba1).
         // En este caso el front hace el chequeo, el back certifica el tick.
-        
+
         session(['prueba2yoseth_superada' => true]);
 
         // AHORA SÍ: NO VAMOS AL FINAL AÚN. VAMOS A LA PRUEBA 3.
@@ -217,8 +241,11 @@ class JuegoController extends Controller
         $CHECKSUM_CORRECTO = config('escape.respuestas.prueba3'); // 18 botones + 80 cents + 5 azucar
         $partida = $this->timerService->obtenerPartidaActiva();
 
-        if ((int)$request->checksum !== $CHECKSUM_CORRECTO) {
-            $this->logAccion($partida, 'Prueba 3 Angel', 'Intento fallido', ['input' => $request->checksum]);
+        // Normalizar entrada: trim espacios y convertir a integer
+        $respuesta_usuario = (int)trim($request->checksum);
+
+        if ($respuesta_usuario !== $CHECKSUM_CORRECTO) {
+            $this->logAccion($partida, 'Prueba 3 Angel', 'Intento fallido', ['input' => $request->checksum, 'corregido' => $respuesta_usuario, 'esperado' => $CHECKSUM_CORRECTO]);
             return response()->json(['success' => false, 'message' => 'Checksum erróneo']);
         }
 
@@ -261,8 +288,11 @@ class JuegoController extends Controller
         $CHECKSUM_OASIS = config('escape.respuestas.prueba4'); // Ej: 6 filas + cod 128 cafe + 7 items A1 -> Total manual: 141
         $partida = $this->timerService->obtenerPartidaActiva();
 
-        if ((int)$request->checksum !== $CHECKSUM_OASIS) {
-            $this->logAccion($partida, 'Prueba 4 Arturo', 'Intento fallido', ['input' => $request->checksum]);
+        // Normalizar entrada: trim espacios y convertir a integer
+        $respuesta_usuario = (int)trim($request->checksum);
+
+        if ($respuesta_usuario !== $CHECKSUM_OASIS) {
+            $this->logAccion($partida, 'Prueba 4 Arturo', 'Intento fallido', ['input' => $request->checksum, 'corregido' => $respuesta_usuario, 'esperado' => $CHECKSUM_OASIS]);
             return response()->json(['success' => false, 'message' => 'Checksum erróneo']);
         }
 
@@ -352,7 +382,7 @@ class JuegoController extends Controller
         for ($i = 0; $i < $maxSteps; $i++) {
             $sequence[] = rand(0, 3);
         }
-        
+
         // Guardar secuencia en sesión
         session(['prueba6_sequence' => $sequence]);
 
@@ -382,7 +412,7 @@ class JuegoController extends Controller
         // FINALIZA LA PRUEBA 6 -> AVANZAMOS A PRUEBA 7
         if ($partida && $partida->inicio_juego) {
             $this->logAccion($partida, 'Prueba 6 Migue', 'Prueba superada');
-            
+
             // LOGRO 2: Cerebro Intacto (No usar pistas)
             if (($partida->penalizacion_segundos ?? 0) == 0) {
                 $this->desbloquearLogro($partida, 'cerebro_intacto');
@@ -414,21 +444,21 @@ class JuegoController extends Controller
                             ->inRandomOrder()
                             ->limit(5)
                             ->get();
-            
+
             if ($preguntas->isEmpty()) {
-                // Failsafe: Si el profesor no ha creado ninguna pregunta activa, 
+                // Failsafe: Si el profesor no ha creado ninguna pregunta activa,
                 // regalémosles la victoria cerrando la partida aquí automáticamente.
                 return redirect()->route('final');
             }
-            
+
             session(['prueba7_preguntas' => $preguntas]);
         }
 
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $this->logAccion($this->timerService->obtenerPartidaActiva(), 'Prueba 7 Dinamica', 'Entra a la prueba');
-        
+
         $preguntasAsignadas = session('prueba7_preguntas');
-        
+
         return view('pruebas.prueba7', compact('tiempo_transcurrido', 'preguntasAsignadas'));
     }
 
@@ -452,7 +482,7 @@ class JuegoController extends Controller
         foreach ($request->respuestas_usuario as $index => $respuestaEnviada) {
             $correcta = \Illuminate\Support\Str::slug($preguntasAsignadas[$index]->respuesta_correcta, '');
             $enviada = \Illuminate\Support\Str::slug($respuestaEnviada, '');
-            
+
             if ($correcta !== $enviada) {
                 // Si alguien trampea el JS y manda un array con fallos, el backend lo bloquea.
                 return response()->json(['success' => false, 'message' => 'Cheating detectado en backend.'], 400);
@@ -478,7 +508,7 @@ class JuegoController extends Controller
                 'segundos_transcurridos' => $segundos_totales,
                 'alcanzado_at' => Carbon::now()
             ]);
-            
+
             Top10Updated::dispatch();
             AdminDashboardUpdated::dispatch();
         }
@@ -507,7 +537,7 @@ class JuegoController extends Controller
             $hitos_db = \App\Models\HitoFase::where('partida_id', $partida->id)
                 ->orderBy('segundos_transcurridos', 'asc')
                 ->get();
-            
+
             $last_seconds = 0;
             foreach ($hitos_db as $hito) {
                 // El hito representa cuándo se *completó* o se *llegó* a una fase.

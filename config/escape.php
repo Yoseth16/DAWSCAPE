@@ -21,8 +21,8 @@ return [
             ['201', 'doscientos uno']
         ],
         // La prueba 2 la maneja el front-end con un anagrama "ROCIO"
-        'prueba3' => 103, // Checksum: 18 botones + 80 cents + 5 azucar
-        'prueba4' => 141, // Checksum Oasis: 6 filas + cod 128 cafe + 7 items A1
-        'prueba5' => 'zasielx', // Palabra espejo
+        'prueba3' => 103, // Checksum: 18 botones + 80 cents + 5 azucar | Se normaliza: trim() + integer casting
+        'prueba4' => 141, // Checksum Oasis: 6 filas + cod 128 cafe + 7 items A1 | Se normaliza: trim() + integer casting
+        'prueba5' => 'zasielx', // Palabra espejo | Se normaliza: trim() + strtolower()
     ],
 ];
