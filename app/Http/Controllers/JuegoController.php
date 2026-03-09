@@ -240,6 +240,15 @@ class JuegoController extends Controller
 
         $CHECKSUM_CORRECTO = config('escape.respuestas.prueba3'); // 18 botones + 80 cents + 5 azucar
         $partida = $this->timerService->obtenerPartidaActiva();
+        
+        // DEBUG: Log para verificar qué valores se están comparando
+        \Log::info('Prueba3 Validation', [
+            'input' => $request->checksum,
+            'expected' => $CHECKSUM_CORRECTO,
+            'input_type' => gettype($request->checksum),
+            'expected_type' => gettype($CHECKSUM_CORRECTO),
+            'int_input' => (int)$request->checksum
+        ]);
 
         // Normalizar entrada: trim espacios y convertir a integer
         $respuesta_usuario = (int)trim($request->checksum);

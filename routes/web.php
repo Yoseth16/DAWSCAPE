@@ -84,6 +84,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/prueba/prueba1', [JuegoController::class, 'mostrarPrueba1'])->name('admin.prueba.prueba1');
     Route::get('/prueba/prueba2', [JuegoController::class, 'mostrarPrueba2'])->name('admin.prueba.prueba2');
     Route::get('/prueba/prueba3', function () {
+        // Crear sesión temporal para admin con email falso
+        session(['email' => 'admin-test@prueba3.test', 'nombre_equipo' => 'ADMIN TEST', 'clase' => 'Pruebas']);
         return view('qr.maquina-cafe', [
             'tiempo_transcurrido' => 0,
             'titulo_prueba' => '[ADMIN TEST] Máquina de Café',
@@ -92,6 +94,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('admin.prueba.prueba3');
 
     Route::get('/prueba/prueba4', function () {
+        // Crear sesión temporal para admin con email falso
+        session(['email' => 'admin-test@prueba4.test', 'nombre_equipo' => 'ADMIN TEST', 'clase' => 'Pruebas']);
         return view('qr.maquina-snacks', [
             'tiempo_transcurrido' => 0,
             'titulo_prueba' => '[ADMIN TEST] Máquina Oasis',
@@ -100,6 +104,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('admin.prueba.prueba4');
 
     Route::get('/prueba/prueba5', function () {
+        // Crear sesión temporal para admin con email falso
+        session(['email' => 'admin-test@prueba5.test', 'nombre_equipo' => 'ADMIN TEST', 'clase' => 'Pruebas']);
         return view('qr.taquillas', [
             'tiempo_transcurrido' => 0,
             'titulo_prueba' => '[ADMIN TEST] Protocolo Espejo',
