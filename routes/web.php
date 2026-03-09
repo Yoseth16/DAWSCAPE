@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\QrController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Top10Controller;
+use App\Http\Controllers\InscripcionController;
 
 // ==========================================
 // ZONA PUBLICA - ESCAPE ROOM (ALUMNOS)
@@ -18,6 +19,12 @@ Route::get('/', function () {
 Route::get('/legal', function () {
     return view('aviso-legal');
 })->name('legal');
+
+// ==========================================
+// INSCRIPCIÓN PREVIA DE EQUIPOS
+// ==========================================
+Route::get('/inscripcion', [InscripcionController::class, 'mostrar'])->name('inscripcion.mostrar');
+Route::post('/inscripcion', [InscripcionController::class, 'guardar'])->name('inscripcion.guardar');
 
 Route::post('/empezar', [JuegoController::class, 'empezarPartida']);
 
@@ -57,7 +64,7 @@ Route::get('/qr/{id}', [QrController::class, 'escanearQr'])->name('qr.scan');
 
 // Envolvemos todo el Dashboard y gestión en el Middleware nativo Auth (Breeze)
 Route::middleware(['auth', 'verified'])->group(function () {
-    
+
     // El dashboard principal será nuestra vista /admin
     Route::get('/dashboard', [AdminController::class, 'adminPanel'])->name('dashboard');
     Route::get('/admin', function() { return redirect('/dashboard'); }); // Alias por costumbre
@@ -67,7 +74,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/admin/equipo/{uuid}', [AdminController::class, 'eliminarEquipo']);
     Route::get('/admin/equipo/{uuid}/logs', [AdminController::class, 'mostrarLogs'])->name('admin.equipo.logs');
     Route::get('/admin/exportar-top20', [AdminController::class, 'exportarTop20PDF']);
-    
+
     // Gestión de QRs Dinámicos
     Route::get('/admin/qrs', [QrController::class, 'mostrarGestor'])->name('admin.qrs');
     Route::post('/admin/qrs', [QrController::class, 'guardarQr']);
@@ -83,7 +90,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'identificador' => 'admin-bypass'
         ]);
     })->name('admin.prueba.prueba3');
-    
+
     Route::get('/prueba/prueba4', function () {
         return view('qr.maquina-snacks', [
             'tiempo_transcurrido' => 0,
@@ -91,7 +98,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'identificador' => 'admin-bypass'
         ]);
     })->name('admin.prueba.prueba4');
-    
+
     Route::get('/prueba/prueba5', function () {
         return view('qr.taquillas', [
             'tiempo_transcurrido' => 0,
