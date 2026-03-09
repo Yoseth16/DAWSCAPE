@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <title>NÚCLEO DE EXTRACCIÓN — DAWSCAPE</title>
 @vite(['resources/css/maquina-cafe.css'])
@@ -36,7 +36,7 @@
     
     <div class="form-group">
         <label style="font-size: 0.8rem; color: #445544;">// CHECKSUM_REQUIRED</label>
-        <input class="answer-input" id="checksum-input" type="number" placeholder="___" autocomplete="off">
+        <input class="answer-input" id="checksum-input" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="___" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         <div class="feedback" id="feedback-msg"></div>
         <button class="btn" id="btn-verificar" onclick="verificarChecksum()">VERIFICAR →</button>
     </div>

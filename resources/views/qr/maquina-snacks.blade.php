@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <title>TERMINAL OASIS — DAWSCAPE</title>
 <style>
@@ -157,7 +157,7 @@
     border: 2px solid var(--border);
     color: var(--green);
     font-family: 'Share Tech Mono', monospace;
-    font-size: clamp(1.5rem, 6vw, 2.2rem);
+    font-size: max(16px, clamp(1.5rem, 6vw, 2.2rem)); /* Prevents iOS zoom */
     padding: 1rem;
     border-radius: 8px;
     outline: none;
