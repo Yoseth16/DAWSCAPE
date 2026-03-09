@@ -45,8 +45,9 @@
     @stack('scripts')
 
     <!-- Firma discreta -->
-    <div style="position: fixed; bottom: 5px; right: 10px; font-family: monospace; font-size: 0.65rem; color: rgba(255, 255, 255, 0.2); pointer-events: none; z-index: 9999;">
-        DAWSCAPE SYSTEM // DAW
+    <div style="position: fixed; bottom: 5px; right: 10px; font-family: monospace; font-size: 0.65rem; color: rgba(255, 255, 255, 0.3); z-index: 9999; text-align: right;">
+        DAWSCAPE SYSTEM // DAW <br>
+        <a href="{{ route('legal') }}" style="color: rgba(255, 255, 255, 0.3); text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='#00ff88'" onmouseout="this.style.color='rgba(255, 255, 255, 0.3)'" target="_blank">AVISO LEGAL Y RGPD</a>
     </div>
 </body>
 </html>
