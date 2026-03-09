@@ -345,7 +345,7 @@
       <div class="term-line" id="l3">[OK] Palabra clave validada.</div>
       <div class="term-line narrative" id="l4">-- NO MESSAGE --</div>
       <div class="term-line" id="l5" style="margin-top: 2rem; text-align: center;">
-          <a href="/final" class="btn" style="text-decoration:none; display:block;">FINALIZAR MAPA →</a>
+          <a href="{{ route('prueba6') }}" class="btn" style="text-decoration:none; display:block;">PASAR A LA SIGUIENTE PRUEBA →</a>
       </div>
   </div>
 </div>
