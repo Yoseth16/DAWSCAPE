@@ -175,7 +175,7 @@
             width: 100%;
             padding: 0.75rem 1rem;
             border: 2px solid var(--border);
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.8);
             color: var(--text);
             font-family: 'Share Tech Mono', monospace;
             font-size: 1rem;
@@ -219,7 +219,7 @@
         }
 
         .errors li:before {
-            content: '⚠';
+            content: '*';
             margin-right: 0.5rem;
             font-weight: bold;
         }
@@ -350,20 +350,18 @@
 
             <!-- Descripción de la experiencia -->
             <div class="description-box">
-                <div class="description-title">📡 BIENVENIDO A DAWSCAPE</div>
+                <div class="description-title">BIENVENIDO A DAWSCAPE</div>
                 <div class="description-text">
                     Estáis a punto de entrar en un <strong>Escape Room lleno de misterios</strong> donde tendréis que resolver acertijos, descifrar códigos y trabajar en equipo para escapar a tiempo.
                     <br><br>
                     Cada prueba os acercará más a la salida. ¿Conseguiréis resolver todos los enigmas antes de que se agote el tiempo?
-                    <br><br>
-                    <strong>⏱️ Tiempo límite: 60 minutos</strong>
                 </div>
             </div>
 
             <!-- Mensajes de éxito -->
             @if (session('success'))
                 <div class="success-message">
-                    ✓ {{ session('success') }}
+                    {{ session('success') }}
                 </div>
             @endif
 
@@ -410,9 +408,9 @@
                     />
                 </div>
 
-                <!-- Clase (Opcional) -->
+                <!-- Clase / Grupo -->
                 <div class="form-group">
-                    <label for="clase">Clase / Grupo (Opcional)</label>
+                    <label for="clase">Clase / Grupo</label>
                     <input
                         type="text"
                         id="clase"
@@ -420,13 +418,14 @@
                         placeholder="Ej: 2º DAW"
                         value="{{ old('clase') }}"
                         maxlength="20"
+                        required
                     />
                 </div>
 
                 <!-- Botones -->
                 <div class="btn-container">
                     <button type="submit">
-                        <span>🚀 REGISTRAR EQUIPO</span>
+                        <span>REGISTRAR EQUIPO</span>
                     </button>
                     <a href="{{ route('inicio') }}" class="btn btn-secondary">
                         VOLVER

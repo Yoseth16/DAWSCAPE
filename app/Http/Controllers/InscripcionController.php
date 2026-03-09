@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 /**
  * InscripcionController
- * 
+ *
  * Controla el flujo de inscripción previa de equipos antes de que
  * comience el Escape Room. Evita que se registren equipos duplicados.
  */
@@ -23,7 +23,7 @@ class InscripcionController extends Controller
 
     /**
      * Recibe los datos del formulario, los valida y los guarda en la BD.
-     * 
+     *
      * Reglas:
      *  - nombre_equipo obligatorio y ÚNICO (no puede haber dos equipos con el mismo nombre)
      *  - correo obligatorio, formato email válido y ÚNICO
@@ -44,7 +44,7 @@ class InscripcionController extends Controller
                 'max:120',
                 'unique:inscripcions,correo',
             ],
-            'clase' => ['nullable', 'string', 'max:20'],
+            'clase' => ['required', 'string', 'max:20'],
         ], [
             // Mensajes de error personalizados (en español)
             'nombre_equipo.required' => 'El nombre del equipo es obligatorio.',
@@ -52,6 +52,7 @@ class InscripcionController extends Controller
             'correo.required'        => 'El correo electrónico es obligatorio.',
             'correo.email'           => 'El formato del correo no es válido.',
             'correo.unique'          => 'Ese correo ya está registrado con otro equipo.',
+            'clase.required'         => 'La clase / grupo es obligatoria.',
         ]);
 
         // 2. GUARDADO
