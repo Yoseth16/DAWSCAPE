@@ -11,6 +11,17 @@ class ValidarPrueba5Request extends FormRequest
         return true;
     }
 
+    /**
+     * Normaliza los datos antes de la validación
+     * Elimina espacios en blanco del checksum
+     */
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'checksum' => trim($this->checksum ?? ''),
+        ]);
+    }
+
     public function rules()
     {
         return [
