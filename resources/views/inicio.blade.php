@@ -160,7 +160,7 @@
   .checkbox-label { font-size: 0.85rem; color: #669977; line-height: 1.5; cursor: pointer; }
 
   /* Customization Selectors */
-  .grid-selector { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8rem; margin-top: 0.5rem; }
+  .grid-selector { display: grid; grid-template-columns: repeat(8, 1fr); gap: 0.5rem; margin-top: 0.5rem; }
   .color-btn {
     aspect-ratio: 1; border-radius: 50%; border: 2px solid var(--panel); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
   }
@@ -168,7 +168,7 @@
   .color-btn.active { border-color: var(--text); box-shadow: 0 0 15px currentColor; transform: scale(1.1); }
   
   .icon-btn {
-    aspect-ratio: 1; border-radius: 8px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; cursor: pointer; transition: all 0.2s; color: var(--green); background: rgba(0, 255, 136, 0.05);
+    aspect-ratio: 1; border-radius: 8px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; transition: all 0.2s; color: var(--green); background: rgba(0, 255, 136, 0.05);
   }
   .icon-btn:hover { background: rgba(0, 255, 136, 0.2); }
   .icon-btn.active { background: var(--green); color: var(--bg); border-color: var(--green); box-shadow: 0 0 15px var(--green); }
@@ -232,8 +232,8 @@
   @media (max-width: 600px) {
     .screen { padding: 1rem; padding-top: 1.5rem; }
     .login-card { padding: 1.2rem 1rem; }
-    .grid-selector { grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
-    .icon-btn { font-size: 1.4rem; }
+    .grid-selector { grid-template-columns: repeat(8, 1fr); gap: 0.3rem; }
+    .icon-btn { font-size: 1.1rem; }
     .form-control { font-size: max(16px, 1rem); }
     .btn { font-size: 0.85rem; letter-spacing: 0.15em; }
   }
@@ -357,5 +357,10 @@ iconBtns.forEach(btn => {
 });
 
 </script>
+<!-- Firma discreta -->
+<div style="position: fixed; bottom: 5px; right: 10px; font-family: monospace; font-size: 0.65rem; color: rgba(255, 255, 255, 0.3); z-index: 9999; text-align: right;">
+    DAWSCAPE SYSTEM // DAW <br>
+    <a href="{{ route('legal') }}" style="color: rgba(255, 255, 255, 0.3); text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='#00ff88'" onmouseout="this.style.color='rgba(255, 255, 255, 0.3)'">AVISO LEGAL Y RGPD</a>
+</div>
 </body>
 </html>

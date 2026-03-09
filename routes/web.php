@@ -15,6 +15,10 @@ Route::get('/', function () {
     return view('inicio');
 })->name('inicio');
 
+Route::get('/legal', function () {
+    return view('aviso-legal');
+})->name('legal');
+
 Route::post('/empezar', [JuegoController::class, 'empezarPartida']);
 
 // Grupo protegido para las fases del juego (Asegura progreso lineal)
