@@ -175,7 +175,7 @@
             width: 100%;
             padding: 0.75rem 1rem;
             border: 2px solid var(--border);
-            background: transparent;
+            background: rgba(0, 0, 0, 0.8);
             color: var(--text);
             font-family: 'Share Tech Mono', monospace;
             font-size: 1rem;
