@@ -67,7 +67,7 @@
         }
 
         .card-body {
-            padding: 2rem;
+            padding: 1.5rem;
         }
 
         .intro-box {
@@ -75,7 +75,7 @@
             border-left: 4px solid #22c55e;
             padding: 1.5rem;
             border-radius: 0.5rem;
-            margin-bottom: 2rem;
+            margin-bottom: 3rem;
         }
 
         .intro-box h2 {
@@ -87,11 +87,6 @@
         .intro-box p {
             color: #cbd5e1;
             line-height: 1.6;
-        }
-
-        .intro-box + .form-group,
-        .alert + .form-group {
-            margin-top: 2.5rem;
         }
 
         .form-group {
@@ -160,8 +155,8 @@
             border: 1px solid rgba(34, 197, 94, 0.2);
             border-radius: 0.5rem;
             padding: 1.5rem;
-            margin-bottom: 1rem;
-            max-height: 250px;
+            margin-bottom: 0.75rem;
+            max-height: 200px;
             overflow-y: auto;
         }
 
@@ -311,8 +306,8 @@
                     <p>
                         Estás a punto de entrar en un <strong>Escape Room digital</strong> lleno de misterios.
                         Resuelve acertijos, descifra códigos, escanea códigos QR ocultos en el mundo real y trabaja en equipo.
-                        ¿Aceptas el reto?
-
+                        ¿Aceptas el reto?                    </p>
+                </div>
                 <!-- Success/Error Messages -->
                 @if (session('success'))
                     <div class="alert alert-success">
