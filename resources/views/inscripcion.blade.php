@@ -302,13 +302,11 @@
             <div class="card-body">
                 <!-- Description Box -->
                 <div class="intro-box">
-                    <h2>🚀 Bienvenido al Desafío</h2>
+                    <h2>Bienvenido al Desafío</h2>
                     <p>
                         Estás a punto de entrar en un <strong>Escape Room digital</strong> lleno de misterios.
-                        Resuelve acertijos, descifra códigos, escanea QRs ocultos en el mundo real y trabaja en equipo
-                        para escapar a tiempo. ¿Aceptas el reto?
-                    </p>
-                </div>
+                        Resuelve acertijos, descifra códigos, escanea códigos QR ocultos en el mundo real y trabaja en equipo.
+                        ¿Aceptas el reto?
 
                 <!-- Success/Error Messages -->
                 @if (session('success'))
@@ -370,30 +368,29 @@
 
                     <!-- Legal Terms Section -->
                     <div class="legal-section">
-                        <h3>📋 Aviso Legal y Términos de Uso</h3>
+                        <h3>Aviso Legal y Términos de Uso</h3>
                         <div class="legal-content">
                             <p><strong>1. Descripción del Evento</strong><br>
-                            DAWSCAPE es un Escape Room Educativo interactivo diseñado para dinamizar sesiones de formación.
-                            Esta actividad está dirigida a estudiantes activos y requiere participación durante aproximadamente 40 minutos.</p>
+                            DAWSCAPE es un Escape Room Educativo interactivo diseñado para dinamizar sesiones de formación. Esta aplicación ha sido desarrollada por alumnos de 1º de Desarrollo de Aplicaciones Web.</p>
 
-                            <p><strong>2. Responsabilidades del Participante</strong><br>
+                            <p><strong>2. Restricciones y Prohibiciones</strong><br>
+                            • No se permite la inspección, modificación o intento de acceso al código fuente de la aplicación.<br>
+                            • Está prohibido intentar acceder a sistemas sin autorización o hacer trampa.<br>
+                            • No se permite la reproducción, distribución o uso de esta aplicación sin autorización expresa.<br>
+                            • Cumplirás con las instrucciones del personal a cargo del evento.</p>
+
+                            <p><strong>3. Responsabilidades del Participante</strong><br>
                             • Mantendrás un comportamiento respetuoso y profesional durante la actividad.<br>
-                            • No intentarás acceder a sistemas sin autorización o hacer trampa.<br>
-                            • Cumplirás con las instrucciones del personal a cargo del evento.<br>
-                            • Reportarás inmediatamente cualquier incidente técnico.</p>
+                            • Reportarás inmediatamente cualquier incidente técnico o comportamiento inapropiado.</p>
 
-                            <p><strong>3. Privacidad y Datos Personales</strong><br>
-                            Los datos recopilados (nombre del equipo, correo electrónico, clase) se utilizarán exclusivamente para la administración de esta actividad
-                            y la clasificación de equipos. No serán compartidos con terceros.</p>
+                            <p><strong>4. Privacidad y Datos Personales</strong><br>
+                            Los datos recopilados (nombre del equipo, correo electrónico, clase) se utilizarán exclusivamente para la administración de esta actividad y la clasificación de equipos. No serán compartidos con terceros.</p>
 
-                            <p><strong>4. Limitación de Responsabilidad</strong><br>
-                            Los organizadores no se responsabilizan por daños al equipo o lesiones derivadas del mal uso.
-                            Tu participación implica aceptación de estos términos y riesgos inherentes a la actividad.</p>
+                            <p><strong>5. Limitación de Responsabilidad</strong><br>
+                            Los organizadores no se responsabilizan por daños al equipo o lesiones derivadas del mal uso. Tu participación implica aceptación de estos términos.</p>
 
-                            <p><strong>5. Modificaciones</strong><br>
-                            Los organizadores se reservan el derecho a modificar las reglas o cancelar la actividad si es necesario por razones de seguridad.</p>
-                        </div>
-                    </div>
+                            <p><strong>6. Derechos de Autor</strong><br>
+                            Todos los derechos sobre esta aplicación y su contenido son propiedad del equipo de desarrollo de 1º DAW.</p>
 
                     <!-- Checkbox to Accept Terms -->
                     <div class="checkbox-group">
@@ -409,10 +406,10 @@
                     <!-- Buttons -->
                     <div class="button-group">
                         <button type="submit" class="btn btn-primary">
-                            ✓ Registrar Equipo
+                            Registrar Equipo
                         </button>
                         <a href="{{ route('inicio') }}" class="btn btn-secondary">
-                            ← Volver
+                            Volver
                         </a>
                     </div>
                 </form>

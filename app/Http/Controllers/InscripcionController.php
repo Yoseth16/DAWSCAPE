@@ -44,6 +44,11 @@ class InscripcionController extends Controller
                 'email',
                 'max:120',
                 'unique:inscripcions,correo',
+                function ($attribute, $value, $fail) {
+                    if (!str_ends_with($value, '@estudiante.xtart.com')) {
+                        $fail('El correo debe pertenecer al dominio @estudiante.xtart.com del centro.');
+                    }
+                },
             ],
             'clase' => ['required', 'string', 'max:20'],
             'acepta_terminos' => ['required', 'accepted'],

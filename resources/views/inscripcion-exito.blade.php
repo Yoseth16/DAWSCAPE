@@ -253,21 +253,21 @@
         <div class="card">
             <!-- Header -->
             <div class="card-header">
-                <h1>⟨DAWSCAPE⟩</h1>
-                <p>¡Inscripción Exitosa!</p>
+                <h1>DAWSCAPE</h1>
+                <p>Inscripción Completada</p>
             </div>
 
             <!-- Body -->
             <div class="card-body">
                 <!-- Success Banner -->
                 <div class="success-banner">
-                    <h2>✓ ¡Equipo Registrado Exitosamente!</h2>
-                    <p>Tu equipo está listo para el Escape Room</p>
+                    <h2>Equipo Registrado Correctamente</h2>
+                    <p>Tu equipo está listo para participar en la actividad</p>
                 </div>
 
                 <!-- Team Information -->
                 <div class="team-info">
-                    <h3>📋 Datos del Equipo</h3>
+                    <h3>Datos del Equipo</h3>
                     <div class="info-row">
                         <span class="info-label">Nombre del Equipo:</span>
                         <span class="info-value">{{ $inscripcion->nombre_equipo }}</span>
@@ -284,7 +284,7 @@
 
                 <!-- QR Section -->
                 <div class="qr-section">
-                    <h3>🔐 Tu Código QR de Acceso</h3>
+                    <h3>Código QR de Acceso</h3>
                     <div class="qr-container">
                         <img src="{{ route('inscripcion.qr', ['token' => $inscripcion->qr_token]) }}" alt="QR Code">
                     </div>
@@ -298,13 +298,13 @@
 
                 <!-- Instructions -->
                 <div class="instructions">
-                    <h3>📢 Instrucciones Importantes</h3>
+                    <h3>Instrucciones Importantes</h3>
                     <ol>
                         <li><strong>Descarga tu QR:</strong> Presiona el botón "Descargar QR" para guardar la imagen en tu dispositivo.</li>
-                        <li><strong>Guarda tu correo:</strong> Necesitarás tu correo para iniciar sesión el día del evento.</li>
-                        <li><strong>Atiende al comunicado:</strong> El equipo organizador te contactará con los detalles finales del evento.</li>
-                        <li><strong>Llega a tiempo:</strong> Presenta tu QR o correo en la entrada del evento.</li>
-                        <li><strong>Trabaja en equipo:</strong> ¡La colaboración es clave para escapar a tiempo!</li>
+                        <li><strong>Guarda tu correo:</strong> Necesitarás tu correo para iniciar sesión en el evento.</li>
+                        <li><strong>Atiende al comunicado:</strong> El equipo organizador te contactará con los detalles finales.</li>
+                        <li><strong>Presenta tu acreditación:</strong> Muestra tu QR o correo en la entrada del evento.</li>
+                        <li><strong>Trabaja en equipo:</strong> La colaboración es fundamental para completar la actividad.</li>
                     </ol>
                 </div>
 
@@ -312,10 +312,10 @@
                 <div class="button-group">
                     <a href="{{ route('inscripcion.qr', ['token' => $inscripcion->qr_token]) }}"
                        class="btn btn-primary" download="qr-{{ $inscripcion->nombre_equipo }}.png">
-                        ⬇ Descargar QR
+                        Descargar QR
                     </a>
                     <a href="{{ route('inicio') }}" class="btn btn-secondary">
-                        ← Volver al Inicio
+                        Volver al Inicio
                     </a>
                 </div>
             </div>
