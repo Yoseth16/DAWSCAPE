@@ -89,6 +89,11 @@
             line-height: 1.6;
         }
 
+        .intro-box + .form-group,
+        .alert + .form-group {
+            margin-top: 2.5rem;
+        }
+
         .form-group {
             margin-bottom: 1.5rem;
         }
@@ -155,8 +160,8 @@
             border: 1px solid rgba(34, 197, 94, 0.2);
             border-radius: 0.5rem;
             padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            max-height: 300px;
+            margin-bottom: 1rem;
+            max-height: 250px;
             overflow-y: auto;
         }
 
