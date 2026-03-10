@@ -70,43 +70,12 @@
             padding: 1.5rem;
         }
 
-        /* TAB SYSTEM */
-        .tabs-container {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            border-bottom: 2px solid rgba(34, 197, 94, 0.2);
-        }
-
-        .tab-button {
-            padding: 0.75rem 1.5rem;
-            background: transparent;
-            border: none;
-            color: #cbd5e1;
-            font-weight: 600;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s ease;
-            font-size: 0.95rem;
-        }
-
-        .tab-button:hover {
-            color: #22c55e;
-        }
-
-        .tab-button.active {
-            color: #22c55e;
-            border-bottom-color: #22c55e;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-            background: rgba(241, 245, 249, 0.05);
+        .intro-box {
+            background: rgba(34, 197, 94, 0.05);
+            border-left: 4px solid #22c55e;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 3rem;
             border-left: 4px solid #22c55e;
             padding: 1.5rem;
             border-radius: 0.5rem;
@@ -193,17 +162,6 @@
             margin-bottom: 0.75rem;
         }
 
-        #tab-legal {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .legal-section h3 {
-            color: #22c55e;
-            font-size: 1.1rem;
-            margin-bottom: 1rem;
-        }
-
         .legal-content {
             font-size: 0.85rem;
             color: #cbd5e1;
@@ -240,6 +198,18 @@
             cursor: pointer;
             display: flex;
             align-items: center;
+        }
+
+        .checkbox-group a {
+            color: #22c55e;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-group a:hover {
+            color: #16a34a;
+            text-decoration: underline;
         }
 
         .button-group {
@@ -364,99 +334,56 @@
                     </div>
                 @endif
 
-                <!-- Tab Navigation -->
-                <div class="tabs-container">
-                    <button type="button" class="tab-button active" data-tab="formulario">
-                        Formulario
-                    </button>
-                    <button type="button" class="tab-button" data-tab="legal">
-                        Aviso Legal
-                    </button>
-                </div>
-
                 <!-- Registration Form -->
                 <form method="POST" action="{{ route('inscripcion.guardar') }}" class="form">
                     @csrf
 
-                    <!-- Tab 1: Formulario (Registration Form) -->
-                    <div class="tab-content active" id="tab-formulario">
-                        <!-- Nombre del Equipo -->
-                        <div class="form-group">
-                            <label for="nombre_equipo">Nombre del Equipo *</label>
-                            <input type="text" id="nombre_equipo" name="nombre_equipo"
-                                   placeholder="Ej: Los Detectives Digitales"
-                                   value="{{ old('nombre_equipo') }}"
-                                   required maxlength="60">
-                            @error('nombre_equipo')
-                                <div class="error-message">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <!-- Correo Electrónico -->
-                        <div class="form-group">
-                            <label for="correo">Correo Electrónico *</label>
-                            <input type="email" id="correo" name="correo"
-                                   placeholder="ejemplo@estudiante.xtart.com"
-                                   value="{{ old('correo') }}"
-                                   required maxlength="120">
-                            @error('correo')
-                                <div class="error-message">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <!-- Clase / Grupo -->
-                        <div class="form-group">
-                            <label for="clase">Clase / Grupo *</label>
-                            <input type="text" id="clase" name="clase"
-                                   placeholder="Ej: 2º Marketing Digital"
-                                   value="{{ old('clase') }}"
-                                   required maxlength="20">
-                            @error('clase')
-                                <div class="error-message">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <!-- Checkbox to Accept Terms -->
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="acepta_terminos" name="acepta_terminos" value="1" required>
-                            <label for="acepta_terminos">
-                                He leído y acepto los términos legales. Entiendo que participo bajo mi propia responsabilidad.
-                            </label>
-                        </div>
-                        @error('acepta_terminos')
+                    <!-- Nombre del Equipo -->
+                    <div class="form-group">
+                        <label for="nombre_equipo">Nombre del Equipo *</label>
+                        <input type="text" id="nombre_equipo" name="nombre_equipo"
+                               placeholder="Ej: Los Detectives Digitales"
+                               value="{{ old('nombre_equipo') }}"
+                               required maxlength="60">
+                        @error('nombre_equipo')
                             <div class="error-message">{{ $message }}</div>
                         @enderror
                     </div>
 
-                    <!-- Tab 2: Aviso Legal -->
-                    <div class="tab-content" id="tab-legal">
-                        <div class="legal-section">
-                            <h3>Aviso Legal y Términos de Uso</h3>
-                            <div class="legal-content">
-                                <p><strong>1. Descripción del Evento</strong><br>
-                                DAWSCAPE es un Escape Room Educativo interactivo diseñado para dinamizar sesiones de formación. Esta aplicación ha sido desarrollada por alumnos de 1º de Desarrollo de Aplicaciones Web.</p>
-
-                                <p><strong>2. Restricciones y Prohibiciones</strong><br>
-                                • No se permite la inspección, modificación o intento de acceso al código fuente de la aplicación.<br>
-                                • Está prohibido intentar acceder a sistemas sin autorización o hacer trampa.<br>
-                                • No se permite la reproducción, distribución o uso de esta aplicación sin autorización expresa.<br>
-                                • Cumplirás con las instrucciones del personal a cargo del evento.</p>
-
-                                <p><strong>3. Responsabilidades del Participante</strong><br>
-                                • Mantendrás un comportamiento respetuoso y profesional durante la actividad.<br>
-                                • Reportarás inmediatamente cualquier incidente técnico o comportamiento inapropiado.</p>
-
-                                <p><strong>4. Privacidad y Datos Personales</strong><br>
-                                Los datos recopilados (nombre del equipo, correo electrónico, clase) se utilizarán exclusivamente para la administración de esta actividad y la clasificación de equipos. No serán compartidos con terceros.</p>
-
-                                <p><strong>5. Limitación de Responsabilidad</strong><br>
-                                Los organizadores no se responsabilizan por daños al equipo o lesiones derivadas del mal uso. Tu participación implica aceptación de estos términos.</p>
-
-                                <p><strong>6. Derechos de Autor</strong><br>
-                                Todos los derechos sobre esta aplicación y su contenido son propiedad del equipo de desarrollo de 1º DAW.</p>
-                            </div>
-                        </div>
+                    <!-- Correo Electrónico -->
+                    <div class="form-group">
+                        <label for="correo">Correo Electrónico *</label>
+                        <input type="email" id="correo" name="correo"
+                               placeholder="ejemplo@estudiante.xtart.com"
+                               value="{{ old('correo') }}"
+                               required maxlength="120">
+                        @error('correo')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
+
+                    <!-- Clase / Grupo -->
+                    <div class="form-group">
+                        <label for="clase">Clase / Grupo *</label>
+                        <input type="text" id="clase" name="clase"
+                               placeholder="Ej: 2º Marketing Digital"
+                               value="{{ old('clase') }}"
+                               required maxlength="20">
+                        @error('clase')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <!-- Checkbox to Accept Terms -->
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="acepta_terminos" name="acepta_terminos" value="1" required>
+                        <label for="acepta_terminos">
+                            He leído y acepto el <a href="/aviso-legal" target="_blank">Aviso Legal</a>. Entiendo que participo bajo mi propia responsabilidad.
+                        </label>
+                    </div>
+                    @error('acepta_terminos')
+                        <div class="error-message">{{ $message }}</div>
+                    @enderror
 
                     <!-- Buttons -->
                     <div class="button-group">
@@ -472,22 +399,7 @@
         </div>
     </div>
 
-    <script>
-        // Tab System Functionality
-        document.querySelectorAll('.tab-button').forEach(button => {
-            button.addEventListener('click', function() {
-                const tabName = this.getAttribute('data-tab');
 
-                // Remove active class from all buttons and contents
-                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-                // Add active class to clicked button and corresponding content
-                this.classList.add('active');
-                document.getElementById('tab-' + tabName).classList.add('active');
-            });
-        });
-    </script>
 </body>
 </html>
 
