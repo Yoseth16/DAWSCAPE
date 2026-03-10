@@ -122,8 +122,8 @@
 
     <h2>1. Información General y Autoría</h2>
     <p>
-        El presente proyecto web, denominado <strong>DAWSCAPE</strong> (en adelante, la "Plataforma"), 
-        ha sido desarrollado íntegramente por los alumnos del Ciclo Formativo de Grado Superior en Desarrollo de Aplicaciones Web (DAW) del <strong>I.E.S Vértice</strong> (o institución correspondiente).
+        El presente proyecto web, denominado <strong>DAWSCAPE</strong> (en adelante, la "Plataforma"),
+        ha sido desarrollado íntegramente por los alumnos del Ciclo Formativo de Grado Superior en Desarrollo de Aplicaciones Web (DAW) del <strong>XTART</strong>.
     </p>
     <p>
         Esta plataforma tiene una finalidad estrictamente educativa, académica y de demostración técnica de los conocimientos adquiridos durante el ciclo formativo. No persigue fines comerciales ni de lucro.
