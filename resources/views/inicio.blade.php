@@ -94,7 +94,7 @@
   }
 
   .form-group { margin-bottom: 1.8rem; }
-  
+
   .form-label {
     display: block;
     font-size: 0.75rem;
@@ -156,7 +156,7 @@
   }
 
   input[type="checkbox"]:checked::before { transform: scale(1); }
-  
+
   .checkbox-label { font-size: 0.85rem; color: #669977; line-height: 1.5; cursor: pointer; }
 
   /* Customization Selectors */
@@ -166,7 +166,7 @@
   }
   .color-btn:hover { transform: scale(1.1); }
   .color-btn.active { border-color: var(--text); box-shadow: 0 0 15px currentColor; transform: scale(1.1); }
-  
+
   .icon-btn {
     aspect-ratio: 1; border-radius: 8px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; transition: all 0.2s; color: var(--green); background: rgba(0, 255, 136, 0.05);
   }
@@ -248,6 +248,13 @@
   <div class="subtitle">// AULA 115 · SISTEMA DE ESCAPE_</div>
   <div class="glitch-text">ACCESO RESTRINGIDO. IDENTIFÍQUESE.</div>
 
+  <!-- BANNER INFORMATIVO -->
+  <div style="max-width: 500px; margin-bottom: 2rem; padding: 1.5rem; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 0.5rem; color: #cbd5e1; text-align: center; font-size: 0.95rem; line-height: 1.6;">
+    <p style="margin-bottom: 1rem;"><strong style="color: #22c55e;">¿PRIMERA VEZ?</strong></p>
+    <p style="margin-bottom: 1.5rem;">Si aún no te has inscrito, debes hacerlo primero para generar tu código QR. La inscripción te permite registrar tu equipo y obtener el código necesario para acceder al juego.</p>
+    <a href="/inscripcion" style="display: inline-block; padding: 0.8rem 1.5rem; background: rgba(34, 197, 94, 0.2); border: 1px solid #22c55e; color: #22c55e; text-decoration: none; border-radius: 0.35rem; font-weight: 600; transition: all 0.3s; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.1em;">→ Ir a Inscripción</a>
+  </div>
+
   <div class="login-card">
     <form action="/empezar" method="POST">
       @csrf
@@ -257,7 +264,11 @@
       @if(session('error'))
         <div class="error-feedback">✖ {{ session('error') }}</div>
       @endif
-      
+
+      <div style="background: rgba(241, 245, 249, 0.03); border-left: 3px solid #22c55e; padding: 1rem; margin-bottom: 2rem; border-radius: 0.3rem; color: #cbd5e1; font-size: 0.9rem;">
+        <strong style="color: #22c55e;">INSTRUCCIONES:</strong> Utiliza los datos que ingresaste en tu inscripción previa.
+      </div>
+
       <div class="form-group">
         <label class="form-label">CORREO INSTITUCIONAL</label>
         <input type="email" name="email" class="form-control" placeholder="usuario@estudiante.xtart.com" required autocomplete="off" autofocus>
@@ -310,7 +321,7 @@
       <div class="checkbox-group">
         <input type="checkbox" id="checkHonestidad" required>
         <label class="checkbox-label" for="checkHonestidad">
-            Certifico bajo honor que este es mi correo corporativo real. 
+            Certifico bajo honor que este es mi correo corporativo real.
             El uso de identidad falsa conllevará la expulsión del sistema.
         </label>
       </div>
@@ -344,7 +355,7 @@ colorBtns.forEach(btn => {
         colorBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         inputColor.value = btn.dataset.color;
-        
+
         // Efecto visual: cambiar el verde principal temporalmente
         document.documentElement.style.setProperty('--green', btn.dataset.color);
     });

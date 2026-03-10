@@ -25,6 +25,9 @@ Route::get('/legal', function () {
 // ==========================================
 Route::get('/inscripcion', [InscripcionController::class, 'mostrar'])->name('inscripcion.mostrar');
 Route::post('/inscripcion', [InscripcionController::class, 'guardar'])->name('inscripcion.guardar');
+Route::get('/inscripcion/exito/{token}', [InscripcionController::class, 'exito'])->name('inscripcion.exito');
+Route::get('/inscripcion/qr/{token}', [InscripcionController::class, 'descargarQr'])->name('inscripcion.qr');
+Route::get('/inscripcion/validar/{token}', [InscripcionController::class, 'validarQr'])->name('inscripcion.validar');
 
 Route::post('/empezar', [JuegoController::class, 'empezarPartida']);
 

@@ -10,16 +10,63 @@ El juego sitúa a los alumnos en un escenario donde deben burlar el cortafuegos 
 
 ## 🚀 1. Descripción General del Flujo
 
-1. **Pantalla de Inicio y Login**: Los alumnos acceden a la aplicación y registran el nombre de su equipo y su clase (para las mecánicas de ranking). Una vez entran, el temporizador global arranca en el servidor.
-2. **Desarrollo Lineal de Pruebas**: Los equipos se enfrentan a pruebas secuenciales (1 a 7). Cada prueba contiene un desafío específico (lógica, matemáticas, geografía, deducción).
-3. **Integración con QRs Físicos**: Las Pruebas 3, 4 y 5 invitan al jugador a levantarse del asiento, explorar el aula o edificio y escanear códigos QR que están escondidos físicamente en máquinas de café, taquillas u otros lugares reales.
-4. **Validación Segura**: Cada respuesta introducida en la interfaz (simulando una terminal hacker) se valida silenciosamente en el backend contra la base de datos (omitiendo espacios, mayúsculas y acentos automáticamnete). Las pistas no bloquean el juego, pero añaden penalizaciones de tiempo invisibles.
-5. **Cortafuegos Final**: La Prueba 7 inyecta aleatoriamente al cliente 5 acertijos o preguntas extraídas de una base de datos gestionada por el profesor.
-6. **Reporte Final**: Una vez superada la última barrera, la app congela sus cronómetros y emite su Informe de Rendimiento para que los jugadores observen cuánto tiempo les costó cada reto.
+1. **Inscripción Previa de Equipos** (Nuevo): Antes del evento, los equipos deben registrarse en `/inscripcion` con su nombre, correo y clase. Se les otorga un código QR único descargable.
+2. **Pantalla de Inicio y Login**: Los alumnos acceden a la aplicación usando su correo y validan su QR. Una vez verificados, el temporizador global arranca en el servidor.
+3. **Desarrollo Lineal de Pruebas**: Los equipos se enfrentan a pruebas secuenciales (1 a 7). Cada prueba contiene un desafío específico (lógica, matemáticas, geografía, deducción).
+4. **Integración con QRs Físicos**: Las Pruebas 3, 4 y 5 invitan al jugador a levantarse del asiento, explorar el aula o edificio y escanear códigos QR que están escondidos físicamente en máquinas de café, taquillas u otros lugares reales.
+5. **Validación Segura**: Cada respuesta introducida en la interfaz (simulando una terminal hacker) se valida silenciosamente en el backend contra la base de datos (omitiendo espacios, mayúsculas y acentos automáticamnete). Las pistas no bloquean el juego, pero añaden penalizaciones de tiempo invisibles.
+6. **Cortafuegos Final**: La Prueba 7 inyecta aleatoriamente al cliente 5 acertijos o preguntas extraídas de una base de datos gestionada por el profesor.
+7. **Reporte Final**: Una vez superada la última barrera, la app congela sus cronómetros y emite su Informe de Rendimiento para que los jugadores observen cuánto tiempo les costó cada reto.
 
 ---
 
-## 🧩 2. Inventario Oficial de Pruebas y Respuestas
+## 📝 2.5. Sistema de Inscripción Previa de Equipos
+
+**DAWSCAPE** implementa un sistema robusto de inscripción previa que asegura orden y legitimidad en la participación:
+
+### Flujo de Inscripción
+
+1. **Registro Previo** (`/inscripcion`):
+   - Los equipos se registran con nombre único, correo único y clase.
+   - La validación backend previene duplicados.
+   - Se aceptan términos legales obligatorios.
+
+2. **Generación de QR Único**:
+   - Cada inscripción recibe un token único de 32 caracteres.
+   - Se genera automáticamente un código QR PNG descargable.
+   - El QR contiene la URL: `dawscape.fun/inscripcion/validar/{token}`.
+
+3. **Página de Éxito**:
+   - El equipo accede a su página de éxito (`/inscripcion/exito/{token}`).
+   - Visualiza sus datos, descarga el QR e instrucciones.
+
+4. **Validación de Acceso**:
+   - En el día del evento, escanean o muestran su QR/correo.
+   - El endpoint de validación (`/inscripcion/validar/{token}`) retorna JSON con sus datos.
+   - Se verifica autorización antes de permitir iniciar sesión.
+
+### Tabla de Base de Datos
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `id` | INT PK | Identificador único |
+| `nombre_equipo` | VARCHAR(60) UNIQUE | Nombre del equipo (sin duplicados) |
+| `correo` | VARCHAR(120) UNIQUE | Email único del representante |
+| `clase` | VARCHAR(20) | Grupo/clase participante |
+| `qr_token` | VARCHAR(32) UNIQUE | Token aleatorio para el QR |
+| `created_at` / `updated_at` | TIMESTAMP | Timestamps de auditoría |
+
+### Rutas Relacionadas
+
+- `GET /inscripcion` → Formulario de registro
+- `POST /inscripcion` → Guardar inscripción
+- `GET /inscripcion/exito/{token}` → Página de éxito + descarga QR
+- `GET /inscripcion/qr/{token}` → Generar/descargar PNG del QR
+- `GET /inscripcion/validar/{token}` → Validar QR (respuesta JSON)
+
+---
+
+## 🧩 3. Inventario Oficial de Pruebas y Respuestas
 
 Cada prueba fue desarrollada por un miembro distinto. A continuación la ruta canónica y las llaves maestras:
 
@@ -35,7 +82,7 @@ Cada prueba fue desarrollada por un miembro distinto. A continuación la ruta ca
 
 ---
 
-## 🛠️ 3. Stack Tecnológico
+## 🛠️ 4. Stack Tecnológico
 
 DAWSCAPE se apoya en un stack moderno de backend y estilos híbridos:
 
@@ -48,7 +95,7 @@ DAWSCAPE se apoya en un stack moderno de backend y estilos híbridos:
 
 ---
 
-## 💾 4. Instalación y Despliegue
+## 💾 5. Instalación y Despliegue
 
 ### Requisitos Previos
 
@@ -80,7 +127,7 @@ Repite los pasos anteriores vía SSH, pero asegurándote de:
 
 ---
 
-## 🏢 5. Panel de Control del Game Master (Administrador)
+## 🏢 6. Panel de Control del Game Master (Administrador)
 
 Puedes acceder al cuartel general como profesor dirigiéndote a `/login` e ingresando las credenciales predeterminadas sembradas en base de datos.
 
@@ -95,7 +142,7 @@ Este potente Dashboard ofrece:
 
 ---
 
-## 📸 6. El Sistema de QRs Dinámicos
+## 📸 7. El Sistema de QRs Dinámicos
 
 Para las pruebas semi-físicas (Pruebas 3, 4 y 5) Dawscape evita hardcodear las rutas en el código:
 
@@ -107,7 +154,7 @@ Para las pruebas semi-físicas (Pruebas 3, 4 y 5) Dawscape evita hardcodear las 
 
 ---
 
-## 🌍 7. Url de Producción Pública
+## 🌍 8. Url de Producción Pública
 
 Actualmente DAWSCAPE opera desde el servidor en vivo:
 🔗 [**https://dawscape.fun**](https://dawscape.fun)
