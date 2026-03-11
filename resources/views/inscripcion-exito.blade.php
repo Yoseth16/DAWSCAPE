@@ -269,34 +269,12 @@
                 <div class="team-info">
                     <h3>Datos del Equipo</h3>
                     <div class="info-row">
-                        <span class="info-label">Nombre del Equipo:</span>
-                        <span class="info-value">{{ $inscripcion->nombre_equipo }}</span>
-                    </div>
-                    <div class="info-row">
                         <span class="info-label">Correo Electrónico:</span>
                         <span class="info-value">{{ $inscripcion->correo }}</span>
                     </div>
                     <div class="info-row">
-                        <span class="info-label">Clase / Grupo:</span>
-                        <span class="info-value">{{ $inscripcion->clase }}</span>
-                    </div>
-                    <div class="info-row">
                         <span class="info-label">Código de Acceso:</span>
                         <span class="info-value" style="font-size: 1.3rem; letter-spacing: 2px;">{{ $inscripcion->codigo_acceso }}</span>
-                    </div>
-                </div>
-
-                <!-- QR Section -->
-                <div class="qr-section">
-                    <h3>Código QR de Acceso</h3>
-                    <div class="qr-container">
-                        <img src="{{ route('inscripcion.qr', ['token' => $inscripcion->qr_token]) }}" alt="QR Code">
-                    </div>
-                    <div class="qr-description">
-                        <p>
-                            Este código QR es tu <strong>identificador único</strong> para el evento.
-                            Guárdalo bien: lo necesitarás durante el Escape Room para validar tu participación.
-                        </p>
                     </div>
                 </div>
 
@@ -314,10 +292,6 @@
 
                 <!-- Buttons -->
                 <div class="button-group">
-                    <a href="{{ route('inscripcion.qr', ['token' => $inscripcion->qr_token]) }}"
-                       class="btn btn-primary" download="qr-{{ $inscripcion->nombre_equipo }}.png">
-                        Descargar QR
-                    </a>
                     <a href="{{ route('inicio') }}" class="btn btn-secondary">
                         Volver al Inicio
                     </a>
