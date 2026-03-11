@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Partida;
+use App\Models\Inscripcion;
 use Barryvdh\DomPDF\Facade\Pdf;
 use \App\Services\GameTimerService;
 use App\Http\Requests\EmpezarPartidaRequest;
@@ -132,19 +133,25 @@ class JuegoController extends Controller
     {
         $redirDestino = $request->input('redirect_to');
 
-        // ── RECONEXIÓN: el equipo ya existe, solo restauramos la sesión ────
-        $partidaExistente = Partida::where('email', $request->email)->first();
-        if ($partidaExistente) {
-            // Verificamos que el nombre de equipo coincide (seguridad mínima)
-            if (strtolower(trim($partidaExistente->nombre_equipo)) !== strtolower(trim($request->nombre_equipo))) {
-                return back()->with('error', 'NOMBRE DE EQUIPO NO COINCIDE CON EL REGISTRO EXISTENTE.');
-            }
+        // Buscar la inscripción que coincida exactamente con los 3 datos
+        $inscripcion = Inscripcion::where('correo', $request->correo)
+            ->where('nombre_equipo', $request->nombre_equipo)
+            ->where('codigo_acceso', strtoupper($request->codigo_acceso))
+            ->first();
 
+        if (!$inscripcion) {
+            return back()->with('error', 'Datos incorrectos o código inválido. Verifica tu correo, nombre de equipo y código de acceso.');
+        }
+
+        // ── RECONEXIÓN: el equipo ya existe, solo restauramos la sesión ────
+        $partidaExistente = Partida::where('email', $inscripcion->correo)->first();
+        if ($partidaExistente) {
             // Restauramos la sesión con los datos de la partida guardados en BBDD
             session([
-                'email'        => $partidaExistente->email,
+                'email'         => $partidaExistente->email,
                 'nombre_equipo' => $partidaExistente->nombre_equipo,
-                'clase'        => $partidaExistente->clase,
+                'clase'         => $partidaExistente->clase,
+                'inscripcion_id' => $inscripcion->id,
             ]);
 
             // Redirigimos al QR (o a prueba1 como fallback)
@@ -154,20 +161,19 @@ class JuegoController extends Controller
 
         // ── REGISTRO NUEVO ────────────────────────────────────────────────
         Partida::create([
-            'email'          => $request->email,
-            'nombre_equipo'  => $request->nombre_equipo,
-            'clase'          => $request->clase,
-            'color_hex'      => $request->color_hex ?? '#3b82f6',
-            'icono'          => $request->icono ?? 'ph-user-focus',
-            'fase_actual'    => 'Prueba 1 Mario',
-            'tiempo_segundos' => 0,
-            'inicio_juego'   => Carbon::now()
+            'email'             => $inscripcion->correo,
+            'nombre_equipo'     => $inscripcion->nombre_equipo,
+            'clase'             => $inscripcion->clase,
+            'fase_actual'       => 'Prueba 1 Mario',
+            'tiempo_segundos'   => 0,
+            'inicio_juego'      => Carbon::now()
         ]);
 
         session([
-            'email'         => $request->email,
-            'nombre_equipo' => $request->nombre_equipo,
-            'clase'         => $request->clase,
+            'email'             => $inscripcion->correo,
+            'nombre_equipo'     => $inscripcion->nombre_equipo,
+            'clase'             => $inscripcion->clase,
+            'inscripcion_id'    => $inscripcion->id,
         ]);
 
         $destino = ($redirDestino && str_starts_with($redirDestino, '/')) ? $redirDestino : route('prueba1');
@@ -293,7 +299,7 @@ class JuegoController extends Controller
 
         $CHECKSUM_CORRECTO = config('escape.respuestas.prueba3'); // 18 botones + 80 cents + 5 azucar
         $partida = $this->timerService->obtenerPartidaActiva();
-        
+
         // DEBUG: Log para verificar qué valores se están comparando
         \Log::info('Prueba3 Validation', [
             'input' => $request->checksum,

@@ -125,11 +125,11 @@
   .form-control:focus { border-bottom-color: var(--green); box-shadow: 0 4px 15px -10px var(--green); }
 
   /* MEJORADO: Helper text con mejor contraste */
-  .helper-text { 
-    display: block; 
-    margin-top: 0.4rem; 
-    color: #88ccaa; 
-    font-size: 0.7rem; 
+  .helper-text {
+    display: block;
+    margin-top: 0.4rem;
+    color: #88ccaa;
+    font-size: 0.7rem;
     letter-spacing: 0.05em;
     text-shadow: 0 0 4px rgba(136, 204, 170, 0.15);
   }
@@ -278,63 +278,31 @@
       @endif
 
       <div style="background: rgba(241, 245, 249, 0.03); border-left: 3px solid #22c55e; padding: 1rem; margin-bottom: 2rem; border-radius: 0.3rem; color: #cbd5e1; font-size: 0.9rem;">
-        <strong style="color: #22c55e;">INSTRUCCIONES:</strong> Utiliza los datos que ingresaste en tu inscripción previa.
+        <strong style="color: #22c55e;">INSTRUCCIONES:</strong> Utiliza los datos que recibiste en tu email de inscripción.
       </div>
 
       <div class="form-group">
         <label class="form-label">CORREO INSTITUCIONAL</label>
-        <input type="email" name="email" class="form-control" placeholder="usuario@estudiante.xtart.com" required autocomplete="off" autofocus>
+        <input type="email" name="correo" class="form-control" placeholder="usuario@estudiante.xtart.com" required autocomplete="off" autofocus>
         <span class="helper-text">* Solo se permite el dominio @estudiante.xtart.com</span>
       </div>
 
       <div class="form-group">
         <label class="form-label">NOMBRE DEL EQUIPO</label>
         <input type="text" name="nombre_equipo" class="form-control" placeholder="Ej: Los Hackers" required autocomplete="off">
-        <span class="helper-text">Máx. 4 agentes por escuadrón</span>
+        <span class="helper-text">Tal como lo registraste en la inscripción</span>
       </div>
 
       <div class="form-group">
-        <label class="form-label">CLASE</label>
-        <input type="text" name="clase" class="form-control" placeholder="Ej: 1DAW" required autocomplete="off">
+        <label class="form-label">CÓDIGO DE ACCESO</label>
+        <input type="password" name="codigo_acceso" class="form-control" placeholder="6 caracteres" required autocomplete="off" maxlength="6">
+        <span class="helper-text">Lo recibiste en tu correo de inscripción</span>
       </div>
-
-      <!-- PERSONALIZACIÓN -->
-      <div class="form-group">
-        <label class="form-label">COLOR DEL EQUIPO</label>
-        <input type="hidden" name="color_hex" id="input_color" value="#00ff88">
-        <div class="grid-selector">
-            <div class="color-btn active" data-color="#00ff88" style="background:#00ff88; color:#00ff88;"></div>
-            <div class="color-btn" data-color="#3b82f6" style="background:#3b82f6; color:#3b82f6;"></div>
-            <div class="color-btn" data-color="#f43f5e" style="background:#f43f5e; color:#f43f5e;"></div>
-            <div class="color-btn" data-color="#a855f7" style="background:#a855f7; color:#a855f7;"></div>
-            <div class="color-btn" data-color="#eab308" style="background:#eab308; color:#eab308;"></div>
-            <div class="color-btn" data-color="#06b6d4" style="background:#06b6d4; color:#06b6d4;"></div>
-            <div class="color-btn" data-color="#f97316" style="background:#f97316; color:#f97316;"></div>
-            <div class="color-btn" data-color="#ec4899" style="background:#ec4899; color:#ec4899;"></div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">AVATAR DEL EQUIPO</label>
-        <input type="hidden" name="icono" id="input_icono" value="ph-first-aid">
-        <div class="grid-selector" id="icons-grid">
-            <div class="icon-btn active" data-icon="ph-first-aid" title="Primeros Auxilios (Sanidad)"><i class="ph ph-first-aid"></i></div>
-            <div class="icon-btn" data-icon="ph-heartbeat" title="Cardiología (Sanidad)"><i class="ph ph-heartbeat"></i></div>
-            <div class="icon-btn" data-icon="ph-tooth" title="Odontólogo (Dentistas)"><i class="ph ph-tooth"></i></div>
-            <div class="icon-btn" data-icon="ph-pill" title="Farmacia (Parafarmacia)"><i class="ph ph-pill"></i></div>
-            <div class="icon-btn" data-icon="ph-fire-extinguisher" title="Extintor (Emergencias)"><i class="ph ph-fire-extinguisher"></i></div>
-            <div class="icon-btn" data-icon="ph-siren" title="Ambulancia (Protección Civil)"><i class="ph ph-siren"></i></div>
-            <div class="icon-btn" data-icon="ph-megaphone" title="Megáfono (Marketing)"><i class="ph ph-megaphone"></i></div>
-            <div class="icon-btn" data-icon="ph-chart-line-up" title="Crecimiento (Marketing)"><i class="ph ph-chart-line-up"></i></div>
-        </div>
-      </div>
-      <!-- FIN PERSONALIZACIÓN -->
 
       <div class="checkbox-group">
         <input type="checkbox" id="checkHonestidad" required>
         <label class="checkbox-label" for="checkHonestidad">
-            Certifico bajo honor que este es mi correo corporativo real.
-            El uso de identidad falsa conllevará la expulsión del sistema.
+            Certifico bajo honor que estos son mis datos reales de inscripción.
         </label>
       </div>
 
@@ -356,31 +324,6 @@
     c.appendChild(p);
   }
 })();
-// Lógica Selectores
-const colorBtns = document.querySelectorAll('.color-btn');
-const inputColor = document.getElementById('input_color');
-const iconBtns = document.querySelectorAll('.icon-btn');
-const inputIcono = document.getElementById('input_icono');
-
-colorBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        colorBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        inputColor.value = btn.dataset.color;
-
-        // Efecto visual: cambiar el verde principal temporalmente
-        document.documentElement.style.setProperty('--green', btn.dataset.color);
-    });
-});
-
-iconBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        iconBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        inputIcono.value = btn.dataset.icon;
-    });
-});
-
 </script>
 <!-- Firma discreta -->
 <div style="position: fixed; bottom: 5px; right: 10px; font-family: monospace; font-size: 0.65rem; color: rgba(255, 255, 255, 0.3); z-index: 9999; text-align: right;">

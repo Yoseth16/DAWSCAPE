@@ -269,6 +269,10 @@
                 <div class="team-info">
                     <h3>Datos del Equipo</h3>
                     <div class="info-row">
+                        <span class="info-label">Nombre del Equipo:</span>
+                        <span class="info-value">{{ $inscripcion->nombre_equipo }}</span>
+                    </div>
+                    <div class="info-row">
                         <span class="info-label">Correo Electrónico:</span>
                         <span class="info-value">{{ $inscripcion->correo }}</span>
                     </div>
