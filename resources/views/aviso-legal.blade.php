@@ -161,7 +161,7 @@
         El uso del sistema se realiza bajo la propia responsabilidad del usuario. Los creadores no se hacen responsables de problemas técnicos locales en el dispositivo del usuario ni de interrupciones externas que puedan afectar al cronómetro o al desarrollo de las pruebas.
     </p>
 
-    <a href="javascript:history.back()" class="btn-back">← VOLVER AL SISTEMA</a>
+    <a href="{{ route('inscripcion') }}" class="btn-back">← VOLVER A INSCRIPCIÓN</a>
 </div>
 
 </body>
