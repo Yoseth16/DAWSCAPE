@@ -385,7 +385,7 @@
                     <div class="checkbox-group">
                         <input type="checkbox" id="acepta_terminos" name="acepta_terminos" value="1" required>
                         <label for="acepta_terminos">
-                            He leído y acepto el <a href="/aviso-legal" target="_blank">Aviso Legal</a>. Entiendo que participo bajo mi propia responsabilidad.
+                            He leído y acepto el <a href="{{ route('legal') }}" target="_blank">Aviso Legal</a>. Entiendo que participo bajo mi propia responsabilidad.
                         </label>
                     </div>
                     @error('acepta_terminos')
