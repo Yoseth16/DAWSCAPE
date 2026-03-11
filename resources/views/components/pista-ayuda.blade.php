@@ -175,7 +175,7 @@
     </div>
 </div>
 
-<div class="pista-penalizacion-aviso" id="pistaPenalizacion">⏱️ +1 minuto de penalización</div>
+<div class="pista-penalizacion-aviso" id="pistaPenalizacion">⚠️ Penalización: +8 minutos | Si usas todas las pistas perderás mucho tiempo y no podrás ganar</div>
 
 <script>
 (function() {
@@ -274,6 +274,12 @@
                 // Actualizar timer local si existe
                 if (typeof tiempoInicial !== 'undefined') {
                     tiempoInicial += data.penalizacion;
+                }
+                // Mostrar advertencia sobre uso de pistas
+                var avisoDiv = document.getElementById('pistaPenalizacion');
+                if (avisoDiv) {
+                    var minutosActuales = Math.floor(data.penalizacion / 60);
+                    avisoDiv.textContent = '⚠️ +' + minutosActuales + ' minutos de penalización | ¡Cuidado! Las pistas restan mucho tiempo';
                 }
             } else {
                 marcarComoUsada();

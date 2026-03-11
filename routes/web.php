@@ -88,6 +88,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Gestión de Partidas y Ticker Live
     Route::get('/admin/api/stats', [AdminController::class, 'apiStats']);
     Route::get('/admin/api/inscripciones', [AdminController::class, 'apiInscripciones']);
+    Route::delete('/admin/inscripcion/{id}', [AdminController::class, 'eliminarInscripcion']);
     Route::delete('/admin/equipo/{uuid}', [AdminController::class, 'eliminarEquipo']);
     Route::get('/admin/equipo/{uuid}/logs', [AdminController::class, 'mostrarLogs'])->name('admin.equipo.logs');
     Route::get('/admin/exportar-top20', [AdminController::class, 'exportarTop20PDF']);
@@ -132,10 +133,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/prueba/prueba6', [JuegoController::class, 'mostrarPrueba6'])->name('admin.prueba.prueba6');
     Route::get('/prueba/prueba7', [JuegoController::class, 'mostrarPrueba7'])->name('admin.prueba.prueba7');
 
-    Route::get('/prueba/prueba7dinamica', function () {
+    Route::get('/prueba/prueba8', function () {
         // Admin bypass: crear sesión temporal y generar combinación de prueba fija para demostración
         session([
-            'email'        => 'admin-test@prueba7dinamica.test',
+            'email'        => 'admin-test@prueba8.test',
             'nombre_equipo' => 'ADMIN TEST',
             'clase'        => 'Pruebas'
         ]);
@@ -151,7 +152,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ],
             'intentos_fallidos'   => 0
         ]);
-    })->name('admin.prueba.prueba7dinamica');
+    })->name('admin.prueba.prueba8');
 
     // Gestión de Perfil de Profesor (Breeze)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

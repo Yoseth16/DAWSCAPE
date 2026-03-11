@@ -33,7 +33,7 @@ return [
             'texto' => 'Presta atención a la secuencia de luces y sonidos. La cooperación entre el equipo es vital.',
         ],
     ],
-    'penalizacion_pista' => 60, // 1 minuto por pista
+    'penalizacion_pista' => 480, // 8 minutos por pista
 
     'respuestas' => [
         'prueba1' => [

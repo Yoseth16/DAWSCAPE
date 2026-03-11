@@ -172,6 +172,18 @@ class AdminController extends Controller
     // ==========================================
     // MÓDULO: CREADOR DINÁMICO DE PRUEBAS
     // ==========================================
+    public function eliminarInscripcion($id)
+    {
+        $inscripcion = Inscripcion::findOrFail($id);
+        $nombreEquipo = $inscripcion->nombre_equipo;
+        $inscripcion->delete();
+
+        return back()->with('success', "Inscripción de '" . $nombreEquipo . "' eliminada correctamente.");
+    }
+
+    // ==========================================
+    // MÓDULO: CREADOR DINÁMICO DE PRUEBAS
+    // ==========================================
     public function gestionarPreguntas()
     {
         $preguntas = \App\Models\PreguntaDinamica::orderBy('created_at', 'desc')->get();

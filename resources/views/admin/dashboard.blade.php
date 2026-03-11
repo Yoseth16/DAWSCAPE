@@ -250,22 +250,29 @@
         @if($inscritosNoIniciados > 0)
         <div class="glass-panel" style="margin-bottom: 2.5rem; border-left: 4px solid #3b82f6;">
             <div class="panel-heading"><i class="ph ph-clipboard-text"></i> Equipos Inscritos (Sin Iniciar)</div>
-            <div style="max-height: 400px; overflow-y: auto;">
-                <div class="podium-list">
+            <div style="max-height: 400px; overflow-y: auto; border-radius: 0 0 12px 12px;">
+                <div class="podium-list" style="margin: 0;">
                     @foreach($inscripcionesPendientes as $insc)
-                    <div class="podium-item" style="background: linear-gradient(135deg, #f0f9ff, #ffffff); border-left: 3px solid #3b82f6;">
+                    <div class="podium-item" style="background: linear-gradient(135deg, #f0f9ff, #ffffff); border-left: 3px solid #3b82f6; display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid #e0e7ff; margin: 0;">
                         <div class="pos-badge" style="background: #dbeafe; color: #3b82f6; box-shadow: none;">
                             {{ strtoupper(substr($insc->nombre_equipo, 0, 1)) }}
                         </div>
-                        <div class="podium-details" style="flex: 1;">
-                            <div class="podium-name">{{ $insc->nombre_equipo }}</div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">
+                        <div style="flex: 1; min-width: 0; margin: 0 12px;">
+                            <div style="font-weight: 600; color: var(--text-main); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $insc->nombre_equipo }}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">
                                 {{ $insc->correo }} | {{ $insc->clase }}
                             </div>
                         </div>
-                        <div style="font-size: 0.8rem; color: #64748b; white-space: nowrap;">
+                        <div style="font-size: 0.75rem; color: #64748b; white-space: nowrap; margin-right: 8px;">
                             {{ $insc->created_at->diffForHumans() }}
                         </div>
+                        <form action="/admin/inscripcion/{{ $insc->id }}" method="POST" onsubmit="return confirm('¿Eliminar inscripción de {{ $insc->nombre_equipo }}?');" style="margin:0;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn-action" title="Eliminar inscripción" style="background: #fee2e2; color: #dc2626;">
+                                <i class="ph ph-trash"></i>
+                            </button>
+                        </form>
                     </div>
                     @endforeach
                 </div>
@@ -477,32 +484,43 @@
 
             // Actualizar panel de inscripciones pendientes
             const inscripcionesPanel = document.querySelector('[style*="border-left: 4px solid"]');
-            if (inscripcionesPanel && data.no_iniciados > 0) {
-                const listContainer = inscripcionesPanel.querySelector('.podium-list');
-                if (listContainer) {
-                    let html = '';
-                    data.inscripciones_pendientes.forEach(insc => {
-                        html += `
-                        <div class="podium-item" style="background: linear-gradient(135deg, #f0f9ff, #ffffff); border-left: 3px solid #3b82f6;">
-                            <div class="pos-badge" style="background: #dbeafe; color: #3b82f6; box-shadow: none;">
-                                ${insc.avatar}
-                            </div>
-                            <div class="podium-details" style="flex: 1;">
-                                <div class="podium-name">${insc.nombre_equipo}</div>
-                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">
-                                    ${insc.correo} | ${insc.clase}
+            if (inscripcionesPanel) {
+                if (data.no_iniciados > 0) {
+                    const listContainer = inscripcionesPanel.querySelector('.podium-list');
+                    if (listContainer) {
+                        let html = '';
+                        data.inscripciones_pendientes.forEach(insc => {
+                            const csrfToken = document.querySelector('meta[name=csrf-token]').content;
+                            html += `
+                            <div class="podium-item" style="background: linear-gradient(135deg, #f0f9ff, #ffffff); border-left: 3px solid #3b82f6; display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid #e0e7ff; margin: 0;">
+                                <div class="pos-badge" style="background: #dbeafe; color: #3b82f6; box-shadow: none;">
+                                    ${insc.avatar}
                                 </div>
-                            </div>
-                            <div style="font-size: 0.8rem; color: #64748b; white-space: nowrap;">
-                                ${insc.tiempo_inscripcion}
-                            </div>
-                        </div>`;
-                    });
-                    listContainer.innerHTML = html;
+                                <div style="flex: 1; min-width: 0; margin: 0 12px;">
+                                    <div style="font-weight: 600; color: var(--text-main); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${insc.nombre_equipo}</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">
+                                        ${insc.correo} | ${insc.clase}
+                                    </div>
+                                </div>
+                                <div style="font-size: 0.75rem; color: #64748b; white-space: nowrap; margin-right: 8px;">
+                                    ${insc.tiempo_inscripcion}
+                                </div>
+                                <form action="/admin/inscripcion/${insc.id}" method="POST" onsubmit="return confirm('¿Eliminar inscripción de ${insc.nombre_equipo}?');" style="margin:0;">
+                                    <input type="hidden" name="_token" value="${csrfToken}">
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <button type="submit" class="btn-action" title="Eliminar inscripción" style="background: #fee2e2; color: #dc2626;">
+                                        <i class="ph ph-trash"></i>
+                                    </button>
+                                </form>
+                            </div>`;
+                        });
+                        listContainer.innerHTML = html;
+                        inscripcionesPanel.style.display = 'block';
+                    }
+                } else {
+                    // Ocultar panel si no hay inscritos pendientes
+                    inscripcionesPanel.style.display = 'none';
                 }
-            } else if (inscripcionesPanel && data.no_iniciados === 0) {
-                // Ocultar panel si no hay inscritos pendientes
-                inscripcionesPanel.style.display = 'none';
             }
         }
 
