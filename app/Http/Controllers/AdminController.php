@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Partida;
+use App\Models\Inscripcion;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class AdminController extends Controller
@@ -22,7 +23,7 @@ class AdminController extends Controller
 
         // 2. Obtener la lista general
         $partidas = $this->statsService->getPartidasOrdered();
-            
+
         // 3. Obtener Métricas (Ahora optimizadas desde BBDD)
         $metrics = $this->statsService->getMetrics();
         $totalEquipos =      $metrics['total'];
@@ -34,7 +35,16 @@ class AdminController extends Controller
         // 4. Obtener Chart Data
         $chartData = $this->statsService->getChartData();
 
-        // 5. Autodescubrimiento de rutas de pruebas para el menú Admin
+        // 5. NUEVO: Obtener Inscripciones (equipos que se registraron pero no han comenzado)
+        $emailsConPartida = Partida::pluck('email')->toArray();
+        $inscripcionesPendientes = Inscripcion::whereNotIn('correo', $emailsConPartida)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $totalInscritos = Inscripcion::count();
+        $inscritosNoIniciados = $inscripcionesPendientes->count();
+
+        // 6. Autodescubrimiento de rutas de pruebas para el menú Admin
         $rutasPruebas = collect(\Illuminate\Support\Facades\Route::getRoutes()->getRoutes())
             ->filter(function ($route) {
                 return str_starts_with($route->getName(), 'admin.prueba.');
@@ -50,8 +60,9 @@ class AdminController extends Controller
             ->values();
 
         return view('admin.dashboard', compact(
-            'partidas', 'top5', 'rutasPruebas', 
-            'totalEquipos', 'equiposFinalizados', 'equiposActivos', 'equiposTimeout', 'chartData'
+            'partidas', 'top5', 'rutasPruebas',
+            'totalEquipos', 'equiposFinalizados', 'equiposActivos', 'equiposTimeout', 'chartData',
+            'inscripcionesPendientes', 'totalInscritos', 'inscritosNoIniciados'
         ))->with('tiempoMedioSegundos', $promedioSegundos);
     }
 
@@ -130,6 +141,34 @@ class AdminController extends Controller
         ]);
     }
 
+    public function apiInscripciones()
+    {
+        $emailsConPartida = Partida::pluck('email')->toArray();
+        $inscripcionesPendientes = Inscripcion::whereNotIn('correo', $emailsConPartida)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $totalInscritos = Inscripcion::count();
+        $inscritosNoIniciados = $inscripcionesPendientes->count();
+
+        return response()->json([
+            'total_inscritos' => $totalInscritos,
+            'no_iniciados' => $inscritosNoIniciados,
+            'iniciados' => $totalInscritos - $inscritosNoIniciados,
+            'inscripciones_pendientes' => $inscripcionesPendientes->map(function($insc) {
+                return [
+                    'id' => $insc->id,
+                    'nombre_equipo' => $insc->nombre_equipo,
+                    'correo' => $insc->correo,
+                    'clase' => $insc->clase,
+                    'avatar' => strtoupper(substr($insc->nombre_equipo, 0, 1)),
+                    'tiempo_inscripcion' => $insc->created_at->diffForHumans(),
+                    'created_at' => $insc->created_at
+                ];
+            })
+        ]);
+    }
+
     // ==========================================
     // MÓDULO: CREADOR DINÁMICO DE PRUEBAS
     // ==========================================
@@ -160,7 +199,7 @@ class AdminController extends Controller
         $pregunta = \App\Models\PreguntaDinamica::findOrFail($id);
         $pregunta->activa = !$pregunta->activa;
         $pregunta->save();
-        
+
         $estado = $pregunta->activa ? 'activada' : 'desactivada';
         return back()->with('success', "Pregunta $estado exitosamente.");
     }
@@ -169,7 +208,7 @@ class AdminController extends Controller
     {
         $pregunta = \App\Models\PreguntaDinamica::findOrFail($id);
         $pregunta->delete();
-        
+
         return back()->with('success', 'Pregunta eliminada del sistema.');
     }
 }

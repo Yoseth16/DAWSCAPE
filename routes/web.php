@@ -77,6 +77,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Gestión de Partidas y Ticker Live
     Route::get('/admin/api/stats', [AdminController::class, 'apiStats']);
+    Route::get('/admin/api/inscripciones', [AdminController::class, 'apiInscripciones']);
     Route::delete('/admin/equipo/{uuid}', [AdminController::class, 'eliminarEquipo']);
     Route::get('/admin/equipo/{uuid}/logs', [AdminController::class, 'mostrarLogs'])->name('admin.equipo.logs');
     Route::get('/admin/exportar-top20', [AdminController::class, 'exportarTop20PDF']);

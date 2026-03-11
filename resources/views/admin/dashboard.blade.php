@@ -80,7 +80,7 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .panel-heading i { color: var(--brand-color); }
 
         .chart-container { position: relative; height: 250px; width: 100%; display: flex; justify-content: center; }
@@ -137,7 +137,7 @@
 
         .time-display { font-family: monospace; font-weight: 600; font-size: 1rem; }
         .text-live { color: var(--warning-color); }
-        
+
         /* Botones Acción */
         .btn-action {
             width: 34px; height: 34px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center;
@@ -198,8 +198,17 @@
                     <i class="ph ph-users-three"></i>
                 </div>
                 <div class="kpi-info">
-                    <h4>Equipos Inscritos</h4>
-                    <p>{{ $totalEquipos }}</p>
+                    <h4>Total Inscritos</h4>
+                    <p>{{ $totalInscritos }}</p>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon-wrap kpi-blue">
+                    <i class="ph ph-clipboard"></i>
+                </div>
+                <div class="kpi-info">
+                    <h4>Pendientes de Inicio</h4>
+                    <p>{{ $inscritosNoIniciados }}</p>
                 </div>
             </div>
             <div class="kpi-card">
@@ -236,6 +245,33 @@
                 </div>
             </div>
         </div>
+
+        <!-- NUEVA SECCIÓN: INSCRIPCIONES PENDIENTES -->
+        @if($inscritosNoIniciados > 0)
+        <div class="glass-panel" style="margin-bottom: 2.5rem; border-left: 4px solid #3b82f6;">
+            <div class="panel-heading"><i class="ph ph-clipboard-text"></i> Equipos Inscritos (Sin Iniciar)</div>
+            <div style="max-height: 400px; overflow-y: auto;">
+                <div class="podium-list">
+                    @foreach($inscripcionesPendientes as $insc)
+                    <div class="podium-item" style="background: linear-gradient(135deg, #f0f9ff, #ffffff); border-left: 3px solid #3b82f6;">
+                        <div class="pos-badge" style="background: #dbeafe; color: #3b82f6; box-shadow: none;">
+                            {{ strtoupper(substr($insc->nombre_equipo, 0, 1)) }}
+                        </div>
+                        <div class="podium-details" style="flex: 1;">
+                            <div class="podium-name">{{ $insc->nombre_equipo }}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">
+                                {{ $insc->correo }} | {{ $insc->clase }}
+                            </div>
+                        </div>
+                        <div style="font-size: 0.8rem; color: #64748b; white-space: nowrap;">
+                            {{ $insc->created_at->diffForHumans() }}
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+        @endif
 
         <!-- GRÁFICO Y PODIUM -->
         <div class="mid-grid">
@@ -284,7 +320,7 @@
 
         <!-- TABLA PRINCIPAL DE EQUIPOS -->
         <h2 style="font-size:1.3rem; font-weight:700; margin-bottom:1.2rem; color:var(--text-main);">Listado Completo de Equipos</h2>
-        
+
         <div class="search-wrapper">
             <i class="ph ph-magnifying-glass"></i>
             <input type="text" id="searchInput" class="search-input" placeholder="Buscar por nombre, correo o clase..." onkeyup="filterTable()">
@@ -389,10 +425,10 @@
 @push('scripts')
     <!-- Chart.js para la Gráfica -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <!-- Chart.js para la Gráfica -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <script>
         let myChart = null;
 
@@ -414,41 +450,86 @@
 
                 // 1. Actualizar KPIs
                 updateKPIs(data.metrics);
-                
+
                 // 2. Actualizar Tabla
                 updateTable(data.partidas);
-                
+
                 // 3. Actualizar Gráfica
                 updateChart(data.chart);
+
+                // 4. Actualizar Inscripciones
+                const inscripcionesRes = await fetch('/admin/api/inscripciones');
+                const inscripcionesData = await inscripcionesRes.json();
+                updateKeysInscritos(inscripcionesData);
 
             } catch (error) {
                 console.error("Error refrescando dashboard:", error);
             }
         }
 
+        function updateKeysInscritos(data) {
+            // Actualizar KPIs de inscripción
+            const cards = document.querySelectorAll('.kpi-card');
+            if (cards.length >= 2) {
+                cards[0].querySelector('p').innerText = data.total_inscritos;
+                cards[1].querySelector('p').innerText = data.no_iniciados;
+            }
+
+            // Actualizar panel de inscripciones pendientes
+            const inscripcionesPanel = document.querySelector('[style*="border-left: 4px solid"]');
+            if (inscripcionesPanel && data.no_iniciados > 0) {
+                const listContainer = inscripcionesPanel.querySelector('.podium-list');
+                if (listContainer) {
+                    let html = '';
+                    data.inscripciones_pendientes.forEach(insc => {
+                        html += `
+                        <div class="podium-item" style="background: linear-gradient(135deg, #f0f9ff, #ffffff); border-left: 3px solid #3b82f6;">
+                            <div class="pos-badge" style="background: #dbeafe; color: #3b82f6; box-shadow: none;">
+                                ${insc.avatar}
+                            </div>
+                            <div class="podium-details" style="flex: 1;">
+                                <div class="podium-name">${insc.nombre_equipo}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">
+                                    ${insc.correo} | ${insc.clase}
+                                </div>
+                            </div>
+                            <div style="font-size: 0.8rem; color: #64748b; white-space: nowrap;">
+                                ${insc.tiempo_inscripcion}
+                            </div>
+                        </div>`;
+                    });
+                    listContainer.innerHTML = html;
+                }
+            } else if (inscripcionesPanel && data.no_iniciados === 0) {
+                // Ocultar panel si no hay inscritos pendientes
+                inscripcionesPanel.style.display = 'none';
+            }
+        }
+
         function updateKPIs(metrics) {
             // Buscamos los nodos por su estructura de KPI
             const cards = document.querySelectorAll('.kpi-card');
-            cards[0].querySelector('p').innerText = metrics.total;
-            cards[1].querySelector('p').innerText = metrics.activos;
-            cards[2].querySelector('p').innerText = metrics.finalizados;
-            cards[3].querySelector('p').innerText = metrics.promedio;
+            // Actualizar solo los que corresponden de las métricas en tiempo real
+            if (cards.length >= 4) {
+                cards[2].querySelector('p').innerText = metrics.activos;
+                cards[3].querySelector('p').innerText = metrics.finalizados;
+            }
         }
 
         function updateTable(partidas) {
             const tbody = document.querySelector('#mainTable tbody');
             const searchVal = document.getElementById("searchInput").value.toLowerCase();
-            
+
             // Reconstruimos filas (más seguro para mantener el orden dinámico)
             let newHtml = '';
-            
+
             if (partidas.length === 0) {
                 newHtml = `<tr><td colspan="6" style="text-align:center; padding: 4rem 2rem; color:var(--text-muted);"><i class="ph ph-ghost" style="font-size:3rem; opacity:0.3; margin-bottom:1rem; display:block;"></i>Sistema vacío.</td></tr>`;
             } else {
                 partidas.forEach(p => {
                     const isVisible = (p.nombre_equipo + p.email + p.clase).toLowerCase().includes(searchVal);
                     const displayStyle = isVisible ? '' : 'style="display:none"';
-                    
+
                     let statusHtml = '';
                     if (p.fase_actual === 'FINALIZADO') {
                         statusHtml = '<span class="status-pill status-success"><i class="ph-fill ph-check-circle"></i> COMPLETADO</span>';
