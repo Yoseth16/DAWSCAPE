@@ -280,6 +280,10 @@
                         <span class="info-label">Clase / Grupo:</span>
                         <span class="info-value">{{ $inscripcion->clase }}</span>
                     </div>
+                    <div class="info-row">
+                        <span class="info-label">Código de Acceso:</span>
+                        <span class="info-value" style="font-size: 1.3rem; letter-spacing: 2px;">{{ $inscripcion->codigo_acceso }}</span>
+                    </div>
                 </div>
 
                 <!-- QR Section -->
@@ -300,10 +304,10 @@
                 <div class="instructions">
                     <h3>Instrucciones Importantes</h3>
                     <ol>
-                        <li><strong>Descarga tu QR:</strong> Presiona el botón "Descargar QR" para guardar la imagen en tu dispositivo.</li>
-                        <li><strong>Guarda tu correo:</strong> Necesitarás tu correo para iniciar sesión en el evento.</li>
-                        <li><strong>Atiende al comunicado:</strong> El equipo organizador te contactará con los detalles finales.</li>
-                        <li><strong>Presenta tu acreditación:</strong> Muestra tu QR o correo en la entrada del evento.</li>
+                        <li><strong>Guarda tu código:</strong> Tu código de acceso es <strong>{{ $inscripcion->codigo_acceso }}</strong>. Cópialo y guárdalo en un lugar seguro.</li>
+                        <li><strong>Revisa tu correo:</strong> Te hemos enviado tu código de acceso a <strong>{{ $inscripcion->correo }}</strong>. Verifica la bandeja de entrada.</li>
+                        <li><strong>Atiende al comunicado:</strong> El equipo organizador te contactará con los detalles finales del evento.</li>
+                        <li><strong>El día del evento:</strong> Integra tu código + nombre de equipo para acceder al Escape Room digital.</li>
                         <li><strong>Trabaja en equipo:</strong> La colaboración es fundamental para completar la actividad.</li>
                     </ol>
                 </div>

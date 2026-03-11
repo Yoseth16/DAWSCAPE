@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Inscripcion;
+use App\Mail\CodigoAccesoInscripcion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 /**
@@ -15,19 +17,40 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 class InscripcionController extends Controller
 {
     /**
+     * Arreglo de clases disponibles (selector de lista cerrada).
+     * Previene inconsistencias de datos en BD.
+     */
+    private array $clases = [
+        '1º DAW',
+        '2º DAW',
+        '1º ASIR',
+        '2º ASIR',
+        '1º Marketing Digital',
+        '2º Marketing Digital',
+        'Otros',
+    ];
+
+    /**
      * Muestra el formulario de inscripción previa.
      */
     public function mostrar()
     {
-        return view('inscripcion');
+        return view('inscripcion', [
+            'clases' => $this->clases,
+        ]);
     }
 
     /**
      * Recibe los datos del formulario, los valida y los guarda en la BD.
      *
      * Reglas:
-     *  - nombre_equipo obligatorio y ÚNICO (no puede haber dos equipos con el mismo nombre)
+     *  - nombre_equipo obligatorio y ÚNICO
      *  - correo obligatorio, formato email válido y ÚNICO
+     *  - clase debe estar en la lista predefinida
+     *
+     * Genera:
+     *  - código_acceso: 6 caracteres alfanuméricos únicos
+     *  - Envía email con Resend
      */
     public function guardar(Request $request)
     {
@@ -50,7 +73,11 @@ class InscripcionController extends Controller
                     }
                 },
             ],
-            'clase' => ['required', 'string', 'max:20'],
+            'clase' => [
+                'required',
+                'string',
+                'in:' . implode(',', $this->clases),
+            ],
             'acepta_terminos' => ['required', 'accepted'],
         ], [
             // Mensajes de error personalizados (en español)
@@ -59,7 +86,8 @@ class InscripcionController extends Controller
             'correo.required'        => 'El correo electrónico es obligatorio.',
             'correo.email'           => 'El formato del correo no es válido.',
             'correo.unique'          => 'Ese correo ya está registrado con otro equipo.',
-            'clase.required'         => 'La clase / grupo es obligatoria.',
+            'clase.required'         => 'Debes seleccionar una clase / grupo.',
+            'clase.in'               => 'La clase seleccionada no es válida.',
             'acepta_terminos.required' => 'Debes aceptar el aviso legal para continuar.',
             'acepta_terminos.accepted' => 'Debes aceptar el aviso legal para continuar.',
         ]);
@@ -71,9 +99,17 @@ class InscripcionController extends Controller
             'clase'         => $validated['clase'],
         ]);
 
-        // 3. REDIRECCIÓN con mensaje de éxito y token para descargar QR
+        // 3. ENVÍO DE EMAIL CON CÓDIGO DE ACCESO VÍA RESEND
+        try {
+            Mail::send(new CodigoAccesoInscripcion($inscripcion));
+        } catch (\Exception $e) {
+            \Log::error('Error enviando email de inscripción: ' . $e->getMessage());
+            // No fallar si hay error en email, pero loguear
+        }
+
+        // 4. REDIRECCIÓN con mensaje de éxito
         return redirect()->route('inscripcion.exito', ['token' => $inscripcion->qr_token])
-            ->with('success', '¡Equipo "' . $validated['nombre_equipo'] . '" registrado con éxito!');
+            ->with('success', '¡Equipo "' . $validated['nombre_equipo'] . '" registrado con éxito! Revisa tu correo para el código de acceso.');
     }
 
     /**

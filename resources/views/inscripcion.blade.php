@@ -106,7 +106,8 @@
         }
 
         .form-group input[type="text"],
-        .form-group input[type="email"] {
+        .form-group input[type="email"],
+        .form-group select {
             width: 100%;
             background: rgba(30, 41, 59, 0.8);
             border: 1px solid rgba(34, 197, 94, 0.3);
@@ -118,7 +119,8 @@
         }
 
         .form-group input[type="text"]:focus,
-        .form-group input[type="email"]:focus {
+        .form-group input[type="email"]:focus,
+        .form-group select:focus {
             outline: none;
             border-color: #22c55e;
             box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
@@ -365,10 +367,15 @@
                     <!-- Clase / Grupo -->
                     <div class="form-group">
                         <label for="clase">Clase / Grupo *</label>
-                        <input type="text" id="clase" name="clase"
-                               placeholder="Ej: 2º Marketing Digital"
-                               value="{{ old('clase') }}"
-                               required maxlength="20">
+                        <select id="clase" name="clase" required>
+                            <option value="">-- Selecciona tu clase --</option>
+                            @foreach ($clases as $clase)
+                                <option value="{{ $clase }}"
+                                        @if(old('clase') === $clase) selected @endif>
+                                    {{ $clase }}
+                                </option>
+                            @endforeach
+                        </select>
                         @error('clase')
                             <div class="error-message">{{ $message }}</div>
                         @enderror
