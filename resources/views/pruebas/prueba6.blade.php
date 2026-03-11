@@ -19,10 +19,10 @@
 
 <div class="screen" id="screen-game">
     <div class="title-glitch">RESTAURACIÓN DE ENERGÍA</div>
-    
+
     <div class="lore-box">
         <strong>FALLO CASCADA DETECTADO.</strong><br>
-        El sistema requiere la reintroducción manual de las secuencias de encendido. 
+        El sistema requiere la reintroducción manual de las secuencias de encendido.
         <br><br>Repartíos el esfuerzo mental: la frecuencia sobrecargará la memoria de un solo individuo.
     </div>
 
@@ -38,10 +38,10 @@
 
     <!-- Tablero 2x2 -->
     <div class="simon-board" id="board">
-        <div class="sector" id="btn-0" onmousedown="touchSector(0)" ontouchstart="touchSector(0)"></div>
-        <div class="sector" id="btn-1" onmousedown="touchSector(1)" ontouchstart="touchSector(1)"></div>
-        <div class="sector" id="btn-2" onmousedown="touchSector(2)" ontouchstart="touchSector(2)"></div>
-        <div class="sector" id="btn-3" onmousedown="touchSector(3)" ontouchstart="touchSector(3)"></div>
+        <div class="sector" id="btn-0" onmousedown="touchSector(0, event)" ontouchstart="touchSector(0, event)"></div>
+        <div class="sector" id="btn-1" onmousedown="touchSector(1, event)" ontouchstart="touchSector(1, event)"></div>
+        <div class="sector" id="btn-2" onmousedown="touchSector(2, event)" ontouchstart="touchSector(2, event)"></div>
+        <div class="sector" id="btn-3" onmousedown="touchSector(3, event)" ontouchstart="touchSector(3, event)"></div>
     </div>
 
 </div>

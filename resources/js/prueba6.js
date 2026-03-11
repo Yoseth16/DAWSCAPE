@@ -96,8 +96,15 @@ function playRound() {
     }, 1000);
 }
 
-function handleSectorTouch(sectorId) {
+function handleSectorTouch(sectorId, event) {
+    // Prevenir comportamiento por defecto en móvil
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
     if (!isPlaying) return;
+
     lightUp(sectorId, true);
 
     let targetSteps = roundLengths[currentRound];
@@ -228,4 +235,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ── SECTOR TOUCH (registrar en window para los onclick inline del HTML) ──
     window.touchSector = handleSectorTouch;
+
+    // ── EVENT LISTENERS PARA MÓVIL Y ORDENADOR ──
+    for (let i = 0; i < 4; i++) {
+        const btn = document.getElementById("btn-" + i);
+        if (btn) {
+            // Prevenir comportamiento por defecto
+            btn.addEventListener("touchstart", function (e) {
+                e.preventDefault();
+                handleSectorTouch(i, e);
+            });
+            btn.addEventListener("mousedown", function (e) {
+                e.preventDefault();
+                handleSectorTouch(i, e);
+            });
+            btn.style.touchAction = "none";
+            btn.style.userSelect = "none";
+        }
+    }
 });
