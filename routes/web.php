@@ -57,6 +57,16 @@ Route::middleware(['check.fase'])->group(function () {
     Route::get('/final', [JuegoController::class, 'mostrarFinal'])->name('final');
 });
 
+// ==========================================
+// QRs DEL CÓDICE OCULTO (Prueba 7 Dinámica)
+// Deben ir ANTES del comodín /qr/{id}
+// ==========================================
+foreach (range(0, 9) as $digito) {
+    Route::get('/qr/codice-' . $digito, [QrController::class, 'escanearCodicedigito'])
+        ->defaults('digito', $digito)
+        ->name('qr.codice.' . $digito);
+}
+
 // Enrutamiento Inteligente de Escaneo QR
 Route::get('/qr/{id}', [QrController::class, 'escanearQr'])->name('qr.scan');
 
@@ -117,6 +127,27 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('admin.prueba.prueba5');
     Route::get('/prueba/prueba6', [JuegoController::class, 'mostrarPrueba6'])->name('admin.prueba.prueba6');
     Route::get('/prueba/prueba7', [JuegoController::class, 'mostrarPrueba7'])->name('admin.prueba.prueba7');
+
+    Route::get('/prueba/prueba7dinamica', function () {
+        // Admin bypass: crear sesión temporal y generar combinación de prueba fija para demostración
+        session([
+            'email'        => 'admin-test@prueba7dinamica.test',
+            'nombre_equipo' => 'ADMIN TEST',
+            'clase'        => 'Pruebas'
+        ]);
+        // Forzamos combinación de test visible para el admin: [3, 7, 1, 9]
+        return view('pruebas.prueba7dinamica', [
+            'tiempo_transcurrido' => 0,
+            'combinacion'         => [3, 7, 1, 9],
+            'pistas'              => [
+                'Cristal de la biblioteca',
+                'Mesa de ping pong del patio',
+                'Puerta de dirección',
+                'Mostrador de conserjería'
+            ],
+            'intentos_fallidos'   => 0
+        ]);
+    })->name('admin.prueba.prueba7dinamica');
 
     // Gestión de Perfil de Profesor (Breeze)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

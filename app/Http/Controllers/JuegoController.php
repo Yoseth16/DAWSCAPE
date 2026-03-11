@@ -417,90 +417,149 @@ class JuegoController extends Controller
     }
 
     // =====================================================
-    // PRUEBA 7: CORTAFUEGOS DE CONOCIMIENTO (Banco de Preguntas Dinámico)
+    // PRUEBA 7: OPERACIÓN EL CÓDICE OCULTO — Cerradura Digital + QRs físicos
     // =====================================================
+
+    /**
+     * Base de datos de dígitos: cada dígito tiene una ubicación física y un acertijo.
+     * Modifica aquí ubicaciones y acertijos sin tocar la vista.
+     */
+    private const DIGITOS_CODICE = [
+        0 => [
+            'ubicacion' => 'Pegado en la máquina de café',
+            'acertijo'  => 'No valgo absolutamente nada si me pones a la izquierda, pero multiplico tu riqueza si me pones a la derecha. Fui el último dígito en inventarse, nacido en la India para representar la nada y el vacío absoluto.'
+        ],
+        1 => [
+            'ubicacion' => 'Puerta de dirección',
+            'acertijo'  => 'Soy el único número cuyo cuadrado, cubo y raíz son exactamente idénticos a mí mismo. En la tabla periódica, corono al elemento más ligero y abundante de todo el universo.'
+        ],
+        2 => [
+            'ubicacion' => 'Baño de la planta baja',
+            'acertijo'  => 'En informática, soy la base fundamental de todo el lenguaje que entienden las máquinas. Soy la excepción a la regla: el único número par que tiene el honor de ser primo.'
+        ],
+        3 => [
+            'ubicacion' => 'Cristal de la biblioteca',
+            'acertijo'  => 'Newton necesitó exactamente este número de leyes para explicar el movimiento del universo. Si quieres definir un plano geométrico perfecto en el espacio sin que cojee, me necesitas estrictamente.'
+        ],
+        4 => [
+            'ubicacion' => 'Tablón de anuncios principal',
+            'acertijo'  => 'Lato sin descanso en tu pecho gracias a mis cavidades anatómicas. En la genética, soy el total de letras químicas (A, C, G, T) que escriben el libro de la vida.'
+        ],
+        5 => [
+            'ubicacion' => 'Silla del profesor en el taller 1',
+            'acertijo'  => 'En la geometría clásica, represento el total de sólidos platónicos perfectos que existen. En el emblema de los Juegos Olímpicos, doy forma a los anillos que representan las partes habitadas del mundo.'
+        ],
+        6 => [
+            'ubicacion' => 'Junto al extintor del pasillo norte',
+            'acertijo'  => 'Soy el primer número perfecto, la suma de mis divisores exactos (1, 2 y 3) te dará mi valor. En química, soy el cimiento de la vida, el número atómico del carbono.'
+        ],
+        7 => [
+            'ubicacion' => 'Mesa de ping pong del patio',
+            'acertijo'  => 'Químicamente hablando, soy la neutralidad perfecta, el pH del agua pura. Anatómicamente, soy el número de vértebras cervicales que comparte un humano con una jirafa.'
+        ],
+        8 => [
+            'ubicacion' => 'Canasta de baloncesto',
+            'acertijo'  => 'En el mundo digital, formo la unidad básica de memoria (el byte) cuando agrupo a mis pequeños soldados (los bits). Soy el número de planetas reconocidos oficialmente en nuestro sistema solar.'
+        ],
+        9 => [
+            'ubicacion' => 'Mostrador de conserjería',
+            'acertijo'  => 'Tengo una maldición: multiplícame por el entero que quieras; si sumas las cifras del resultado, siempre volverás a mí. Soy el total de círculos del Infierno de Dante.'
+        ],
+    ];
+
     public function mostrarPrueba7()
     {
         if ($this->timerService->verificarTimeout()) return redirect()->route('final')->with('timeout', true);
 
-        // EXTRAER Y ASIGNAR 5 PREGUNTAS ALEATORIAS SI NO SE HAN ASIGNADO AÚN
-        if (!session()->has('prueba7_preguntas')) {
-            $preguntas = \App\Models\PreguntaDinamica::where('activa', true)
-                            ->inRandomOrder()
-                            ->limit(5)
-                            ->get();
+        $partida = $this->timerService->obtenerPartidaActiva();
 
-            if ($preguntas->isEmpty()) {
-                // Failsafe: Si el profesor no ha creado ninguna pregunta activa,
-                // regalémosles la victoria cerrando la partida aquí automáticamente.
-                return redirect()->route('final');
-            }
-
-            session(['prueba7_preguntas' => $preguntas]);
+        // Generar y persistir combinación única por equipo si aún no existe
+        if ($partida && empty($partida->combinacion_codice)) {
+            $digitos = range(0, 9);
+            shuffle($digitos);
+            $combinacion = array_slice($digitos, 0, 4); // 4 dígitos únicos sin repetir
+            $partida->update(['combinacion_codice' => $combinacion, 'intentos_codice' => 0]);
         }
 
+        $combinacion = $partida ? ($partida->combinacion_codice ?? [0,1,2,3]) : [0,1,2,3];
+
+        // Construir array de pistas (ubicaciones) para los 4 dígitos de esta partida
+        $pistas = array_map(function($digito) {
+            return self::DIGITOS_CODICE[$digito]['ubicacion'];
+        }, $combinacion);
+
+        $intentos_fallidos = $partida ? ($partida->intentos_codice ?? 0) : 0;
+
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
-        $this->logAccion($this->timerService->obtenerPartidaActiva(), 'Prueba 7 Dinamica', 'Entra a la prueba');
+        $this->logAccion($partida, 'Prueba 7 Dinamica', 'Entra a la prueba (Códice Oculto)');
 
-        $preguntasAsignadas = session('prueba7_preguntas');
-
-        return view('pruebas.prueba7', compact('tiempo_transcurrido', 'preguntasAsignadas'));
+        return view('pruebas.prueba7dinamica', compact('tiempo_transcurrido', 'combinacion', 'pistas', 'intentos_fallidos'));
     }
 
     public function validarPrueba7(Request $request)
     {
         $partida = $this->timerService->obtenerPartidaActiva();
 
-        if (!$request->completed) {
-            $this->logAccion($partida, 'Prueba 7 Dinamica', 'Intento fallido', ['motivo' => 'Rechazado por cliente incompleto']);
-            return response()->json(['success' => false, 'message' => 'Validación fallida.'], 400);
+        if (!$partida) {
+            return response()->json(['success' => false, 'message' => 'Sesión no encontrada.'], 401);
         }
 
-        $preguntasAsignadas = session('prueba7_preguntas');
+        $combinacionCorrecta = $partida->combinacion_codice;
 
-        if (!$preguntasAsignadas || count($request->respuestas_usuario) !== $preguntasAsignadas->count()) {
-            $this->logAccion($partida, 'Prueba 7 Dinamica', 'Intento fallido', ['motivo' => 'Manipulación de array de respuestas']);
-            return response()->json(['success' => false, 'message' => 'Desajuste de validadores detectado.'], 400);
+        if (!$combinacionCorrecta || count($combinacionCorrecta) !== 4) {
+            $this->logAccion($partida, 'Prueba 7 Dinamica', 'Error: combinación no inicializada');
+            return response()->json(['success' => false, 'message' => 'Error interno: combinación no inicializada.'], 500);
         }
 
-        // Normalizamos y validamos una a una en servidor para evitar trampas en JS
-        foreach ($request->respuestas_usuario as $index => $respuestaEnviada) {
-            $correcta = \Illuminate\Support\Str::slug($preguntasAsignadas[$index]->respuesta_correcta, '');
-            $enviada = \Illuminate\Support\Str::slug($respuestaEnviada, '');
+        $digitsInput = $request->input('digits', []);
 
-            if ($correcta !== $enviada) {
-                // Si alguien trampea el JS y manda un array con fallos, el backend lo bloquea.
-                return response()->json(['success' => false, 'message' => 'Cheating detectado en backend.'], 400);
+        // Normalizar: convertir a enteros
+        $digitsInput = array_map('intval', array_values((array) $digitsInput));
+
+        if (count($digitsInput) !== 4) {
+            return response()->json(['success' => false, 'message' => 'Debes introducir exactamente 4 dígitos.']);
+        }
+
+        if ($digitsInput === array_map('intval', $combinacionCorrecta)) {
+            // ✅ COMBINACIÓN CORRECTA
+            session(['prueba7dinamica_superada' => true]);
+
+            if ($partida->inicio_juego) {
+                $this->logAccion($partida, 'Prueba 7 Dinamica', 'Códice Oculto — COMBINACIÓN CORRECTA');
+                $segundos_totales = $this->timerService->obtenerTiempoTranscurrido();
+
+                $partida->update([
+                    'tiempo_segundos' => $segundos_totales,
+                    'fase_actual'     => 'FINALIZADO',
+                ]);
+
+                \App\Models\HitoFase::create([
+                    'partida_id'            => $partida->id,
+                    'fase'                  => 'JUEGO FINALIZADO',
+                    'segundos_transcurridos' => $segundos_totales,
+                    'alcanzado_at'          => Carbon::now()
+                ]);
+
+                Top10Updated::dispatch();
+                AdminDashboardUpdated::dispatch();
             }
+
+            return response()->json(['success' => true]);
         }
 
-        session(['prueba7dinamica_superada' => true]);
+        // ❌ COMBINACIÓN INCORRECTA — incrementar contador
+        $nuevosIntentos = ($partida->intentos_codice ?? 0) + 1;
+        $partida->update(['intentos_codice' => $nuevosIntentos]);
 
-        // CÁLCULO FINAL Y CIERRE ABSOLUTO (Prueba 7 es la última oficial)
-        if ($partida && $partida->inicio_juego) {
-            $this->logAccion($partida, 'Prueba 7 Dinamica', 'Prueba superada -> FINALIZAR');
-            $segundos_totales = $this->timerService->obtenerTiempoTranscurrido();
-
-            $partida->update([
-                'tiempo_segundos' => $segundos_totales,
-                'fase_actual'     => 'FINALIZADO',
-            ]);
-
-            // REGISTRO DE HITO FINAL
-            \App\Models\HitoFase::create([
-                'partida_id' => $partida->id,
-                'fase' => 'JUEGO FINALIZADO',
-                'segundos_transcurridos' => $segundos_totales,
-                'alcanzado_at' => Carbon::now()
-            ]);
-
-            Top10Updated::dispatch();
-            AdminDashboardUpdated::dispatch();
-        }
+        $this->logAccion($partida, 'Prueba 7 Dinamica', 'Intento fallido', [
+            'intento'  => $nuevosIntentos,
+            'enviado'  => $digitsInput,
+            'correcto' => $combinacionCorrecta
+        ]);
 
         return response()->json([
-            'success' => true,
-            'mensaje' => '¡CORTAFUEGOS DERRIBADO! Has escapado del DAWSCAPE.'
+            'success'  => false,
+            'intentos' => $nuevosIntentos
         ]);
     }
 

@@ -115,4 +115,66 @@ class QrController extends Controller
 
         return view($vistaEspecial, compact('tiempo_transcurrido', 'titulo_prueba', 'identificador'));
     }
+
+    // =====================================================
+    // SISTEMA DE QRS DEL CÓDICE OCULTO (Prueba 7 Dinámica)
+    // URLs fijas: /qr/codice-0 ... /qr/codice-9
+    // =====================================================
+
+    /**
+     * Base de datos de acértijos por dígito.
+     * Ref: JuegoController::DIGITOS_CODICE (mantener sincronizado).
+     */
+    private const ACERTIJOS_CODICE = [
+        0 => 'No valgo absolutamente nada si me pones a la izquierda, pero multiplico tu riqueza si me pones a la derecha. Fui el último dígito en inventarse, nacido en la India para representar la nada y el vacío absoluto.',
+        1 => 'Soy el único número cuyo cuadrado, cubo y raíz son exactamente idénticos a mí mismo. En la tabla periódica, corono al elemento más ligero y abundante de todo el universo.',
+        2 => 'En informática, soy la base fundamental de todo el lenguaje que entienden las máquinas. Soy la excepción a la regla: el único número par que tiene el honor de ser primo.',
+        3 => 'Newton necesitó exactamente este número de leyes para explicar el movimiento del universo. Si quieres definir un plano geométrico perfecto en el espacio sin que cojee, me necesitas estrictamente.',
+        4 => 'Lato sin descanso en tu pecho gracias a mis cavidades anatómicas. En la genética, soy el total de letras químicas (A, C, G, T) que escriben el libro de la vida.',
+        5 => 'En la geometría clásica, represento el total de sólidos platónicos perfectos que existen. En el emblema de los Juegos Olímpicos, doy forma a los anillos que representan las partes habitadas del mundo.',
+        6 => 'Soy el primer número perfecto, la suma de mis divisores exactos (1, 2 y 3) te dará mi valor. En química, soy el cimiento de la vida, el número atómico del carbono.',
+        7 => 'Químicamente hablando, soy la neutralidad perfecta, el pH del agua pura. Anatómicamente, soy el número de vértebras cervicales que comparte un humano con una jirafa.',
+        8 => 'En el mundo digital, formo la unidad básica de memoria (el byte) cuando agrupo a mis pequeños soldados (los bits). Soy el número de planetas reconocidos oficialmente en nuestro sistema solar.',
+        9 => 'Tengo una maldición: multiplícame por el entero que quieras; si sumas las cifras del resultado, siempre volverás a mí. Soy el total de círculos del Infierno de Dante.',
+    ];
+
+    public function escanearCodicedigito($digito)
+    {
+        // Forzar entero y validar rango 0-9
+        $digito = (int) $digito;
+        if ($digito < 0 || $digito > 9) {
+            abort(404, 'Código QR no válido.');
+        }
+
+        // Guard: requiere sesión activa de equipo
+        if (!session()->has('email')) {
+            return redirect('/')
+                ->with('error', '⚠️ Acceso denegado. Escanea el QR con el mismo navegador donde empezasteis a jugar.');
+        }
+
+        // Verificar que el equipo está en la fase correcta
+        $partida = $this->timerService->obtenerPartidaActiva();
+
+        if (!$partida) {
+            return redirect('/')->with('error', 'No se encontró una partida activa para este equipo.');
+        }
+
+        $faseActual = strtolower(trim($partida->fase_actual));
+        if (!str_contains($faseActual, 'prueba 7') && !str_contains($faseActual, 'dinamica')) {
+            $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
+            return view('qr.error-fase', [
+                'mensaje' => '¡Eh, listillos! Aún no estáis en la Prueba 7. Completad las pruebas anteriores primero.',
+                'tiempo_transcurrido' => $tiempo_transcurrido
+            ]);
+        }
+
+        // Timeout check
+        if ($this->timerService->verificarTimeout()) {
+            return redirect('/final')->with('timeout', true);
+        }
+
+        $acertijo = self::ACERTIJOS_CODICE[$digito];
+
+        return view('qr.codice-digito', compact('digito', 'acertijo'));
+    }
 }

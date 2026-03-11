@@ -20,13 +20,16 @@ class Partida extends Model
         'logros',
         'estado',
         'tiempo_pausado_segundos',
-        'ultima_pausa_at'
+        'ultima_pausa_at',
+        'combinacion_codice',
+        'intentos_codice'
     ];
 
     protected $casts = [
         'logros' => 'array',
         'inicio_juego' => 'datetime',
-        'ultima_pausa_at' => 'datetime'
+        'ultima_pausa_at' => 'datetime',
+        'combinacion_codice' => 'array'
     ];
 
     /**
