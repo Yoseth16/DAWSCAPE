@@ -48,12 +48,17 @@ body::before {
   backdrop-filter: blur(8px);
 }
 
+/* MEJORADO: Team info con mejor contraste y sombra */
 .team-info {
   font-size: 0.75rem;
-  color: #88ccaa;
+  color: #b0e0bf;
   line-height: 1.5;
+  text-shadow: 0 0 8px rgba(0, 255, 136, 0.2);
 }
-.team-info strong { color: var(--green); }
+.team-info strong { 
+  color: var(--green); 
+  text-shadow: 0 0 10px var(--green);
+}
 .header-timer {
   font-family: 'Orbitron', sans-serif;
   font-size: 1.3rem;
@@ -87,19 +92,22 @@ body::before {
   text-transform: uppercase;
 }
 
+/* MEJORADO: Lore box con mejor contraste */
 .lore-box {
   width: 100%;
   max-width: 500px;
   border: 1px dashed var(--green);
   padding: 1rem;
   margin-bottom: 1.5rem;
-  background: rgba(0,255,136,0.02);
+  background: rgba(0, 20, 10, 0.5);
   font-size: 0.9rem;
   line-height: 1.6;
   text-align: center;
-  color: #88ccaa;
+  color: #b0e0bf;
+  text-shadow: 0 0 6px rgba(0, 255, 136, 0.15);
 }
 
+/* MEJORADO: System status con mejor contraste */
 #sys-status {
     font-weight: bold;
     color: var(--red);
@@ -108,9 +116,16 @@ body::before {
     letter-spacing: 0.1em;
     min-height: 1.5rem;
     text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(255, 34, 68, 0.3);
 }
-.status-ok { color: var(--green) !important; text-shadow: 0 0 10px var(--green); }
-.status-info { color: #00aaff !important; text-shadow: 0 0 10px #00aaff; }
+.status-ok { 
+  color: var(--green) !important; 
+  text-shadow: 0 0 10px var(--green); 
+}
+.status-info { 
+  color: #00aaff !important; 
+  text-shadow: 0 0 10px #00aaff; 
+}
 
 /* GAME BOARD */
 .simon-board {

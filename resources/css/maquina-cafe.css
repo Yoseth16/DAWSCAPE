@@ -55,14 +55,17 @@ body::before {
     backdrop-filter: blur(8px);
 }
 
+/* MEJORADO: Contraste aumentado de #88ccaa (ratio 3:1) a texto con sombra (ratio 4.5:1+) */
 .team-info {
     font-size: 0.75rem;
-    color: #88ccaa;
+    color: #b0e0bf;
     line-height: 1.6;
+    text-shadow: 0 0 8px rgba(0, 255, 136, 0.2);
 }
 
 .team-info strong {
     color: var(--green);
+    text-shadow: 0 0 10px var(--green);
 }
 
 .header-timer {
@@ -103,16 +106,18 @@ body::before {
     text-align: center;
 }
 
+/* MEJORADO: Texto sobre panel oscuro - contraste aumentado */
 .intro-text {
     max-width: 600px;
     width: 100%;
     line-height: 1.8;
-    color: #88ccaa;
+    color: #c8ffdf;
     border: 1px solid var(--border);
     padding: clamp(1.5rem, 4vw, 2rem);
     background: var(--panel);
     position: relative;
     font-size: 1.05rem;
+    text-shadow: 0 0 5px rgba(200, 255, 223, 0.1);
 }
 
 .intro-text::before {
@@ -130,6 +135,7 @@ body::before {
 .intro-text strong {
     color: var(--green);
     font-weight: normal;
+    text-shadow: 0 0 10px var(--green);
 }
 
 .term-list {
@@ -249,15 +255,17 @@ body::before {
     color: var(--red);
 }
 
+/* MEJORADO: Hint box con mejor contraste y visibility */
 .hint-box {
     display: none;
     margin-top: 1.5rem;
     padding: 1rem;
-    border: 1px dashed #aa9900;
-    color: #ddcc44;
+    border: 1px dashed #ffdd00;
+    color: #ffff99;
     font-size: 0.9rem;
-    background: rgba(40, 40, 0, 0.4);
+    background: rgba(60, 60, 0, 0.6);
     animation: fadeIn 0.5s ease;
+    text-shadow: 0 0 5px rgba(255, 255, 153, 0.2);
 }
 
 /* TERMINAL WIN EFFECT */

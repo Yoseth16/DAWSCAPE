@@ -46,19 +46,22 @@
         margin: 0 0 6px 0;
     }
 
+    /* MEJORADO: Logo p con mejor contraste */
     .login-logo p {
-        color: #64748b;
+        color: #cbd5e1;
         font-size: 0.85rem;
         margin: 0;
+        text-shadow: 0 0 4px rgba(203, 213, 225, 0.1);
     }
 
     .form-group {
         margin-bottom: 18px;
     }
 
+    /* MEJORADO: Form label con mejor contraste */
     .form-group label {
         display: block;
-        color: #94a3b8;
+        color: #cbd5e1;
         font-size: 0.75rem;
         font-weight: 600;
         letter-spacing: 0.8px;
@@ -79,7 +82,8 @@
         transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    .form-control::placeholder { color: #475569; }
+    /* MEJORADO: Placeholder con mejor contraste */
+    .form-control::placeholder { color: #64748b; }
 
     .form-control:focus {
         outline: none;
@@ -105,7 +109,8 @@
     }
 
     .remember-row input[type=checkbox] { accent-color: #3b82f6; }
-    .remember-row label { color: #64748b; font-size: 0.8rem; cursor: pointer; }
+    /* MEJORADO: Remember label con mejor contraste */
+    .remember-row label { color: #cbd5e1; font-size: 0.8rem; cursor: pointer; }
 
     .btn-login {
         width: 100%;
@@ -130,13 +135,14 @@
         text-align: center;
         margin-top: 24px;
     }
+    /* MEJORADO: Footer links con mejor contraste */
     .footer-link a {
-        color: #475569;
+        color: #94a3b8;
         font-size: 0.8rem;
         text-decoration: none;
         transition: color 0.2s;
     }
-    .footer-link a:hover { color: #94a3b8; }
+    .footer-link a:hover { color: #cbd5e1; }
 </style>
 @endpush
 

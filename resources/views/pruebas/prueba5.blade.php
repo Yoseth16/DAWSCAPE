@@ -49,13 +49,15 @@
     backdrop-filter: blur(8px);
   }
 
+  /* MEJORADO: Team info con mejor contraste */
   .team-info {
     font-size: 0.75rem;
-    color: #88ccaa;
-    line-height: 1.5;
+    color: #b0e0bf;
+    line-height: 1.6;
+    text-shadow: 0 0 8px rgba(0, 255, 136, 0.2);
   }
 
-  .team-info strong { color: var(--green); }
+  .team-info strong { color: var(--green); text-shadow: 0 0 10px var(--green); }
 
   .header-timer {
     font-family: 'Orbitron', sans-serif;
@@ -89,17 +91,19 @@
     animation: pulse-glow 2.5s ease-in-out infinite;
   }
 
+  /* MEJORADO: Intro text con mejor contraste */
   .intro-text {
     width: 100%;
     max-width: 600px;
     line-height: 1.8;
-    color: #88ccaa;
+    color: #c8ffdf;
     border: 1px solid var(--border);
     padding: clamp(1.5rem, 5vw, 2.5rem) clamp(1.2rem, 4vw, 2rem);
     background: var(--panel);
     position: relative;
     text-align: center;
     font-size: clamp(1rem, 4vw, 1.1rem);
+    text-shadow: 0 0 5px rgba(200, 255, 223, 0.1);
   }
 
   .intro-text::before {

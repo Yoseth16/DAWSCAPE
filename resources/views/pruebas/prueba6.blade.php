@@ -50,7 +50,7 @@
 <div class="screen" id="screen-success">
     <div style="font-size: 5rem; margin-bottom: 1rem; filter: drop-shadow(0 0 20px #00ff88);">⚡</div>
     <div class="title-glitch" style="margin-bottom:0.5rem">SISTEMA RESTAURADO</div>
-    <div style="color:#88ccaa; font-size:1.1rem; margin-bottom: 2rem;">"Enrutamiento de energía cooperativo completado al 100%."</div>
+    <div style="color:#b0e0bf; font-size:1.1rem; margin-bottom: 2rem; text-shadow: 0 0 4px rgba(200, 255, 223, 0.1);">"Enrutamiento de energía cooperativo completado al 100%."</div>
     <a href="/final" class="success-btn">COMPLETAR ESCAPE ROOM →</a>
 </div>
 

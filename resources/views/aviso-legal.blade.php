@@ -72,10 +72,12 @@
             text-transform: uppercase;
         }
 
+        /* MEJORADO: Párrafo con mejor contraste */
         p {
             margin-bottom: 1.2rem;
-            color: #88ccaa;
+            color: #b0e0bf;
             text-align: justify;
+            text-shadow: 0 0 4px rgba(200, 255, 223, 0.1);
         }
 
         .alert-box {

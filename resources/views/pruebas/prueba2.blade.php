@@ -50,13 +50,15 @@
     backdrop-filter: blur(8px);
   }
 
+  /* MEJORADO: Team info con mejor contraste */
   .team-info {
     font-size: 0.75rem;
-    color: #88ccaa;
+    color: #b0e0bf;
     line-height: 1.6;
+    text-shadow: 0 0 8px rgba(0, 255, 136, 0.2);
   }
 
-  .team-info strong { color: var(--green); }
+  .team-info strong { color: var(--green); text-shadow: 0 0 10px var(--green); }
 
   .header-timer {
     font-family: 'Orbitron', sans-serif;
@@ -122,12 +124,14 @@
     letter-spacing: 0.2em;
   }
 
+  /* MEJORADO: Terminal label con mejor contraste */
   .terminal-label {
     display: block;
     font-size: 0.9rem;
-    color: #88ccaa;
+    color: #b0e0bf;
     margin-bottom: 1rem;
     text-align: center;
+    text-shadow: 0 0 4px rgba(200, 255, 223, 0.1);
   }
 
   .answer-input {
@@ -146,19 +150,21 @@
   }
 
   .answer-input:focus { box-shadow: 0 2px 10px #00ff8820; }
-  .answer-input::placeholder { color: #88ccaa80; letter-spacing: 0.5em; } /* Better WCAG placeholder contrast */
+  .answer-input::placeholder { color: #88ccaa; letter-spacing: 0.5em; } /* WCAG improved placeholder contrast */
 
   /* HINT AREA */
+  /* MEJORADO: Hint con mejor contraste */
   .hint {
     display: none;
     margin-top: 1.5rem;
     padding: 1rem;
-    border: 1px dashed #007744;
-    color: #88ccaa;
+    border: 1px dashed #00ff88;
+    color: #b0e0bf;
     font-size: 0.9rem;
     text-align: center;
     line-height: 1.6;
     animation: fadeIn 0.5s ease;
+    text-shadow: 0 0 4px rgba(200, 255, 223, 0.1);
   }
 
   /* CONSOLE OUTPUT */

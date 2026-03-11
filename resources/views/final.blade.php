@@ -97,14 +97,17 @@
         animation: glitch-blink 2s infinite;
       }
 
+      /* MEJORADO: Subtitle text con mejor contraste */
       .subtitle-txt {
         font-size: 1.1rem;
         line-height: 1.8;
-        color: #88ccaa;
+        color: #b0e0bf;
         margin-bottom: 2rem;
+        text-shadow: 0 0 6px rgba(200, 255, 223, 0.15);
       }
       .victory-box.timeout .subtitle-txt {
-        color: #ffcccc;
+        color: #ff9999;
+        text-shadow: 0 0 6px rgba(255, 153, 153, 0.2);
       }
 
       .highlight { color: var(--green); font-weight: bold; }
@@ -127,12 +130,14 @@
         margin-top: 1.5rem;
       }
 
+      /* MEJORADO: Ranking panel header con mejor contraste */
       .ranking-panel h4 {
-        color: #007744;
+        color: #00ff88;
         font-size: 0.85rem;
         letter-spacing: 0.2em;
         margin-bottom: 1rem;
         text-transform: uppercase;
+        text-shadow: 0 0 8px rgba(0, 255, 136, 0.2);
       }
 
       .breakdown-panel {
@@ -152,12 +157,14 @@
         text-transform: uppercase;
       }
 
+      /* MEJORADO: Breakdown list con mejor contraste */
       .breakdown-list {
           list-style: none;
           padding: 0;
           font-size: 0.95rem;
           line-height: 2;
-          color: #88ccaa;
+          color: #b0e0bf;
+          text-shadow: 0 0 5px rgba(200, 255, 223, 0.1);
       }
 
       .breakdown-list li {
@@ -168,11 +175,13 @@
           margin-bottom: 0.3rem;
       }
 
+      /* MEJORADO: Ranking list con mejor contraste */
       .ranking-list {
         list-style-type: decimal;
         padding-left: 1.5rem;
-        color: #669977;
+        color: #88ccaa;
         line-height: 1.8;
+        text-shadow: 0 0 4px rgba(136, 204, 170, 0.15);
       }
 
       .ranking-list li { margin-bottom: 0.5rem; }
