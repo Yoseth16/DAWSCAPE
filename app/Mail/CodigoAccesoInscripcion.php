@@ -37,7 +37,7 @@ class CodigoAccesoInscripcion extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.codigo-acceso',
+            markdown: 'emails.codigo-acceso',
             with: [
                 'inscripcion' => $this->inscripcion,
                 'nombreEquipo' => $this->inscripcion->nombre_equipo,
