@@ -27,6 +27,7 @@ class CodigoAccesoInscripcion extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
+            to: $this->inscripcion->correo,
             subject: '🎮 Tu código de acceso a DAWSCAPE',
         );
     }
