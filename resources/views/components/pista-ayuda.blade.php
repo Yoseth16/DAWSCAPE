@@ -108,16 +108,18 @@
 }
 .pista-bocadillo-texto {
     position: absolute;
-    top: 12%; left: 12%; right: 12%; bottom: 28%;
+    top: 18%; left: 15%; right: 15%; bottom: 35%;
     display: flex; align-items: center; justify-content: center;
     text-align: center;
     font-family: 'Share Tech Mono', monospace;
-    font-size: clamp(0.85rem, 3.5vw, 1.05rem);
+    font-size: clamp(0.8rem, 3vw, 0.95rem);
     color: #1a1a2e;
-    line-height: 1.6;
-    padding: 0.5rem;
+    line-height: 1.7;
+    padding: 1rem;
     font-weight: 600;
     overflow-y: auto;
+    word-wrap: break-word;
+    max-height: 100%;
 }
 .pista-close {
     position: absolute; top: 6%; right: 8%;
@@ -157,7 +159,7 @@
     .pista-btn { width: 58px; height: 58px; bottom: 1rem; right: 1rem; }
     .pista-tooltip { bottom: 5rem; right: 0.8rem; font-size: 0.65rem; }
     .pista-bocadillo { width: 95%; max-width: 350px; }
-    .pista-bocadillo-texto { font-size: clamp(0.78rem,3.5vw,0.95rem); top:14%;left:14%;right:14%;bottom:30%; }
+    .pista-bocadillo-texto { font-size: clamp(0.75rem, 3vw, 0.95rem); top: 18%; left: 15%; right: 15%; bottom: 35%; padding: 1rem; }
     .pista-penalizacion-aviso { font-size: 0.75rem; padding: 0.5rem 1rem; }
 }
 </style>
