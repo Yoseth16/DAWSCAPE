@@ -64,6 +64,9 @@
 @push('scripts')
 @vite(['resources/js/prueba6.js'])
 @endpush
+
+@include('components.pista-ayuda', ['pruebaNumero' => 6, 'pistaConfig' => $pistaConfig, 'yaUsada' => $yaUsada])
+
 @endsection
 
 @include('components.live-listener')

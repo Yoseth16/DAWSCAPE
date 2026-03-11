@@ -16,6 +16,7 @@ use App\Http\Requests\ValidarPrueba6Request;
 use App\Events\Top10Updated;
 use App\Events\AdminDashboardUpdated;
 use App\Models\LogJuego;
+use App\Models\PistaUsada;
 
 class JuegoController extends Controller
 {
@@ -58,6 +59,73 @@ class JuegoController extends Controller
         return false;
     }
 
+
+    /**
+     * Obtiene los números de prueba donde este equipo ya usó pista.
+     */
+    private function obtenerPistasUsadas($partida): array
+    {
+        if (!$partida) return [];
+        return $partida->pistasUsadas()->pluck('prueba_numero')->toArray();
+    }
+
+    // =====================================================
+    // SISTEMA DE PISTAS / AYUDA
+    // =====================================================
+    public function usarPista(Request $request)
+    {
+        $request->validate([
+            'prueba_numero' => 'required|integer|min:1|max:7',
+        ]);
+
+        $pruebaNumero = (int) $request->prueba_numero;
+        $partida = $this->timerService->obtenerPartidaActiva();
+
+        if (!$partida) {
+            return response()->json(['success' => false, 'message' => 'No hay partida activa.'], 403);
+        }
+
+        $pistaConfig = config("escape.pistas.{$pruebaNumero}");
+        if (!$pistaConfig) {
+            return response()->json(['success' => false, 'message' => 'No existe pista para esta prueba.'], 404);
+        }
+
+        // ¿Ya usó esta pista?
+        $yaUsada = PistaUsada::where('partida_id', $partida->id)
+                             ->where('prueba_numero', $pruebaNumero)
+                             ->exists();
+
+        if ($yaUsada) {
+            return response()->json([
+                'success' => true,
+                'ya_usada' => true,
+                'texto' => $pistaConfig['texto'],
+                'penalizacion' => 0,
+            ]);
+        }
+
+        // PRIMERA VEZ: registrar + penalizar
+        $penalizacion = config('escape.penalizacion_pista', 60);
+
+        PistaUsada::create([
+            'partida_id' => $partida->id,
+            'prueba_numero' => $pruebaNumero,
+        ]);
+
+        $partida->increment('penalizacion_segundos', $penalizacion);
+
+        $this->logAccion($partida, $partida->fase_actual, 'Pista Usada', [
+            'prueba' => $pruebaNumero,
+            'penalizacion' => $penalizacion,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'ya_usada' => false,
+            'texto' => $pistaConfig['texto'],
+            'penalizacion' => $penalizacion,
+        ]);
+    }
 
     // --- LOGIN DE EQUIPO ---
     public function empezarPartida(EmpezarPartidaRequest $request)
@@ -115,8 +183,11 @@ class JuegoController extends Controller
         if ($this->timerService->verificarTimeout()) return redirect()->route('final')->with('timeout', true);
 
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
-        $this->logAccion($this->timerService->obtenerPartidaActiva(), 'Prueba 1 Mario', 'Entra a la prueba');
-        return view('pruebas.prueba1', compact('tiempo_transcurrido'));
+        $partida = $this->timerService->obtenerPartidaActiva();
+        $this->logAccion($partida, 'Prueba 1 Mario', 'Entra a la prueba');
+        $yaUsada = in_array(1, $this->obtenerPistasUsadas($partida));
+        $pistaConfig = config('escape.pistas.1');
+        return view('pruebas.prueba1', compact('tiempo_transcurrido', 'yaUsada', 'pistaConfig'));
     }
 
     public function validarPrueba1(ValidarPrueba1Request $request)
@@ -173,8 +244,11 @@ class JuegoController extends Controller
         if ($this->timerService->verificarTimeout()) return redirect()->route('final')->with('timeout', true);
 
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
-        $this->logAccion($this->timerService->obtenerPartidaActiva(), 'Prueba 2 Yoseth', 'Entra a la prueba');
-        return view('pruebas.prueba2', compact('tiempo_transcurrido'));
+        $partida = $this->timerService->obtenerPartidaActiva();
+        $this->logAccion($partida, 'Prueba 2 Yoseth', 'Entra a la prueba');
+        $yaUsada = in_array(2, $this->obtenerPistasUsadas($partida));
+        $pistaConfig = config('escape.pistas.2');
+        return view('pruebas.prueba2', compact('tiempo_transcurrido', 'yaUsada', 'pistaConfig'));
     }
 
     public function validarPrueba2(Request $request)
@@ -207,8 +281,11 @@ class JuegoController extends Controller
         if ($this->timerService->verificarTimeout()) return redirect()->route('final')->with('timeout', true);
 
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
-        $this->logAccion($this->timerService->obtenerPartidaActiva(), 'Prueba 3 Angel', 'Entra a la prueba');
-        return view('pruebas.prueba3', compact('tiempo_transcurrido'));
+        $partida = $this->timerService->obtenerPartidaActiva();
+        $this->logAccion($partida, 'Prueba 3 Angel', 'Entra a la prueba');
+        $yaUsada = in_array(3, $this->obtenerPistasUsadas($partida));
+        $pistaConfig = config('escape.pistas.3');
+        return view('pruebas.prueba3', compact('tiempo_transcurrido', 'yaUsada', 'pistaConfig'));
     }
 
     public function validarPrueba3(ValidarPrueba3Request $request)
@@ -263,8 +340,11 @@ class JuegoController extends Controller
         if ($this->timerService->verificarTimeout()) return redirect()->route('final')->with('timeout', true);
 
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
-        $this->logAccion($this->timerService->obtenerPartidaActiva(), 'Prueba 4 Arturo', 'Entra a la prueba');
-        return view('pruebas.prueba4', compact('tiempo_transcurrido'));
+        $partida = $this->timerService->obtenerPartidaActiva();
+        $this->logAccion($partida, 'Prueba 4 Arturo', 'Entra a la prueba');
+        $yaUsada = in_array(4, $this->obtenerPistasUsadas($partida));
+        $pistaConfig = config('escape.pistas.4');
+        return view('pruebas.prueba4', compact('tiempo_transcurrido', 'yaUsada', 'pistaConfig'));
     }
 
     public function validarPrueba4(ValidarPrueba4Request $request)
@@ -310,8 +390,11 @@ class JuegoController extends Controller
         if ($this->timerService->verificarTimeout()) return redirect()->route('final')->with('timeout', true);
 
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
-        $this->logAccion($this->timerService->obtenerPartidaActiva(), 'Prueba 5 Eloy', 'Entra a la prueba');
-        return view('pruebas.prueba5', compact('tiempo_transcurrido'));
+        $partida = $this->timerService->obtenerPartidaActiva();
+        $this->logAccion($partida, 'Prueba 5 Eloy', 'Entra a la prueba');
+        $yaUsada = in_array(5, $this->obtenerPistasUsadas($partida));
+        $pistaConfig = config('escape.pistas.5');
+        return view('pruebas.prueba5', compact('tiempo_transcurrido', 'yaUsada', 'pistaConfig'));
     }
 
     public function validarPrueba5(ValidarPrueba5Request $request)
@@ -372,8 +455,11 @@ class JuegoController extends Controller
         session(['prueba6_sequence' => $sequence]);
 
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
-        $this->logAccion($this->timerService->obtenerPartidaActiva(), 'Prueba 6 Migue', 'Entra a la prueba');
-        return view('pruebas.prueba6', compact('tiempo_transcurrido'));
+        $partida = $this->timerService->obtenerPartidaActiva();
+        $this->logAccion($partida, 'Prueba 6 Migue', 'Entra a la prueba');
+        $yaUsada = in_array(6, $this->obtenerPistasUsadas($partida));
+        $pistaConfig = config('escape.pistas.6');
+        return view('pruebas.prueba6', compact('tiempo_transcurrido', 'yaUsada', 'pistaConfig'));
     }
 
     public function validarPrueba6(ValidarPrueba6Request $request)

@@ -616,4 +616,5 @@ function resetGame() {
 </body>
 </html>
 
+@include('components.pista-ayuda', ['pruebaNumero' => 1, 'pistaConfig' => $pistaConfig, 'yaUsada' => $yaUsada])
 @include('components.live-listener')

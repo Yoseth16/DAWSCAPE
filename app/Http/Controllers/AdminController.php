@@ -110,6 +110,7 @@ class AdminController extends Controller
                 if ($p->fase_actual !== 'FINALIZADO' && $p->fase_actual !== 'FINALIZADO_TIMEOUT' && $p->inicio_juego) {
                     $segsLive = abs(now()->diffInSeconds(\Carbon\Carbon::parse($p->inicio_juego)));
                 }
+                $pistasCount = \App\Models\PistaUsada::where('partida_id', $p->id)->count();
                 return [
                     'uuid' => $p->uuid,
                     'id' => str_pad($p->id, 3, '0', STR_PAD_LEFT),
@@ -122,7 +123,8 @@ class AdminController extends Controller
                     'color_hex' => $p->color_hex ?? '#3b82f6',
                     'icono' => $p->icono ?? 'ph-user-focus',
                     'logros' => $p->logros ?? [],
-                    'avatar' => strtoupper(substr($p->nombre_equipo, 0, 1))
+                    'avatar' => strtoupper(substr($p->nombre_equipo, 0, 1)),
+                    'pistas_count' => $pistasCount
                 ];
             })
         ]);

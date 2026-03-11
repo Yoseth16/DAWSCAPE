@@ -55,6 +55,9 @@ Route::middleware(['check.fase'])->group(function () {
     Route::post('/prueba7', [JuegoController::class, 'validarPrueba7']);
 
     Route::get('/final', [JuegoController::class, 'mostrarFinal'])->name('final');
+
+    // Sistema de Pistas/Ayuda
+    Route::post('/pista', [JuegoController::class, 'usarPista'])->name('pista.usar');
 });
 
 // Enrutamiento Inteligente de Escaneo QR
