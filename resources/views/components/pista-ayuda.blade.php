@@ -14,17 +14,17 @@
     position: fixed;
     bottom: 1.5rem;
     right: 1.5rem;
-    width: 72px;
-    height: 72px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
-    border: 3px solid var(--green, #00ff88);
-    background: rgba(4, 26, 14, 0.9);
+    border: 4px solid var(--green, #00ff88);
+    background: linear-gradient(135deg, rgba(4, 26, 14, 0.95), rgba(0, 50, 25, 0.95));
     cursor: pointer;
     z-index: 500;
     overflow: hidden;
     transition: all 0.3s ease;
-    box-shadow: 0 0 15px rgba(0,255,136,0.3), 0 4px 15px rgba(0,0,0,0.5);
-    animation: pista-pulse 3s ease-in-out infinite;
+    box-shadow: 0 0 20px rgba(0,255,136,0.5), 0 6px 20px rgba(0,0,0,0.6), inset 0 0 15px rgba(0,255,136,0.2);
+    animation: pista-pulse 2s ease-in-out infinite;
     padding: 0;
 }
 .pista-btn img {
@@ -177,7 +177,7 @@
     </div>
 </div>
 
-<div class="pista-penalizacion-aviso" id="pistaPenalizacion">⚠️ Penalización: +8 minutos | Si usas todas las pistas perderás mucho tiempo y no podrás ganar</div>
+<div class="pista-penalizacion-aviso" id="pistaPenalizacion">⚠️ Penalización: +1 minuto | ¡Cuidado! Las pistas restan tiempo</div>
 
 <script>
 (function() {

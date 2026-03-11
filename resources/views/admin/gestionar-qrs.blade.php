@@ -30,7 +30,7 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: all 0.2s;
         }
         .card-qr:hover { border-color: #cbd5e1; box-shadow: 0 8px 15px rgba(0,0,0,0.05); }
-        
+
         .print-container { display: flex; align-items: center; gap: 1.5rem; }
         .qr-info h3 { font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.3rem; }
         .qr-info p { margin-bottom: 0; color: var(--text-muted); font-size: 0.9rem; }
@@ -140,6 +140,7 @@
                     </div>
                 </div>
                 <div class="actions">
+                    <button class="btn-print" onclick="editarQr('{{ $qr->id }}', '{{ addslashes($qr->nombre) }}')"><i class="ph ph-pencil"></i> Editar</button>
                     <button class="btn-print" onclick="printQr('{{ $qr->id }}')"><i class="ph ph-printer"></i> Imprimir</button>
                     <form action="/admin/qrs/{{ $qr->id }}" method="POST" onsubmit="return confirm('¿Eliminar QR? Este código dejará de funcionar permanentemente.')">
                         @csrf
@@ -152,11 +153,46 @@
         </div>
     @endif
 
+    <!-- Modal para editar nombre del QR -->
+    <div id="editModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+        <div style="background:white; padding:2rem; border-radius:12px; max-width:500px; width:90%;">
+            <h3 style="margin-bottom:1.5rem; font-weight:700;">Editar Nombre del QR</h3>
+            <form id="editForm" method="POST">
+                @csrf
+                @method('PATCH')
+                <input type="text" id="editNombre" name="nombre" class="form-control mb-3" placeholder="Nuevo nombre" required>
+                <div style="display:flex; gap:1rem; justify-content:flex-end;">
+                    <button type="button" onclick="cerrarModal()" style="padding:0.6rem 1.2rem; border:1px solid #cbd5e1; background:white; border-radius:8px; cursor:pointer;">Cancelar</button>
+                    <button type="submit" class="btn-primary-custom">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         function printQr(id) {
             document.querySelectorAll('.card-qr').forEach(el => el.classList.remove('printing'));
             document.getElementById('qr-card-' + id).classList.add('printing');
             window.print();
         }
+
+        function editarQr(id, nombreActual) {
+            const modal = document.getElementById('editModal');
+            const form = document.getElementById('editForm');
+            const input = document.getElementById('editNombre');
+
+            form.action = '/admin/qrs/' + id + '/editar';
+            input.value = nombreActual;
+            modal.style.display = 'flex';
+        }
+
+        function cerrarModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('editModal')?.addEventListener('click', function(e) {
+            if (e.target === this) cerrarModal();
+        });
     </script>
 @endsection

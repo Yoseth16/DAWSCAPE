@@ -5,35 +5,35 @@ return [
         1 => [
             'creador' => 'Mario',
             'imagen' => 'mario.png',
-            'texto' => 'Observa bien los números de las puertas y cuenta los elementos pares del aula. La suma final es la clave.',
+            'texto' => 'El guardián silencioso vigila desde lo alto. Su identidad está grabada en metal, visible para quien mire hacia arriba. Los pares se multiplican en este santuario del conocimiento.',
         ],
         2 => [
             'creador' => 'Yoseth',
             'imagen' => 'yoseth.png',
-            'texto' => 'El anagrama ROCIO se forma con las letras dispersas. Rebusca en el código de las máquinas.',
+            'texto' => 'Cinco fragmentos dispersos por el edificio. Cada máquina guarda una letra. El nombre de una mujer emerge del caos cuando ordenas el desorden.',
         ],
         3 => [
             'creador' => 'Ángel',
             'imagen' => 'angel.png',
-            'texto' => 'Suma los botones (18), el precio del café (80) y el nivel de azúcar (5).',
+            'texto' => 'Tres elementos convergen en un único número: la interfaz táctil, el tributo monetario y la dulzura medida. La suma de estos tres revela el camino.',
         ],
         4 => [
             'creador' => 'Arturo',
             'imagen' => 'arturo.png',
-            'texto' => 'El checksum de la Oasis es la suma de las filas, el código del café y los items de la primera columna.',
+            'texto' => 'La estructura vertical, el código del elixir oscuro y la primera columna del alfabeto. Tres valores que, unidos, desbloquean el siguiente nivel.',
         ],
         5 => [
             'creador' => 'Eloy',
             'imagen' => 'eloy.png',
-            'texto' => 'A=Z, B=Y... Invierte el abecedario para leer el mensaje oculto en las taquillas.',
+            'texto' => 'El mundo al revés. Donde A se encuentra con Z, y la primera letra del alfabeto besa a la última. 64 nodos metálicos guardan el secreto invertido.',
         ],
         6 => [
             'creador' => 'Migue',
             'imagen' => 'migue.png',
-            'texto' => 'Presta atención a la secuencia de luces y sonidos. La cooperación entre el equipo es vital.',
+            'texto' => 'La memoria es frágil cuando trabaja sola. Dividid la carga, compartid el patrón. Cuatro cuadrantes, una mente colectiva. La sincronización es vuestra única salvación.',
         ],
     ],
-    'penalizacion_pista' => 480, // 8 minutos por pista
+    'penalizacion_pista' => 60, // 60 segundos (1 minuto) por pista
 
     'respuestas' => [
         'prueba1' => [

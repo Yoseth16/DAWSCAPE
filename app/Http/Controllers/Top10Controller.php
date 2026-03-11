@@ -35,18 +35,20 @@ class Top10Controller extends Controller
 
         // Get all teams
         $todasPartidas = Partida::all()->map(function ($partida) {
-            // Calculate current live time in seconds
+            // Calculate current live time in seconds (including penalties)
             $segsLive = 0;
+            $penalizacion = (int)($partida->penalizacion_segundos ?? 0);
+
             if ($partida->fase_actual !== 'FINALIZADO' && $partida->fase_actual !== 'FINALIZADO_TIMEOUT' && $partida->inicio_juego) {
-                $segsLive = abs(now()->diffInSeconds(Carbon::parse($partida->inicio_juego)));
+                $segsLive = abs(now()->diffInSeconds(Carbon::parse($partida->inicio_juego))) + $penalizacion;
             } else {
-                $segsLive = (int)$partida->tiempo_segundos;
+                $segsLive = (int)$partida->tiempo_segundos + $penalizacion;
             }
 
             // Assign a weight based on the phase for sorting
             $peso = $this->fases_orden[$partida->fase_actual]['peso'] ?? 0;
             $nombre_prueba = $this->fases_orden[$partida->fase_actual]['nombre'] ?? $partida->fase_actual;
-            
+
             // Calculate progress percentage (max weight is 6 before finish)
             $progreso = min(100, round(($peso / 6) * 100));
 
@@ -71,7 +73,10 @@ class Top10Controller extends Controller
         // Split into finished and active
         $finalizados = $todasPartidas->filter(function ($p) {
             return $p['terminado'];
-        })->sortBy('tiempo_live')->values(); // Sort by shortest time
+        })->sortBy(function ($p) {
+            // Ordenar por tiempo total (tiempo_live ya incluye penalizaciones en el cálculo)
+            return $p['tiempo_live'];
+        })->values(); // Sort by shortest time (including penalties)
 
         $activos = $todasPartidas->filter(function ($p) {
             return !$p['terminado'];
@@ -86,7 +91,7 @@ class Top10Controller extends Controller
 
         // Get top 10 actives
         $top10Activos = $activos->take(10);
-        
+
         // Calculate gap for podium (2nd vs 1st, 3rd vs 1st)
         if ($top10Activos->count() > 0) {
             $firstTime = $top10Activos[0]['tiempo_live'];

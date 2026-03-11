@@ -6,6 +6,7 @@ use App\Models\Partida;
 use Carbon\Carbon;
 use App\Services\GameTimerService;
 use App\Http\Requests\GuardarQrRequest;
+use Illuminate\Http\Request;
 
 class QrController extends Controller
 {
@@ -51,6 +52,20 @@ class QrController extends Controller
         if ($qr) {
             $qr->delete();
             return back()->with('success', 'QR eliminado del sistema.');
+        }
+        return back()->with('error', 'El QR no existe.');
+    }
+
+    public function editarQr(Request $request, $id)
+    {
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+        ]);
+
+        $qr = \App\Models\Qr::find($id);
+        if ($qr) {
+            $qr->update(['nombre' => $request->nombre]);
+            return back()->with('success', 'Nombre del QR actualizado correctamente.');
         }
         return back()->with('error', 'El QR no existe.');
     }

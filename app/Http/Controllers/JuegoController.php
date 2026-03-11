@@ -509,6 +509,32 @@ class JuegoController extends Controller
     }
 
     // =====================================================
+    // PENALIZACIÓN POR FALLO EN SIMÓN DICE
+    // =====================================================
+    public function penalizarPrueba6(Request $request)
+    {
+        $partida = $this->timerService->obtenerPartidaActiva();
+
+        if (!$partida) {
+            return response()->json(['success' => false, 'message' => 'No hay partida activa.'], 403);
+        }
+
+        // Penalizar con 480 segundos (8 minutos)
+        $penalizacion = 480;
+        $partida->increment('penalizacion_segundos', $penalizacion);
+
+        $this->logAccion($partida, 'Prueba 6 Migue', 'Penalización por fallo en Simón Dice', [
+            'penalizacion' => $penalizacion,
+            'mensaje' => '¡Te quitamos 8 min porque eres tonto! Es un simón dice'
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'penalizacion' => $penalizacion
+        ]);
+    }
+
+    // =====================================================
     // PRUEBA 7: OPERACIÓN EL CÓDICE OCULTO — Cerradura Digital + QRs físicos
     // =====================================================
 

@@ -20,17 +20,17 @@
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --border-color: #334155;
-            
+
             --brand-color: #3b82f6;
             --brand-glow: rgba(59, 130, 246, 0.4);
-            
+
             --podium-1: linear-gradient(135deg, #fef08a, #eab308);
             --podium-1-text: #713f12;
             --podium-2: linear-gradient(135deg, #e2e8f0, #94a3b8);
             --podium-2-text: #334155;
             --podium-3: linear-gradient(135deg, #fed7aa, #f97316);
             --podium-3-text: #7c2d12;
-            
+
             --success-color: #10b981;
             --danger-color: #ef4444;
             --warning-color: #f59e0b;
@@ -225,7 +225,7 @@
             70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
             100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
-        
+
         .gap-info {
             font-size: 0.85rem;
             color: var(--danger-color);
@@ -252,7 +252,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .move-up { animation: flash-green 2s; }
         .move-down { animation: flash-red 2s; }
 
@@ -298,7 +298,7 @@
             transition: width 1s ease-in-out;
             position: relative;
         }
-        
+
         .progress-fill::after {
             content: '';
             position: absolute;
@@ -434,7 +434,7 @@
         <!-- COLUMNA IZQUIERDA: PODIO Y TICKER -->
         <div class="left-col">
             <h2 class="section-title"><i class="ph-fill ph-trophy"></i> CABEZA DE CARRERA</h2>
-            
+
             <div class="podium-container" id="podium-container">
                 <!-- Se rellena por JS -->
                 <div style="text-align:center; width:100%; color:var(--text-muted); font-size:1.5rem; margin-top:50px;">
@@ -526,11 +526,11 @@
                 ctx.fillStyle = p.color;
                 ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
                 ctx.restore();
-                
+
                 p.y += p.vy;
                 p.x += p.vx;
                 p.rot += p.rotSpeed;
-                
+
                 if(p.y > canvas.height) {
                     if(isConfettiActive) {
                         p.y = -20;
@@ -548,7 +548,7 @@
             const overlay = document.getElementById('celebration-overlay');
             document.getElementById('celeb-team-name').innerText = teamName;
             document.getElementById('celeb-team-time').innerText = "TIEMPO: " + timeFormatted;
-            
+
             overlay.classList.add('active');
             isConfettiActive = true;
             particles = [];
@@ -585,7 +585,7 @@
             } else {
                 // Orden visual del podio: 2º, 1º, 3º
                 let podiumHTML = '';
-                
+
                 // 2º Puesto
                 if(top3[1]) podiumHTML += createPodiumSlot(top3[1], 2, 'p2');
                 else podiumHTML += `<div class="podium-slot"></div>`;
@@ -604,7 +604,7 @@
             // RENDER LISTA 4-10
             const listContainer = document.getElementById('list-container');
             document.getElementById('activos-title').innerHTML = `<i class="ph-fill ph-users-three"></i> PERSIGUIENDO (Top 4-10)`;
-            
+
             // Helper for medals
             const renderMedals = (logros) => {
                 if(!logros || logros.length === 0) return '';
@@ -633,7 +633,7 @@
                     <div class="list-info">
                         <h4 style="color: ${team.color_hex};">${team.nombre_equipo} ${renderMedals(team.logros)} ${team.abandonado ? '(TIMEOUT)' : ''}</h4>
                         <div class="list-phase">
-                            <i class="ph-fill ${team.abandonado ? 'ph-x-circle' : 'ph-spinner-gap ph-spin'}"></i> 
+                            <i class="ph-fill ${team.abandonado ? 'ph-x-circle' : 'ph-spinner-gap ph-spin'}"></i>
                             ${team.nombre_prueba}
                         </div>
                         <div class="progress-wrapper">
@@ -682,7 +682,7 @@
             let newState = {};
             data.top10.forEach((t, i) => { newState[t.id] = { rank: i+1 }; });
             previousTeamsState = newState;
-            
+
             // Si hay initial load de finalizados, añadirlos a conocidos
             if(knownFinishers.size === 0) {
                 data.finalizados.forEach(t => knownFinishers.add(t.id));
@@ -724,7 +724,6 @@
             if (window.Echo) {
                 window.Echo.channel('top10')
                     .listen('Top10Updated', (e) => {
-                        console.log('Top 10 Update Received from Reverb', e);
                         fetchTop10();
                     });
             } else {

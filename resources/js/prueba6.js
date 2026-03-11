@@ -135,15 +135,28 @@ function handleSectorTouch(sectorId, event) {
         if (board) board.style.animation = "shake 0.4s";
         if (statusTxt) {
             statusTxt.innerText =
-                "[ERROR] DESINCRONIZACIÓN. REINICIANDO FASE...";
+                "[ERROR] DESINCRONIZACIÓN. ¡Te quitamos 8 min porque eres tonto! Es un simón dice. REINICIANDO FASE...";
             statusTxt.className = "status-info";
             statusTxt.style.color = "var(--red)";
         }
         playTone(S_ERR, "sawtooth", 0.8);
+
+        // Penalizar al equipo con 480 segundos (8 minutos)
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (csrfToken) {
+            fetch("/prueba6/penalizar", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": csrfToken.getAttribute("content"),
+                },
+            }).catch((err) => console.error("Error al penalizar:", err));
+        }
+
         setTimeout(() => {
             if (board) board.style.animation = "";
             playRound();
-        }, 2000);
+        }, 3000); // Aumentado a 3 segundos para que lean el mensaje
     }
 }
 
@@ -164,7 +177,7 @@ function winGame() {
     })
         .then((r) => r.json())
         .then((res) => {
-            if (res.success) console.log(res.mensaje);
+            // Validación exitosa
         })
         .catch((err) => console.error("Error al validar:", err));
 }

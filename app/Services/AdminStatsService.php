@@ -15,10 +15,10 @@ class AdminStatsService
     public function getPartidasOrdered()
     {
         return Partida::orderByRaw("
-            CASE 
-                WHEN fase_actual = 'FINALIZADO' THEN 0 
+            CASE
+                WHEN fase_actual = 'FINALIZADO' THEN 0
                 WHEN fase_actual = 'FINALIZADO_TIMEOUT' THEN 1
-                ELSE 2 
+                ELSE 2
             END")
             ->orderBy('tiempo_segundos', 'asc')
             ->get();
@@ -26,12 +26,13 @@ class AdminStatsService
 
     /**
      * Obtiene el Top 5 de equipos finalizados más rápidos.
+     * Incluye penalización en el cálculo del tiempo total.
      * @return Collection
      */
     public function getTop5()
     {
         return Partida::where('fase_actual', 'FINALIZADO')
-            ->orderBy('tiempo_segundos', 'asc')
+            ->orderByRaw('(tiempo_segundos + COALESCE(penalizacion_segundos, 0)) ASC')
             ->limit(5)
             ->get();
     }
@@ -91,27 +92,27 @@ class AdminStatsService
     public function getBottlenecks()
     {
         $hitos = \App\Models\HitoFase::orderBy('partida_id')->orderBy('segundos_transcurridos', 'asc')->get();
-        
+
         $tiemposPorFase = [];
         $lastSegundos = [];
 
         foreach ($hitos as $hito) {
             $pid = $hito->partida_id;
-            
+
             // Extraer el nombre de la prueba real removiendo sufijos (Ej: "Prueba 1 Mario Superada" -> "Prueba 1 Mario")
             $faseName = str_replace(' Superada', '', $hito->fase);
             $currentSecs = (int) $hito->segundos_transcurridos;
-            
+
             $prevSecs = $lastSegundos[$pid] ?? 0;
             $delta = $currentSecs - $prevSecs;
-            
+
             if (!isset($tiemposPorFase[$faseName])) {
                 $tiemposPorFase[$faseName] = ['total' => 0, 'count' => 0];
             }
-            
+
             $tiemposPorFase[$faseName]['total'] += $delta;
             $tiemposPorFase[$faseName]['count']++;
-            
+
             $lastSegundos[$pid] = $currentSecs;
         }
 

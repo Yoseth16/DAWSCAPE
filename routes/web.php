@@ -50,6 +50,7 @@ Route::middleware(['check.fase'])->group(function () {
 
     Route::get('/prueba6', [JuegoController::class, 'mostrarPrueba6'])->name('prueba6');
     Route::post('/prueba6', [JuegoController::class, 'validarPrueba6']);
+    Route::post('/prueba6/penalizar', [JuegoController::class, 'penalizarPrueba6']);
 
     Route::get('/prueba7', [JuegoController::class, 'mostrarPrueba7'])->name('prueba7');
     Route::post('/prueba7', [JuegoController::class, 'validarPrueba7']);
@@ -96,6 +97,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Gestión de QRs Dinámicos
     Route::get('/admin/qrs', [QrController::class, 'mostrarGestor'])->name('admin.qrs');
     Route::post('/admin/qrs', [QrController::class, 'guardarQr']);
+    Route::patch('/admin/qrs/{id}/editar', [QrController::class, 'editarQr']);
     Route::delete('/admin/qrs/{id}', [QrController::class, 'eliminarQr']);
 
     // Rutas de Testing Directo (Bypass para el profesor)

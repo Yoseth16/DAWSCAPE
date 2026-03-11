@@ -68,16 +68,16 @@
     letter-spacing: 0.1em;
   }
 
-  .screen { 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      justify-content: center; 
-      padding: 1.5rem; 
-      padding-top: 5rem; 
+  .screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      padding-top: 5rem;
       padding-bottom: 2rem;
-      min-height: 100vh; 
-      animation: fadeIn 1s ease; 
+      min-height: 100vh;
+      animation: fadeIn 1s ease;
   }
 
   .logo {
@@ -117,7 +117,7 @@
     font-size: 0.7rem;
     letter-spacing: 0.2em;
   }
-  
+
   .intro-text strong {
       color: var(--green);
       font-weight: normal;
@@ -132,9 +132,9 @@
 
   /* ANIMATIONS */
   @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes float { 
-      0%, 100% { transform: translateY(0); } 
-      50% { transform: translateY(-10px); text-shadow: 0 10px 20px rgba(0,255,136,0.3); } 
+  @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); text-shadow: 0 10px 20px rgba(0,255,136,0.3); }
   }
   @keyframes pulse-glow {
     0%, 100% { text-shadow: 0 0 20px var(--green), 0 0 50px #00ff8860; }
@@ -173,7 +173,7 @@
     <p>Si quieres restaurar el núcleo del DAWSCAPE, deberás pensar al revés.</p>
     <p><strong>Busca el muro de almacenamiento donde cada número guarda una parte del código. El alfabeto ha sido reflejado.</strong></p>
     <br>
-    <p style="color: var(--red); font-weight: bold; border-top: 1px dashed var(--border); padding-top: 1rem; margin-top: 1rem;">Solo los más atentos podrán reconstruir la palabra clave: ZASIELX.</p>
+    <p style="color: var(--red); font-weight: bold; border-top: 1px dashed var(--border); padding-top: 1rem; margin-top: 1rem;">Solo los más atentos podrán reconstruir la palabra clave.</p>
   </div>
 </div>
 
