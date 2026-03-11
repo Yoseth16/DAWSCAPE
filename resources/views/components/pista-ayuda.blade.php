@@ -51,6 +51,7 @@
     50%     { box-shadow: 0 0 25px rgba(0,255,136,0.5), 0 0 40px rgba(0,255,136,0.15); }
 }
 
+/* Tooltip */
 .pista-tooltip {
     position: fixed;
     bottom: 6rem; right: 1.2rem;
@@ -68,26 +69,37 @@
     transform: translateY(5px);
     transition: all 0.3s ease;
 }
-.pista-btn:hover ~ .pista-tooltip { opacity: 1; transform: translateY(0); }
 
+/* Overlay con fade correcto */
 .pista-overlay {
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.6);
     z-index: 600;
-    display: none;
+    display: flex;
     align-items: center; justify-content: center;
     opacity: 0;
+    pointer-events: none;
     transition: opacity 0.3s ease;
     backdrop-filter: blur(3px);
 }
-.pista-overlay.visible { display: flex; opacity: 1; }
+.pista-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
 
+/* Bocadillo */
 .pista-bocadillo {
     position: relative;
     width: 90%; max-width: 420px;
     min-height: 200px;
     display: flex; align-items: center; justify-content: center;
-    animation: bocadillo-enter 0.4s ease-out;
+    transform: scale(0.8) translateY(20px);
+    opacity: 0;
+    transition: all 0.4s ease;
+}
+.pista-overlay.visible .pista-bocadillo {
+    transform: scale(1) translateY(0);
+    opacity: 1;
 }
 .pista-bocadillo-bg {
     width: 100%; height: auto;
@@ -120,11 +132,7 @@
 }
 .pista-close:hover { background: rgba(255,34,68,0.8); transform: scale(1.1); }
 
-@keyframes bocadillo-enter {
-    from { opacity: 0; transform: scale(0.8) translateY(20px); }
-    to   { opacity: 1; transform: scale(1) translateY(0); }
-}
-
+/* Penalización aviso */
 .pista-penalizacion-aviso {
     position: fixed;
     top: 4.5rem; left: 50%;
@@ -174,6 +182,7 @@
     const pruebaNumero = {{ $pruebaNum }};
     let pistaYaUsada = {{ $usada ? 'true' : 'false' }};
     let pistaTextoCache = null;
+    let fetchEnCurso = false;
 
     const btn = document.getElementById('pistaBtn');
     const overlay = document.getElementById('pistaOverlay');
@@ -182,50 +191,79 @@
     const avisoEl = document.getElementById('pistaPenalizacion');
     const tooltipEl = document.getElementById('pistaTooltip');
 
+    if (!btn || !overlay) return; // Seguridad: si no existen los elementos, no hacer nada
+
     function abrirBocadillo(texto) {
         textoEl.textContent = texto;
-        overlay.style.display = 'flex';
-        requestAnimationFrame(() => overlay.classList.add('visible'));
+        overlay.classList.add('visible');
     }
 
     function cerrarBocadillo() {
         overlay.classList.remove('visible');
-        setTimeout(() => { overlay.style.display = 'none'; }, 300);
     }
 
     function mostrarPenalizacion() {
         avisoEl.classList.add('show');
-        setTimeout(() => avisoEl.classList.remove('show'), 3500);
+        setTimeout(function() { avisoEl.classList.remove('show'); }, 3500);
     }
 
     function marcarComoUsada() {
         pistaYaUsada = true;
         btn.classList.add('usada');
-        tooltipEl.textContent = '📖 Ver pista';
+        if (tooltipEl) tooltipEl.textContent = '📖 Ver pista';
     }
 
+    // Hover tooltip
+    btn.addEventListener('mouseenter', function() {
+        if (tooltipEl) { tooltipEl.style.opacity = '1'; tooltipEl.style.transform = 'translateY(0)'; }
+    });
+    btn.addEventListener('mouseleave', function() {
+        if (tooltipEl) { tooltipEl.style.opacity = '0'; tooltipEl.style.transform = 'translateY(5px)'; }
+    });
+
     btn.addEventListener('click', function() {
+        // Si ya está abierto, cerrar
         if (overlay.classList.contains('visible')) { cerrarBocadillo(); return; }
+
+        // Si ya se usó y tenemos el texto en cache, mostrar directamente
         if (pistaYaUsada && pistaTextoCache) { abrirBocadillo(pistaTextoCache); return; }
 
-        const csrfToken = document.querySelector('meta[name="csrf-token"]');
-        if (!csrfToken) { console.error('CSRF token no encontrado'); return; }
+        // Evitar doble fetch
+        if (fetchEnCurso) return;
+        fetchEnCurso = true;
+
+        var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        if (!csrfMeta) {
+            console.error('CSRF token no encontrado. Asegúrate de tener <meta name="csrf-token"> en el <head>.');
+            fetchEnCurso = false;
+            return;
+        }
 
         btn.style.pointerEvents = 'none';
+        btn.style.opacity = '0.6';
 
         fetch('/pista', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
+                'X-CSRF-TOKEN': csrfMeta.getAttribute('content'),
                 'Accept': 'application/json'
             },
             body: JSON.stringify({ prueba_numero: pruebaNumero })
         })
-        .then(res => res.json())
-        .then(data => {
+        .then(function(res) {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
+        })
+        .then(function(data) {
             btn.style.pointerEvents = '';
-            if (!data.success) { console.error('Error pista:', data.message); return; }
+            btn.style.opacity = '';
+            fetchEnCurso = false;
+
+            if (!data.success) {
+                console.error('Error pista:', data.message);
+                return;
+            }
 
             pistaTextoCache = data.texto;
             abrirBocadillo(data.texto);
@@ -233,12 +271,20 @@
             if (!data.ya_usada && data.penalizacion > 0) {
                 mostrarPenalizacion();
                 marcarComoUsada();
-                if (typeof tiempoInicial !== 'undefined') tiempoInicial += data.penalizacion;
+                // Actualizar timer local si existe
+                if (typeof tiempoInicial !== 'undefined') {
+                    tiempoInicial += data.penalizacion;
+                }
             } else {
                 marcarComoUsada();
             }
         })
-        .catch(err => { btn.style.pointerEvents = ''; console.error('Error pista:', err); });
+        .catch(function(err) {
+            btn.style.pointerEvents = '';
+            btn.style.opacity = '';
+            fetchEnCurso = false;
+            console.error('Error al solicitar pista:', err);
+        });
     });
 
     closeBtn.addEventListener('click', function(e) { e.stopPropagation(); cerrarBocadillo(); });
