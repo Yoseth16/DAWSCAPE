@@ -50,13 +50,15 @@
     backdrop-filter: blur(8px);
   }
 
+  /* MEJORADO: Team info con mejor contraste */
   .team-info {
     font-size: 0.75rem;
-    color: #88ccaa;
+    color: #b0e0bf;
     line-height: 1.6;
+    text-shadow: 0 0 8px rgba(0, 255, 136, 0.2);
   }
 
-  .team-info strong { color: var(--green); }
+  .team-info strong { color: var(--green); text-shadow: 0 0 10px var(--green); }
 
   .header-timer {
     font-family: 'Orbitron', sans-serif;
@@ -82,22 +84,26 @@
     animation: pulse-glow 2.5s ease-in-out infinite;
   }
 
+  /* MEJORADO: Subtitle con mejor contraste */
   .subtitle {
     font-size: 0.85rem;
-    color: #007744;
+    color: #00ff88;
     letter-spacing: 0.3em;
     text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
   }
 
+  /* MEJORADO: Intro text con mejor contraste */
   .intro-text {
     max-width: 580px;
     line-height: 1.9;
-    color: #88ccaa;
+    color: #c8ffdf;
     border: 1px solid var(--border);
     padding: clamp(1.2rem, 4vw, 1.8rem) clamp(1.2rem, 4vw, 2rem);
     background: var(--panel);
     position: relative;
     font-size: clamp(0.95rem, 4vw, 1.05rem);
+    text-shadow: 0 0 5px rgba(200, 255, 223, 0.1);
   }
 
   .intro-text::before {
@@ -159,11 +165,13 @@
     padding-bottom: 0.8rem;
   }
 
+  /* MEJORADO: HUD label con mejor contraste */
   .hud-label {
     font-size: 0.7rem;
-    color: #007744;
+    color: #00ff88;
     letter-spacing: 0.2em;
     text-transform: uppercase;
+    text-shadow: 0 0 6px rgba(0, 255, 136, 0.15);
   }
 
   .hud-val {
@@ -268,13 +276,15 @@
     animation: pulse-glow 1.5s ease-in-out infinite;
   }
 
+  /* MEJORADO: Result panel con mejor contraste */
   .result-panel {
     border: 1px solid var(--border);
     padding: 1.5rem 2.5rem;
     background: var(--panel);
     line-height: 2.2;
     font-size: 0.9rem;
-    color: #88ccaa;
+    color: #b0e0bf;
+    text-shadow: 0 0 5px rgba(200, 255, 223, 0.1);
   }
 
   .result-panel span { color: var(--green); font-size: 1.05rem; }
@@ -606,4 +616,5 @@ function resetGame() {
 </body>
 </html>
 
+@include('components.pista-ayuda', ['pruebaNumero' => 1, 'pistaConfig' => $pistaConfig, 'yaUsada' => $yaUsada])
 @include('components.live-listener')

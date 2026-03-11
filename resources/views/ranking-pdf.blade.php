@@ -25,9 +25,10 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+        /* MEJORADO: Subtitle con mejor contraste para PDF */
         .subtitle {
             font-size: 14px;
-            color: #64748b;
+            color: #334155;
             margin-top: 5px;
         }
         table {
@@ -40,9 +41,10 @@
             text-align: left;
             border-bottom: 1px solid #e2e8f0;
         }
+        /* MEJORADO: Table header con mejor contraste */
         th {
             background-color: #f8fafc;
-            color: #475569;
+            color: #334155;
             font-size: 13px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -62,11 +64,12 @@
             font-weight: bold;
             color: #059669;
         }
+        /* MEJORADO: Footer con mejor contraste */
         .footer {
             margin-top: 50px;
             text-align: center;
             font-size: 11px;
-            color: #94a3b8;
+            color: #64748b;
             border-top: 1px solid #e2e8f0;
             padding-top: 15px;
         }
@@ -93,7 +96,7 @@
             <tr>
                 <td class="pos">{{ $index + 1 }}º</td>
                 <td style="font-weight: bold">{{ $partida->nombre_equipo }}</td>
-                <td style="color: #64748b">{{ $partida->email }}</td>
+                <td style="color: #475569">{{ $partida->email }}</td>
                 <td class="time">
                     {{ floor((int)$partida->tiempo_segundos / 60) }} min {{ (int)$partida->tiempo_segundos % 60 }} seg
                 </td>

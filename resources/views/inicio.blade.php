@@ -60,13 +60,15 @@
     text-align: center;
   }
 
+  /* MEJORADO: Subtitle con mejor contraste - cambio de #007744 a color más claro */
   .subtitle {
     font-size: 0.85rem;
-    color: #007744;
+    color: #00ff88;
     letter-spacing: 0.3em;
     text-transform: uppercase;
     margin-bottom: 2rem;
     text-align: center;
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
   }
 
   .glitch-text { animation: blink 2s infinite; color: var(--red); font-size: 0.9rem; text-shadow: 0 0 10px var(--red); letter-spacing: 0.1em; text-align: center; margin-bottom: 2rem; }
@@ -95,13 +97,15 @@
 
   .form-group { margin-bottom: 1.8rem; }
 
+  /* MEJORADO: Form label con mejor contraste */
   .form-label {
     display: block;
     font-size: 0.75rem;
-    color: #007744;
+    color: #00ff88;
     letter-spacing: 0.15em;
     text-transform: uppercase;
     margin-bottom: 0.5rem;
+    text-shadow: 0 0 6px rgba(0, 255, 136, 0.15);
   }
 
   .form-control {
@@ -120,7 +124,15 @@
   .form-control::placeholder { color: #88ccaa60; } /* Better WCAG contrast */
   .form-control:focus { border-bottom-color: var(--green); box-shadow: 0 4px 15px -10px var(--green); }
 
-  .helper-text { display: block; margin-top: 0.4rem; color: #445544; font-size: 0.7rem; letter-spacing: 0.05em; }
+  /* MEJORADO: Helper text con mejor contraste */
+  .helper-text { 
+    display: block; 
+    margin-top: 0.4rem; 
+    color: #88ccaa; 
+    font-size: 0.7rem; 
+    letter-spacing: 0.05em;
+    text-shadow: 0 0 4px rgba(136, 204, 170, 0.15);
+  }
 
   .checkbox-group {
     display: flex;

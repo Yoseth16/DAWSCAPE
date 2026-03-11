@@ -54,4 +54,9 @@ class Partida extends Model
     {
         return $this->hasMany(LogJuego::class);
     }
+
+    public function pistasUsadas()
+    {
+        return $this->hasMany(PistaUsada::class);
+    }
 }

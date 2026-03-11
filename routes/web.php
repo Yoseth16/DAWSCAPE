@@ -55,6 +55,9 @@ Route::middleware(['check.fase'])->group(function () {
     Route::post('/prueba7', [JuegoController::class, 'validarPrueba7']);
 
     Route::get('/final', [JuegoController::class, 'mostrarFinal'])->name('final');
+
+    // Sistema de Pistas/Ayuda
+    Route::post('/pista', [JuegoController::class, 'usarPista'])->name('pista.usar');
 });
 
 // ==========================================
@@ -84,6 +87,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Gestión de Partidas y Ticker Live
     Route::get('/admin/api/stats', [AdminController::class, 'apiStats']);
+    Route::get('/admin/api/inscripciones', [AdminController::class, 'apiInscripciones']);
     Route::delete('/admin/equipo/{uuid}', [AdminController::class, 'eliminarEquipo']);
     Route::get('/admin/equipo/{uuid}/logs', [AdminController::class, 'mostrarLogs'])->name('admin.equipo.logs');
     Route::get('/admin/exportar-top20', [AdminController::class, 'exportarTop20PDF']);
