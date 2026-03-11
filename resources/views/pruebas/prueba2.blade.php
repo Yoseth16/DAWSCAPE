@@ -410,4 +410,5 @@ function notifyServer() {
 </body>
 </html>
 
+@include('components.pista-ayuda', ['pruebaNumero' => 2, 'pistaConfig' => $pistaConfig, 'yaUsada' => $yaUsada])
 @include('components.live-listener')

@@ -297,8 +297,9 @@
                         <th style="width: 5%">ID</th>
                         <th style="width: 35%">Equipo & Contacto</th>
                         <th style="width: 15%">Clase</th>
-                        <th style="width: 20%">Estado / Progreso</th>
-                        <th style="width: 15%">Tiempo</th>
+                        <th style="width: 15%">Estado / Progreso</th>
+                        <th style="width: 10%">Tiempo</th>
+                        <th style="width: 10%">Pistas</th>
                         <th style="width: 10%; text-align:center;">Borrar</th>
                     </tr>
                 </thead>
@@ -344,6 +345,14 @@
                                 @else
                                     <span style="color:var(--text-muted)">--:--</span>
                                 @endif
+                            @endif
+                        </td>
+                        <td style="text-align:center; font-weight:600;">
+                            @php $pistasUsadas = \App\Models\PistaUsada::where('partida_id', $partida->id)->count(); @endphp
+                            @if($pistasUsadas > 0)
+                                <span style="background:#fef08a; color:#854d0e; padding:4px 8px; border-radius:6px; font-size:0.85rem;">💡 {{ $pistasUsadas }}</span>
+                            @else
+                                <span style="color:var(--text-muted); font-size:0.85rem;">0</span>
                             @endif
                         </td>
                         <td style="text-align:center;">
@@ -472,6 +481,11 @@
                         <td><span style="background:#f1f5f9; padding:4px 10px; border-radius:6px; font-size:0.85rem; font-weight:600; color:var(--text-muted);">${p.clase}</span></td>
                         <td>${statusHtml}</td>
                         <td class="time-display">${timeHtml}</td>
+                        <td style="text-align:center; font-weight:600;">
+                            ${p.pistas_count > 0
+                                ? `<span style="background:#fef08a; color:#854d0e; padding:4px 8px; border-radius:6px; font-size:0.85rem;">💡 ${p.pistas_count}</span>`
+                                : `<span style="color:var(--text-muted); font-size:0.85rem;">0</span>`}
+                        </td>
                         <td style="text-align:center;">
                             <form action="/admin/equipo/${p.uuid}" method="POST" onsubmit="return confirm('¿Borrar permanentemente?');" style="margin:0;">
                                 <input type="hidden" name="_token" value="${document.querySelector('meta[name=csrf-token]').content}">

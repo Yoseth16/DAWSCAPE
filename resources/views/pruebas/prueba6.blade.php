@@ -66,4 +66,5 @@
 @endpush
 @endsection
 
+@include('components.pista-ayuda', ['pruebaNumero' => 6, 'pistaConfig' => $pistaConfig, 'yaUsada' => $yaUsada])
 @include('components.live-listener')
