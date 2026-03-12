@@ -272,6 +272,8 @@
 </head>
 <body>
 
+@include('components.game-audio-setup', ['trackKey' => 'prueba2'])
+
 <div class="game-header">
   <div class="team-info">
     <strong>Equipo:</strong> {{ session('nombre_equipo', 'Sin equipo') }}<br>

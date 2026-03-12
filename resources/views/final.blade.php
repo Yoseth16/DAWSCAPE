@@ -266,6 +266,8 @@
 </head>
 <body>
 
+@include('components.game-audio-setup', ['trackKey' => 'final'])
+
 <div class="particles" id="particles"></div>
 
 <div class="screen">

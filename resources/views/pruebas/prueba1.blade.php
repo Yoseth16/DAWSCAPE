@@ -336,6 +336,8 @@
 </head>
 <body>
 
+@include('components.game-audio-setup', ['trackKey' => 'prueba1'])
+
 <!-- HEADER CON INFO DE EQUIPO Y TIMER -->
 <div class="game-header">
   <div class="team-info">

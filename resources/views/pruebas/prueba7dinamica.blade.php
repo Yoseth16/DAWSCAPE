@@ -438,7 +438,7 @@
 </style>
 </head>
 <body>
-
+  @include('components.game-audio-setup', ['trackKey' => 'prueba8'])
 <!-- HEADER -->
 <div class="game-header">
   <div class="team-info">

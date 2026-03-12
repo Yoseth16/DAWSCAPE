@@ -8,6 +8,8 @@
 
 @section('content')
 
+@include('components.game-audio-setup', ['trackKey' => 'prueba6'])
+
 <!-- HEADER -->
 <div class="game-header">
   <div class="team-info">
