@@ -1,6 +1,9 @@
 /**
  * AudioManager - Sistema completo de gestión de audio
  * Maneja música de fondo, efectos de sonido y fade in/out
+ *
+ * Usa window.AUDIO_BASE_URL (inyectado por Blade vía asset()) para
+ * construir URLs correctas independientemente del subpath del servidor.
  */
 class AudioManager {
   constructor() {
@@ -12,80 +15,93 @@ class AudioManager {
     this.isFading = false;
     this.currentVolume = 0.5;
     this.targetVolume = 0.5;
-    
+
     // Efectos de sonido
     this.sfx = {};
     this.sfxVolume = 0.7;
-    
-    // Configuración de pistas
+
+    // Base URL resuelta por Laravel asset() desde el layout.
+    // Fallback a '/sonido' si la variable no fue inyectada.
+    this.baseUrl = (window.AUDIO_BASE_URL || '/sonido').replace(/\/$/, '');
+
+    // Configuración de pistas (rutas relativas a baseUrl)
     this.tracks = {
       login: {
-        file: '/sonido/MusicaMenuLogin.mp3',
-        title: 'DAWSCAPE - Tema Principal'
+        file: 'MusicaMenuLogin.mp3',
+        title: 'DAWSCAPE - Tema Principal',
       },
       prueba1: {
-        file: '/sonido/Prueba1-suspiro.mp3',
-        title: 'Suspiro 8 Bits - Sergio Mouliaá'
+        file: 'Prueba1-suspiro.mp3',
+        title: 'Suspiro 8 Bits - Sergio Mouliaá',
       },
       prueba2: {
-        file: '/sonido/Prueba2-zasi.mp3',
-        title: 'X TUS BESOS 8 Bits - Zasi'
+        file: 'Prueba2-zasi.mp3',
+        title: 'X TUS BESOS 8 Bits - Zasi',
       },
       prueba3: {
-        file: '/sonido/Prueba3-farsante.mp3',
-        title: 'El Farsante 8 Bits - Ozuna'
+        file: 'Prueba3-farsante.mp3',
+        title: 'El Farsante 8 Bits - Ozuna',
       },
       prueba4: {
-        file: '/sonido/Prueba4-Arturo.mp3',
-        title: 'Pluma Pluma G.. 8 Bits - Morancos'
+        file: 'Prueba4-Arturo.mp3',
+        title: 'Pluma Pluma G.. 8 Bits - Morancos',
       },
       prueba5: {
-        file: '/sonido/Prueba5-delocos.mp3',
-        title: 'De Locos 8 Bits - Sergio Mouliaá'
+        file: 'Prueba5-delocos.mp3',
+        title: 'De Locos 8 Bits - Sergio Mouliaá',
       },
       prueba6: {
-        file: '/sonido/Prueba6-fernanfloo.mp3',
-        title: 'Rap de Fernanfloo 8 Bits - Bambiel'
+        file: 'Prueba6-fernanfloo.mp3',
+        title: 'Rap de Fernanfloo 8 Bits - Bambiel',
       },
       prueba7: {
-        file: '/sonido/Prueba7-NachoRPG.mp3',
-        title: 'Tokyo Drift 8 Bits - Nacho'
+        file: 'Prueba7-NachoRPG.mp3',
+        title: 'Tokyo Drift 8 Bits - Nacho',
       },
       prueba8: {
-        file: '/sonido/Prueba8-mandanga.mp3',
-        title: 'Mandanga Style 8 Bits - Amador'
+        file: 'Prueba8-mandanga.mp3',
+        title: 'Mandanga Style 8 Bits - Amador',
       },
       prueba9: {
-        file: '/sonido/Prueba9-MineroRPG.mp3',
-        title: 'Minero 8 Bits - ElRubiusOMG'
+        file: 'Prueba9-MineroRPG.mp3',
+        title: 'Minero 8 Bits - ElRubiusOMG',
       },
       prueba10: {
-        file: '/sonido/Prueba10-DanzaKuduroRPG.mp3',
-        title: 'Danza Kuduro 8 Bits - Fernando'
+        file: 'Prueba10-DanzaKuduroRPG.mp3',
+        title: 'Danza Kuduro 8 Bits - Fernando',
       },
       final: {
-        file: '/sonido/FinalVictoria.mp3',
-        title: 'We Are The Champions 8 Bits'
-      }
+        file: 'FinalVictoria.mp3',
+        title: 'We Are The Champions 8 Bits',
+      },
     };
-    
-    // SFX
+
+    // SFX (rutas relativas a baseUrl)
     this.sfxFiles = {
-      correct: '/sonido/Acierto.mp3',
-      error: '/sonido/Error.mp3',
-      hint: '/sonido/Boton-Pista.mp3'
+      correct: 'Acierto.mp3',
+      error: 'Error.mp3',
+      hint: 'Boton-Pista.mp3',
     };
-    
+
     this.initializeSFX();
     this.setupEventListeners();
+  }
+
+  /**
+   * Construye la URL completa de un archivo de audio.
+   * @param {string} filename - Nombre del archivo (ej: 'Acierto.mp3')
+   * @returns {string}
+   */
+  _url(filename) {
+    return this.baseUrl + '/' + filename;
   }
 
   /**
    * Inicializar efectos de sonido
    */
   initializeSFX() {
-    Object.keys(this.sfxFiles).forEach(key => {
-      this.sfx[key] = new Audio(this.sfxFiles[key]);
+    Object.keys(this.sfxFiles).forEach((key) => {
+      this.sfx[key] = new Audio(this._url(this.sfxFiles[key]));
       this.sfx[key].crossOrigin = 'anonymous';
       this.sfx[key].volume = this.sfxVolume;
     });
@@ -110,18 +126,18 @@ class AudioManager {
    */
   playMusic(trackKey, fadeInDuration = 2000) {
     const track = this.tracks[trackKey];
-    
+
     if (!track) {
-      console.warn(`Track ${trackKey} not found`);
+      console.warn(`Track '${trackKey}' no encontrado`);
       return;
     }
 
-    // Si es la misma canción, no hacer nada
+    // Si es la misma canción y está sonando, no hacer nada
     if (this.currentTrach === trackKey && this.isPlaying) {
       return;
     }
 
-    // Si hay música sonando, hacer fade out
+    // Si hay música sonando, hacer fade out primero
     if (this.isPlaying) {
       this.fadeOut(1000).then(() => {
         this._loadAndPlayTrack(trackKey, fadeInDuration);
@@ -136,20 +152,28 @@ class AudioManager {
    */
   _loadAndPlayTrack(trackKey, fadeInDuration) {
     const track = this.tracks[trackKey];
-    
-    this.bgMusic.src = track.file;
+    const url = this._url(track.file);
+
+    console.log(`🎵 Cargando audio: ${url}`);
+
+    this.bgMusic.src = url;
     this.bgMusic.volume = 0;
     this.currentVolume = 0;
     this.targetVolume = 0.5;
     this.currentTrach = trackKey;
-    
-    this.bgMusic.play().then(() => {
-      this.isPlaying = true;
-      this._fadeInMusic(fadeInDuration);
-      this._updateUI();
-    }).catch(err => {
-      console.error('Error reproduciendo música:', err);
-    });
+
+    this.bgMusic
+      .play()
+      .then(() => {
+        this.isPlaying = true;
+        this._fadeInMusic(fadeInDuration);
+        this._updateUI();
+      })
+      .catch((err) => {
+        console.error('Error reproduciendo música:', err);
+        // El navegador bloqueó el autoplay; se activará en el primer clic
+        this._updateUI();
+      });
   }
 
   /**
@@ -158,12 +182,12 @@ class AudioManager {
   _fadeInMusic(duration) {
     this.isFading = true;
     const startTime = Date.now();
-    const step = 50; // ms entre pasos
+    const step = 50;
 
     const fadeInterval = setInterval(() => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      
+
       this.currentVolume = 0.5 * progress;
       this.bgMusic.volume = this.currentVolume;
 
@@ -178,6 +202,8 @@ class AudioManager {
 
   /**
    * Hacer fade out de la música actual
+   * @param {number} duration - Duración en ms
+   * @returns {Promise}
    */
   fadeOut(duration = 2000) {
     return new Promise((resolve) => {
@@ -193,7 +219,7 @@ class AudioManager {
       const fadeInterval = setInterval(() => {
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        
+
         this.currentVolume = startVolume * (1 - progress);
         this.bgMusic.volume = this.currentVolume;
 
@@ -226,11 +252,15 @@ class AudioManager {
    */
   resumeMusic() {
     if (!this.isPlaying && this.currentTrach) {
-      this.bgMusic.play().catch(err => {
-        console.error('Error reanudando música:', err);
-      });
-      this.isPlaying = true;
-      this._updateUI();
+      this.bgMusic
+        .play()
+        .then(() => {
+          this.isPlaying = true;
+          this._updateUI();
+        })
+        .catch((err) => {
+          console.error('Error reanudando música:', err);
+        });
     }
   }
 
@@ -247,9 +277,11 @@ class AudioManager {
 
   /**
    * Establecer volumen de música (0-1)
+   * @param {number} value
    */
   setVolume(value) {
-    const vol = Math.Max(0, Math.min(1, value));
+    // ⚠ Corrección: Math.max (no Math.Max)
+    const vol = Math.max(0, Math.min(1, value));
     this.targetVolume = vol;
     this.bgMusic.volume = vol;
     this.currentVolume = vol;
@@ -259,6 +291,7 @@ class AudioManager {
 
   /**
    * Aumentar volumen
+   * @param {number} step
    */
   increaseVolume(step = 0.1) {
     this.setVolume(this.targetVolume + step);
@@ -266,6 +299,7 @@ class AudioManager {
 
   /**
    * Disminuir volumen
+   * @param {number} step
    */
   decreaseVolume(step = 0.1) {
     this.setVolume(this.targetVolume - step);
@@ -273,17 +307,18 @@ class AudioManager {
 
   /**
    * Reproducir efecto de sonido
+   * @param {string} sfxKey
    */
   playSFX(sfxKey) {
     if (!this.sfx[sfxKey]) {
-      console.warn(`SFX ${sfxKey} not found`);
+      console.warn(`SFX '${sfxKey}' no encontrado`);
       return;
     }
 
     try {
       this.sfx[sfxKey].currentTime = 0;
-      this.sfx[sfxKey].play().catch(err => {
-        console.error(`Error reproduciendo SFX ${sfxKey}:`, err);
+      this.sfx[sfxKey].play().catch((err) => {
+        console.error(`Error reproduciendo SFX '${sfxKey}':`, err);
       });
     } catch (err) {
       console.error('Error con SFX:', err);
@@ -292,6 +327,7 @@ class AudioManager {
 
   /**
    * Obtener información de la pista actual
+   * @returns {object|null}
    */
   getCurrentTrackInfo() {
     if (!this.currentTrach) return null;
@@ -307,8 +343,8 @@ class AudioManager {
         isPlaying: this.isPlaying,
         track: this.currentTrach,
         volume: this.currentVolume,
-        trackInfo: this.getCurrentTrackInfo()
-      }
+        trackInfo: this.getCurrentTrackInfo(),
+      },
     });
     document.dispatchEvent(event);
   }

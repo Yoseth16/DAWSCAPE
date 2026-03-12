@@ -1,11 +1,11 @@
 <!--
 ====================================================================
-   ___    ___   _      __ _____  ____   ___  ___   ____  ____ 
+   ___    ___   _      __ _____  ____   ___  ___   ____  ____
   / _ \  / _ \ | | /\ | |/ ___/ / ___| / _ \| _ \ | __/ |  _ \
  | | | || | | || |/  \| |\___ \ | |   | | | |  _/ | __| | | | |
  | |_| || |_| ||   /\   | __/ / | |___| |_| | |   | |___| |_| |
- \___/  \___/  |__/  \__|/___/   \____|\___/|_|   |____/|____/ 
- 
+ \___/  \___/  |__/  \__|/___/   \____|\___/|_|   |____/|____/
+
 ====================================================================
   PROYECTO    : DAWSCAPE - Escape Room Educativo
   DESARROLLO  : Alumnos de Desarrollo de Aplicaciones Web (DAW)
@@ -34,6 +34,11 @@
 
     <!-- Stacks para inyectar CSS especifico desde las vistas -->
     @stack('styles')
+
+    {{-- Base URL para el sistema de audio (necesario para asset() en JS) --}}
+    <script>
+        window.AUDIO_BASE_URL = "{{ asset('sonido') }}";
+    </script>
 
     {{-- Vite Assets (Critical for Audio System) --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])

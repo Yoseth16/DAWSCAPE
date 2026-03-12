@@ -341,6 +341,8 @@
 </head>
 <body>
 
+@include('components.game-audio-setup', ['trackKey' => 'prueba7'])
+
 <!-- HEADER CON INFO DE EQUIPO Y TIMER -->
 <div class="game-header">
   <div class="team-info">
@@ -466,28 +468,28 @@ function loadQuestion() {
   const q = questions[currentQ];
   document.getElementById('question-card').setAttribute('data-label', q.label);
   document.getElementById('riddle-box').innerText = q.riddle;
-  
+
   const inp = document.getElementById('answer-input');
   const btn = document.getElementById('verify-btn');
-  
+
   inp.value = '';
   inp.className = 'answer-input';
   inp.disabled = false;
   if(btn) btn.disabled = false;
-  
+
   document.getElementById('feedback').textContent = '';
   document.getElementById('feedback').className = 'feedback';
   document.getElementById('q-counter').textContent = `${currentQ + 1} / ${questions.length}`;
   document.getElementById('progress-fill').style.width = (currentQ / questions.length * 100) + '%';
 
-  inp.onkeydown = e => { 
+  inp.onkeydown = e => {
       if (e.key === 'Enter') {
           e.preventDefault();
-          checkAnswer(); 
+          checkAnswer();
       }
   };
   inp.focus();
-  
+
   isTransitioning = false;
 }
 
@@ -497,7 +499,7 @@ function checkAnswer() {
   const input = document.getElementById('answer-input');
   const btn = document.getElementById('verify-btn');
   const val = input.value;
-  
+
   if (!val.trim()) {
       input.classList.add('wrong');
       document.getElementById('feedback').className = 'feedback err';
@@ -533,7 +535,7 @@ function checkAnswer() {
     isTransitioning = true;
     input.disabled = true;
     if(btn) btn.disabled = true;
-    
+
     input.classList.add('wrong');
     document.getElementById('feedback').className = 'feedback err';
     document.getElementById('feedback').textContent = '[ERROR] Acceso denegado. Intuitiva incorrecta.';
