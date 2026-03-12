@@ -64,9 +64,8 @@ class QrController extends Controller
         }
 
         // Códigos secretos válidos.
-        // En lugar de exigir coincidencia exacta, comprobamos que el texto leído
-        // CONTIENE la clave esperada (para tolerar espacios/saltos de línea extras),
-        // pero garantizando que cada prueba tenga su propio código distinto.
+        // Comprobamos coincidencia exacta (tras normalización) para garantizar
+        // que cada prueba solo acepte SU QR correspondiente.
         $codigosValidos = [
             3 => 'ACCESO_FASE_3',
             4 => 'ACCESO_FASE_4',
@@ -82,7 +81,14 @@ class QrController extends Controller
 
         $claveEsperada = $codigosValidos[$prueba];
 
-        if (!str_contains($codigo, $claveEsperada)) {
+        if (!hash_equals($claveEsperada, $codigo)) {
+            Log::info('QR inválido', [
+                'prueba'             => $prueba,
+                'codigo_raw'         => $codigoRaw,
+                'codigo_raw_hex'     => bin2hex($codigoRaw),
+                'codigo_normalizado' => $codigo,
+                'esperado'           => $claveEsperada,
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Código incorrecto. Inténtalo de nuevo.',
