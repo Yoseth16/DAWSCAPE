@@ -202,29 +202,32 @@
 
   /* Play/Pause Button */
   .play-pause-btn {
-    background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 255, 136, 0.05));
-    border: 1px solid var(--music-player-border);
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.3), rgba(0, 255, 136, 0.1));
+    border: 2px solid var(--music-player-primary);
     color: var(--music-player-primary);
     cursor: pointer;
-    width: 45px;
-    height: 45px;
-    border-radius: 6px;
-    font-size: 1.2rem;
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    font-size: 1.5rem;
+    font-weight: bold;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.3), inset 0 0 10px rgba(0, 255, 136, 0.1);
+    line-height: 1;
   }
 
   .play-pause-btn:hover {
-    background: linear-gradient(135deg, rgba(0, 255, 136, 0.4), rgba(0, 255, 136, 0.15));
-    box-shadow: 0 0 25px rgba(0, 255, 136, 0.5);
-    transform: scale(1.05);
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.5), rgba(0, 255, 136, 0.25));
+    box-shadow: 0 0 30px rgba(0, 255, 136, 0.6), inset 0 0 15px rgba(0, 255, 136, 0.2);
+    transform: scale(1.08);
   }
 
   .play-pause-btn:active {
-    transform: scale(0.95);
+    transform: scale(0.92);
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.4), inset 0 0 8px rgba(0, 255, 136, 0.3);
   }
 
   /* Indicador de reproducción */
@@ -286,9 +289,9 @@
     }
 
     .play-pause-btn {
-      width: 40px;
-      height: 40px;
-      font-size: 1rem;
+      width: 44px;
+      height: 44px;
+      font-size: 1.2rem;
     }
   }
 
@@ -299,8 +302,9 @@
     }
 
     .play-pause-btn {
-      width: 50px;
-      height: 50px;
+      width: 55px;
+      height: 55px;
+      font-size: 1.8rem;
     }
   }
 
@@ -365,42 +369,52 @@
 
     // Play/Pause
     playPauseBtn.addEventListener('click', () => {
-      audioManager.togglePlayPause();
+      if (window.audioManager) {
+        window.audioManager.togglePlayPause();
+      } else {
+        console.warn('audioManager no disponible');
+      }
     });
 
     // Volume slider
     volumeSlider.addEventListener('input', (e) => {
-      const value = e.target.value / 100;
-      audioManager.setVolume(value);
+      if (window.audioManager) {
+        const value = e.target.value / 100;
+        window.audioManager.setVolume(value);
+      }
     });
 
     // Volume buttons
     volumeDown.addEventListener('click', () => {
-      audioManager.decreaseVolume(0.1);
+      if (window.audioManager) {
+        window.audioManager.decreaseVolume(0.1);
+      }
     });
 
     volumeUp.addEventListener('click', () => {
-      audioManager.increaseVolume(0.1);
+      if (window.audioManager) {
+        window.audioManager.increaseVolume(0.1);
+      }
     });
 
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
       if (e.code === 'Space' && e.target === document.body) {
         e.preventDefault();
-        audioManager.togglePlayPause();
+        if (window.audioManager) window.audioManager.togglePlayPause();
       }
       if (e.code === 'ArrowUp' && e.ctrlKey) {
         e.preventDefault();
-        audioManager.increaseVolume(0.05);
+        if (window.audioManager) window.audioManager.increaseVolume(0.05);
       }
       if (e.code === 'ArrowDown' && e.ctrlKey) {
         e.preventDefault();
-        audioManager.decreaseVolume(0.05);
+        if (window.audioManager) window.audioManager.decreaseVolume(0.05);
       }
     });
 
     // Inicialización visual
-    if (audioManager.isPlaying) {
+    if (window.audioManager && window.audioManager.isPlaying) {
       const playIcon = playPauseBtn.querySelector('.icon-play');
       const pauseIcon = playPauseBtn.querySelector('.icon-pause');
       playIcon.style.display = 'none';
