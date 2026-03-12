@@ -231,6 +231,7 @@
     outline: none;
     letter-spacing: 0;
     transition: border-color 0.2s, box-shadow 0.2s;
+    appearance: textfield;
     -moz-appearance: textfield;
     caret-color: var(--green);
   }
@@ -501,7 +502,9 @@
           oninput="handleDigitInput(this)"
           onkeydown="handleDigitKeydown(event, this)"
         >
-        <button class="hint-btn" onclick="showHint({{ $index }})">📍 Ver pista</button>
+        <div style="margin-top: 10px;">
+          <button class="hint-btn" data-hint-index="{{ $index }}" onclick="showHint(parseInt(this.getAttribute('data-hint-index')))">📍 Ver Ubicación</button>
+        </div>
       </div>
       @endforeach
     </div>
@@ -535,7 +538,7 @@
 
 <script>
 // ── CONFIG INYECTADA DESDE EL SERVIDOR ─────────────────────
-const PISTAS = @json($pistas);
+const PISTAS = JSON.parse( '{!! json_encode($pistas) !!}' );
 let intentosFallidos = parseInt("{{ $intentos_fallidos ?? 0 }}") || 0;
 
 // ── TIMER ───────────────────────────────────────────────────
@@ -599,7 +602,11 @@ function handleDigitKeydown(e, input) {
     const prev = document.getElementById('digit-' + (idx - 1));
     prev.value = '';
     prev.focus();
+  } else if (e.key === 'Backspace' && input.value !== '') {
+    // Si tiene valor, dejamos que el evento natural lo borre
+    // y no forzamos el focus al anterior a menos que ya esté vacío.
   }
+
   if (e.key === 'ArrowRight' && idx < 3) {
     e.preventDefault();
     document.getElementById('digit-' + (idx + 1)).focus();
@@ -682,7 +689,9 @@ function checkCombination() {
         btn.disabled = false;
         btn.textContent = '🔓 COMPROBAR CÓDIGO';
         isTransitioning = false;
-        document.getElementById('digit-0').focus();
+        if (document.getElementById('digit-0')) {
+          document.getElementById('digit-0').focus();
+        }
       }, 1800);
     }
   })
