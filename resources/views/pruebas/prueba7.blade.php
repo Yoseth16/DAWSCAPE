@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <title>CORTAFUEGOS | DAWSCAPE</title>
+@vite(['resources/css/app.css', 'resources/js/app.js'])
 <meta name="quiz-data" content="{{ $preguntasAsignadas->map(function($pregunta, $index) {
     return [
         'label' => '// PROTOCOLO ' . str_pad($index + 1, 2, '0', STR_PAD_LEFT),

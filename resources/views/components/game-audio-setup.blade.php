@@ -5,39 +5,27 @@
 <div id="game-audio-setup" class="game-audio-setup" data-track="{{ $trackKey }}"></div>
 
 @push('scripts')
-  <!-- Audio Manager -->
-  @vite('resources/js/audio-manager.js')
-  
-  <!-- SFX Integration -->
-  @vite('resources/js/sfx-integration.js')
-  
-  <!-- Validation SFX Helper -->
-  @vite('resources/js/validation-sfx-helper.js')
-  
   <script>
-    (function() {
+    // Esperar a que AudioManager esté disponible
+    function initializeAudio() {
       const trackKey = document.querySelector('[data-track]')?.dataset.track || '{{ $trackKey }}';
       
-      // Esperar a que AudioManager esté disponible
-      const waitForAudioManager = () => {
-        if (typeof audioManager !== 'undefined') {
-          // Iniciar música con fade in de 2 segundos
-          audioManager.playMusic(trackKey, 2000);
-          clearInterval(checkInterval);
-        }
-      };
+      if (typeof audioManager !== 'undefined') {
+        // Reproducir música con fade in de 2 segundos
+        console.log('✓ AudioManager cargado. Reproduciendo:', trackKey);
+        audioManager.playMusic(trackKey, 2000);
+      } else {
+        console.warn('⏳ AudioManager aún no disponible, esperando...');
+        setTimeout(initializeAudio, 100);
+      }
+    }
 
-      // Máximo 5 segundos esperando
-      let attempts = 0;
-      const checkInterval = setInterval(() => {
-        attempts++;
-        waitForAudioManager();
-        if (attempts > 50) clearInterval(checkInterval);
-      }, 100);
-
-      // Intentar inmediatamente también
-      waitForAudioManager();
-    })();
+    // Iniciar cuando el DOM esté listo
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeAudio);
+    } else {
+      initializeAudio();
+    }
   </script>
 @endpush
 

@@ -34,6 +34,9 @@
 
     <!-- Stacks para inyectar CSS especifico desde las vistas -->
     @stack('styles')
+
+    {{-- Vite Assets (Critical for Audio System) --}}
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
 
