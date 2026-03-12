@@ -63,15 +63,31 @@ class QrController extends Controller
             ]);
         }
 
-        // Códigos secretos válidos (dejamos la estructura por si quieres volver
-        // a activar la comprobación exacta más adelante).
-        // De momento NO bloqueamos por el valor concreto del código: el QR
-        // actúa como disparador físico siempre que la prueba anterior esté superada.
+        // Códigos secretos válidos.
+        // En lugar de exigir coincidencia exacta, comprobamos que el texto leído
+        // CONTIENE la clave esperada (para tolerar espacios/saltos de línea extras),
+        // pero garantizando que cada prueba tenga su propio código distinto.
         $codigosValidos = [
             3 => 'ACCESO_FASE_3',
             4 => 'ACCESO_FASE_4',
             5 => 'ACCESO_FASE_5',
         ];
+
+        if (!array_key_exists($prueba, $codigosValidos)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Prueba no válida.',
+            ], 422);
+        }
+
+        $claveEsperada = $codigosValidos[$prueba];
+
+        if (!str_contains($codigo, $claveEsperada)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Código incorrecto. Inténtalo de nuevo.',
+            ], 422);
+        }
 
         // Marcar validación del QR en sesión (sin romper el resto del juego)
         // - `prueba_X_completada`: usado por este validador QR
