@@ -63,34 +63,15 @@ class QrController extends Controller
             ]);
         }
 
-        // Códigos secretos válidos (SOLO backend)
+        // Códigos secretos válidos (dejamos la estructura por si quieres volver
+        // a activar la comprobación exacta más adelante).
+        // De momento NO bloqueamos por el valor concreto del código: el QR
+        // actúa como disparador físico siempre que la prueba anterior esté superada.
         $codigosValidos = [
             3 => 'ACCESO_FASE_3',
             4 => 'ACCESO_FASE_4',
             5 => 'ACCESO_FASE_5',
         ];
-
-        if (!array_key_exists($prueba, $codigosValidos)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Prueba no válida.',
-            ], 422);
-        }
-
-        if (!hash_equals($codigosValidos[$prueba], $codigo)) {
-            // Log de diagnóstico (solo servidor) para ver qué está llegando realmente
-            Log::info('QR inválido', [
-                'prueba' => $prueba,
-                'codigo_raw' => $codigoRaw,
-                'codigo_raw_hex' => bin2hex($codigoRaw),
-                'codigo_normalizado' => $codigo,
-                'esperado' => $codigosValidos[$prueba],
-            ]);
-            return response()->json([
-                'success' => false,
-                'message' => 'Código incorrecto. Inténtalo de nuevo.',
-            ], 422);
-        }
 
         // Marcar validación del QR en sesión (sin romper el resto del juego)
         // - `prueba_X_completada`: usado por este validador QR
