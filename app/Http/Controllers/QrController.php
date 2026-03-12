@@ -59,7 +59,7 @@ class QrController extends Controller
         if (session()->get($keyActualCompletada, false)) {
             return response()->json([
                 'success' => true,
-                'redirect_url' => route('prueba' . ($prueba + 1)),
+                'redirect_url' => $this->redirectUrlParaPrueba($prueba),
             ]);
         }
 
@@ -83,8 +83,22 @@ class QrController extends Controller
 
         return response()->json([
             'success' => true,
-            'redirect_url' => route('prueba' . ($prueba + 1)),
+            'redirect_url' => $this->redirectUrlParaPrueba($prueba),
         ]);
+    }
+
+    /**
+     * Determina a qué ruta debe ir el alumno tras validar el QR
+     * de cada prueba.
+     */
+    private function redirectUrlParaPrueba(int $prueba): string
+    {
+        return match ($prueba) {
+            3 => route('juego.maquina-cafe'),
+            4 => route('juego.maquina-snacks'),
+            5 => route('juego.taquillas'),
+            default => route('prueba' . ($prueba + 1)),
+        };
     }
 
 

@@ -82,6 +82,36 @@ Route::post('/validar-codigo-qr', [QrController::class, 'validar'])
     ->name('qr.validar');
 
 
+// Vistas de juego para las máquinas físicas (alumnos, sin panel admin)
+Route::middleware(['check.fase'])->group(function () {
+    Route::get('/juego/maquina-cafe', function () {
+        $timerService = app(\App\Services\GameTimerService::class);
+        $tiempo_transcurrido = $timerService->obtenerTiempoTranscurrido();
+        $titulo_prueba = 'Máquina de Café';
+        $identificador = 'fase3';
+
+        return view('qr.maquina-cafe', compact('tiempo_transcurrido', 'titulo_prueba', 'identificador'));
+    })->name('juego.maquina-cafe');
+
+    Route::get('/juego/maquina-snacks', function () {
+        $timerService = app(\App\Services\GameTimerService::class);
+        $tiempo_transcurrido = $timerService->obtenerTiempoTranscurrido();
+        $titulo_prueba = 'Máquina Oasis';
+        $identificador = 'fase4';
+
+        return view('qr.maquina-snacks', compact('tiempo_transcurrido', 'titulo_prueba', 'identificador'));
+    })->name('juego.maquina-snacks');
+
+    Route::get('/juego/taquillas', function () {
+        $timerService = app(\App\Services\GameTimerService::class);
+        $tiempo_transcurrido = $timerService->obtenerTiempoTranscurrido();
+        $titulo_prueba = 'Protocolo Espejo';
+        $identificador = 'fase5';
+
+        return view('qr.taquillas', compact('tiempo_transcurrido', 'titulo_prueba', 'identificador'));
+    })->name('juego.taquillas');
+});
+
 // ==========================================
 // ZONA PRIVADA - PANEL DE PROFESORES
 // ==========================================
