@@ -32,22 +32,27 @@ class QrController extends Controller
         $codigo = trim($data['codigo']);
         $prueba = (int) $data['prueba'];
 
-        // Anti-salto: exigir que la prueba anterior esté completada en sesión
-        // (para Prueba 3 exige prueba_2_completada, etc.)
-        $pruebaAnterior = $prueba - 1;
-        if ($pruebaAnterior >= 1) {
-            $keyAnterior = 'prueba_' . $pruebaAnterior . '_completada';
-            if (!session()->get($keyAnterior, false)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No tienes acceso a esta prueba todavía. Completa la prueba anterior.',
-                ], 403);
-            }
+        // Anti-salto: alinear con las claves reales de progreso del JuegoController
+        // (prueba2yoseth_superada, prueba3angel_superada, etc.)
+        $keysSuperada = [
+            1 => 'prueba1mario_superada',
+            2 => 'prueba2yoseth_superada',
+            3 => 'prueba3angel_superada',
+            4 => 'prueba4arturo_superada',
+            5 => 'prueba5eloy_superada',
+        ];
+
+        $keyAnteriorSuperada = $keysSuperada[$prueba - 1] ?? null;
+        if ($keyAnteriorSuperada && !session()->get($keyAnteriorSuperada, false)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No tienes acceso a esta prueba todavía. Completa la prueba anterior.',
+            ], 403);
         }
 
-        // Si ya estaba completada, devolvemos éxito idempotente
-        $keyActual = 'prueba_' . $prueba . '_completada';
-        if (session()->get($keyActual, false)) {
+        // Si ya se validó este QR antes, devolvemos éxito idempotente
+        $keyActualCompletada = 'prueba_' . $prueba . '_completada';
+        if (session()->get($keyActualCompletada, false)) {
             return response()->json([
                 'success' => true,
                 'redirect_url' => route('prueba' . ($prueba + 1)),
@@ -75,8 +80,10 @@ class QrController extends Controller
             ], 422);
         }
 
-        // Marcar completada en sesión
-        session([$keyActual => true]);
+        // Marcar validación del QR en sesión (sin romper el resto del juego)
+        // - `prueba_X_completada`: usado por este validador QR
+        // - además, por compatibilidad, marcamos "superada" de la prueba anterior si corresponde
+        session([$keyActualCompletada => true]);
 
         // (Opcional) Persistencia en BBDD si existe un modelo/tabla de progreso:
         // - Puedes integrarlo aquí (GameState/Progress) usando auth()->id()
