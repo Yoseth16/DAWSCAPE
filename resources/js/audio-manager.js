@@ -366,3 +366,6 @@ audioManager.restoreSettings();
 
 // Hacer disponible globalmente en window
 window.audioManager = audioManager;
+
+// Notificar a los componentes Blade que ya pueden usar audioManager
+document.dispatchEvent(new Event('audioManagerReady'));

@@ -29,8 +29,8 @@
          */
         function initializeAudio() {
             if (!window.audioManager) {
-                // AudioManager aún no disponible (Vite async), reintenta
-                setTimeout(initializeAudio, 100);
+                // AudioManager aún no disponible (Vite async), esperar al evento
+                document.addEventListener('audioManagerReady', initializeAudio, { once: true });
                 return;
             }
 
