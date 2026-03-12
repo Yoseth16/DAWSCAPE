@@ -224,6 +224,11 @@
     });
 
     btn.addEventListener('click', function() {
+        // Reproducir sonido del botón de pista
+        if (typeof audioManager !== 'undefined') {
+          audioManager.playSFX('hint');
+        }
+
         // Si ya está abierto, cerrar
         if (overlay.classList.contains('visible')) { cerrarBocadillo(); return; }
 
