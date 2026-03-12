@@ -377,6 +377,73 @@ const TIEMPO_MAXIMO_MINUTOS = 90; // Cambiar según necesidad
 
 ---
 
+## 🎵 Sistema de Audio
+
+DAWSCAPE incluye un sistema de audio completo que reproduce música de fondo distinta en cada prueba, efectos de sonido (SFX) y un reproductor mini visible en pantalla.
+
+### Archivos de Audio
+
+Todos los archivos de audio se encuentran en `public/sonido/`:
+
+| Archivo | Uso |
+|---------|-----|
+| `MusicaMenuLogin.mp3` | Pantalla de inicio / login |
+| `Prueba1-suspiro.mp3` → `Prueba10-DanzaKuduroRPG.mp3` | Música de fondo de cada prueba |
+| `FinalVictoria.mp3` | Pantalla de victoria final |
+| `Acierto.mp3` | SFX respuesta correcta |
+| `Error.mp3` | SFX respuesta incorrecta |
+| `Boton-Pista.mp3` | SFX botón de pista |
+
+### Arquitectura del Sistema
+
+```
+resources/js/audio-manager.js       ← Clase AudioManager (instancia global window.audioManager)
+resources/js/sfx-integration.js     ← Dispara SFX en eventos de validación
+resources/views/components/
+  ├── game-audio-setup.blade.php    ← Inicializa música por prueba + autoplay unlock
+  └── music-player.blade.php        ← Reproductor mini (play/pause, volumen)
+```
+
+### Cómo añadir música a una nueva prueba
+
+1. Copiar el archivo `.mp3` a `public/sonido/`.
+2. Registrar la pista en `resources/js/audio-manager.js`:
+
+```js
+this.tracks = {
+  // ...
+  miPrueba: {
+    file: 'MiAudio.mp3',
+    title: 'Título visible en el reproductor',
+  },
+};
+```
+
+3. Incluir el componente de audio en la vista correspondiente:
+
+```blade
+@include('components.game-audio-setup', ['trackKey' => 'miPrueba'])
+```
+
+### Autoplay y políticas de navegador
+
+Los navegadores modernos bloquean el autoplay de audio sin interacción previa del usuario. El sistema gestiona esto automáticamente:
+
+- Si el autoplay está permitido → la música arranca con fade-in de 2 segundos al cargar la página.
+- Si el autoplay está bloqueado → aparece un banner verde en la parte superior: *"🔇 Haz clic en cualquier lugar para activar la música"*. La música arranca en el primer `click`, `touchstart` o `keydown` del usuario y el banner desaparece con transición suave.
+
+### Fixes aplicados (commit `92f5402`)
+
+| Problema | Causa | Solución |
+|----------|-------|----------|
+| Error 404 en archivos de audio | Rutas `/sonido/...` hardcodeadas que fallaban fuera del dominio raíz | `window.AUDIO_BASE_URL` inyectado con `asset('sonido')` desde Blade; `AudioManager._url()` construye URLs dinámicamente |
+| Música no arrancaba en ninguna prueba | `@push('scripts')` en `game-audio-setup.blade.php` se descartaba silenciosamente (vistas standalone sin `@stack`) | El `<script>` de inicialización ahora es **directo**, no usa `@push` |
+| `setVolume()` lanzaba excepción | `Math.Max` (M mayúscula) no existe en JS | Corregido a `Math.max` |
+| `prueba7` sin música | Faltaba el `@include` del componente de audio | Añadido `@include('components.game-audio-setup', ['trackKey' => 'prueba7'])` |
+| Sin feedback de autoplay bloqueado | No había indicador visual | Banner automático con instrucción al usuario |
+
+---
+
 ## 🐛 Solución de Problemas
 
 ### Error: "Class 'SimpleSoftwareIO\QrCode\Facades\QrCode' not found"
