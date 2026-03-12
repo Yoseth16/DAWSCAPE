@@ -8,8 +8,8 @@
  * Uso: triggerValidationSuccess();
  */
 function triggerValidationSuccess() {
-  if (typeof audioManager !== 'undefined') {
-    audioManager.playSFX('correct');
+  if (window.audioManager) {
+    window.audioManager.playSFX('correct');
   }
   document.dispatchEvent(new CustomEvent('validation:correct'));
 }
@@ -19,8 +19,8 @@ function triggerValidationSuccess() {
  * Uso: triggerValidationError();
  */
 function triggerValidationError() {
-  if (typeof audioManager !== 'undefined') {
-    audioManager.playSFX('error');
+  if (window.audioManager) {
+    window.audioManager.playSFX('error');
   }
   document.dispatchEvent(new CustomEvent('validation:error'));
 }

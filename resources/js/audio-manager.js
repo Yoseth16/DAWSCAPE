@@ -327,3 +327,6 @@ class AudioManager {
 // Instancia global
 const audioManager = new AudioManager();
 audioManager.restoreSettings();
+
+// Hacer disponible globalmente en window
+window.audioManager = audioManager;

@@ -6,14 +6,14 @@
 
 @push('scripts')
   <script>
-    // Esperar a que AudioManager esté disponible
+    // Esperar a que AudioManager esté disponible globalmente
     function initializeAudio() {
       const trackKey = document.querySelector('[data-track]')?.dataset.track || '{{ $trackKey }}';
       
-      if (typeof audioManager !== 'undefined') {
+      if (window.audioManager) {
         // Reproducir música con fade in de 2 segundos
         console.log('✓ AudioManager cargado. Reproduciendo:', trackKey);
-        audioManager.playMusic(trackKey, 2000);
+        window.audioManager.playMusic(trackKey, 2000);
       } else {
         console.warn('⏳ AudioManager aún no disponible, esperando...');
         setTimeout(initializeAudio, 100);

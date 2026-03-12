@@ -20,17 +20,17 @@
     const pistaBtn = document.getElementById('pistaBtn');
     if (pistaBtn) {
       pistaBtn.addEventListener('click', () => {
-        audioManager.playSFX('hint');
+        if (window.audioManager) window.audioManager.playSFX('hint');
       });
     }
 
     // Escuchar eventos de validación en el documento
     document.addEventListener('validation:correct', () => {
-      audioManager.playSFX('correct');
+      if (window.audioManager) window.audioManager.playSFX('correct');
     });
 
     document.addEventListener('validation:error', () => {
-      audioManager.playSFX('error');
+      if (window.audioManager) window.audioManager.playSFX('error');
     });
 
     // Buscar elementos con data-sfx
@@ -40,7 +40,7 @@
         if (sfxType === 'check' && shouldPlayCheckSound(e)) {
           // El sonido se reproducirá según la validación (correct/error)
         } else if (sfxType === 'hint') {
-          audioManager.playSFX('hint');
+          if (window.audioManager) window.audioManager.playSFX('hint');
         }
       });
     });
