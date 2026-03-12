@@ -44,11 +44,11 @@ function updateKeysInscritos(data) {
     }
 
     // Actualizar panel de inscripciones pendientes
-    const inscripcionesPanel = document.querySelector('[style*="border-left: 4px solid"]');
+    const inscripcionesPanel = document.getElementById('inscripciones-panel');
     if (inscripcionesPanel) {
         if (data.no_iniciados > 0) {
             const listContainer = inscripcionesPanel.querySelector('.podium-list');
-            if (listContainer) {
+             if (listContainer) {
                 let html = '';
                 data.inscripciones_pendientes.forEach(insc => {
                     const csrfToken = document.querySelector('meta[name=csrf-token]').content;
@@ -77,7 +77,7 @@ function updateKeysInscritos(data) {
                 });
                 listContainer.innerHTML = html;
                 inscripcionesPanel.style.display = 'block';
-            }
+             }
         } else {
             // Ocultar panel si no hay inscritos pendientes
             inscripcionesPanel.style.display = 'none';
@@ -109,14 +109,24 @@ function updateTable(partidas) {
             const isVisible = (p.nombre_equipo + p.email + p.clase).toLowerCase().includes(searchVal);
             const displayStyle = isVisible ? '' : 'style="display:none"';
 
-            let statusHtml = '';
-            if (p.fase_actual === 'FINALIZADO') {
-                statusHtml = '<span class="status-pill status-success"><i class="ph-fill ph-check-circle"></i> COMPLETADO</span>';
-            } else if (p.fase_actual === 'FINALIZADO_TIMEOUT') {
-                statusHtml = '<span class="status-pill status-danger"><i class="ph-fill ph-clock"></i> TIMEOUT</span>';
-            } else {
-                statusHtml = `<span class="status-pill status-warning"><i class="ph-fill ph-spinner-gap" style="animation: spin 2s linear infinite;"></i> ${p.fase_actual.toUpperCase()}</span>`;
-            }
+            const badges = {
+                'Prueba 1 Mario': { bg: '#dbeafe', color: '#1d4ed8', icon: 'ph-spinner-gap' },
+                'Prueba 2 Yoseth': { bg: '#f3e8ff', color: '#6d28d9', icon: 'ph-spinner-gap' },
+                'Prueba 3 Angel': { bg: '#ffedd5', color: '#c2410c', icon: 'ph-spinner-gap' },
+                'Prueba 4 Arturo': { bg: '#fee2e2', color: '#b91c1c', icon: 'ph-spinner-gap' },
+                'Prueba 5 Eloy': { bg: '#cffafe', color: '#0e7490', icon: 'ph-spinner-gap' },
+                'Prueba 6 Migue': { bg: '#fef08a', color: '#a16207', icon: 'ph-spinner-gap' },
+                'Prueba 7 Dinamica': { bg: '#dcfce7', color: '#15803d', icon: 'ph-spinner-gap' },
+                'Prueba 8': { bg: '#fce7f3', color: '#be185d', icon: 'ph-spinner-gap' },
+                'FINALIZADO': { bg: '#d1fae5', color: '#047857', icon: 'ph-check-circle' },
+                'FINALIZADO_TIMEOUT': { bg: '#f3f4f6', color: '#374151', icon: 'ph-clock' }
+            };
+            const badge = badges[p.fase_actual] || { bg: '#f1f5f9', color: '#475569', icon: 'ph-spinner-gap' };
+            const stageText = (p.fase_actual === 'FINALIZADO') ? 'COMPLETADO' : ((p.fase_actual === 'FINALIZADO_TIMEOUT') ? 'TIMEOUT' : p.fase_actual.toUpperCase());
+            const anim = badge.icon === 'ph-spinner-gap' ? 'style="animation: spin 2s linear infinite;"' : '';
+            const statusHtml = `<span class="status-pill" style="background: ${badge.bg}; color: ${badge.color}; font-weight: 600; padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 4px; box-shadow: none;">
+                <i class="ph-fill ${badge.icon}" ${anim}></i> ${stageText}
+            </span>`;
 
             let timeHtml = '';
             if (p.fase_actual === 'FINALIZADO' || p.fase_actual === 'FINALIZADO_TIMEOUT') {
@@ -126,12 +136,18 @@ function updateTable(partidas) {
                 timeHtml = `<span class="text-live">${Math.floor(p.tiempo_live / 60)}m ${Math.floor(p.tiempo_live % 60).toString().padStart(2, '0')}s</span>`;
             }
 
+            const avatarBg = p.color_hex ? p.color_hex : 'linear-gradient(135deg, #60a5fa, #3b82f6)';
+            const avatarInner = p.icono 
+                ? `<i class="ph-fill ${p.icono}"></i>` 
+                : `<span style="font-weight: bold; font-size: 1.2rem;">${p.avatar}</span>`;
+            const avatarHtml = `<div class="avatar" style="background: ${avatarBg}; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; color: white;">${avatarInner}</div>`;
+
             newHtml += `
             <tr class="team-row" ${displayStyle}>
                 <td style="color:var(--text-muted); font-weight:600;">#${p.id}</td>
                 <td>
                     <div class="team-cell">
-                        <div class="avatar">${p.avatar}</div>
+                        ${avatarHtml}
                         <div class="team-meta">
                             <div class="t-name">${p.nombre_equipo}</div>
                             <div class="t-email">${p.email}</div>

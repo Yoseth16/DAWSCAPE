@@ -133,14 +133,13 @@ class JuegoController extends Controller
     {
         $redirDestino = $request->input('redirect_to');
 
-        // Buscar la inscripción que coincida exactamente con los 3 datos
+        // Buscar la inscripción que coincida exactamente con los 2 datos (correo y código de acceso)
         $inscripcion = Inscripcion::where('correo', $request->correo)
-            ->where('nombre_equipo', $request->nombre_equipo)
             ->where('codigo_acceso', strtoupper($request->codigo_acceso))
             ->first();
 
         if (!$inscripcion) {
-            return back()->with('error', 'Datos incorrectos o código inválido. Verifica tu correo, nombre de equipo y código de acceso.');
+            return back()->with('error', 'Datos incorrectos o código inválido. Verifica tu correo y código de acceso.');
         }
 
         // ── RECONEXIÓN: el equipo ya existe, solo restauramos la sesión ────
@@ -166,24 +165,27 @@ class JuegoController extends Controller
                 'FINALIZADO' => 8
             ];
 
-            $nivelActual = $fasesOrdenadas[$partidaExistente->fase_actual] ?? 1;
+            $faseActualDBNormalizada = ucwords(strtolower(trim($partidaExistente->fase_actual ?? '')));
+            $nivelDB = $fasesOrdenadas[$faseActualDBNormalizada] ?? 0;
 
-            if ($nivelActual > 1) session(['prueba1mario_superada' => true]);
-            if ($nivelActual > 2) session(['prueba2yoseth_superada' => true]);
-            if ($nivelActual > 3) {
-                session(['prueba3angel_superada' => true]);
-                session(['prueba_3_completada' => true]);
+            foreach ($fasesOrdenadas as $faseNombre => $nivel) {
+                if ($nivel < $nivelDB) {
+                    $slugFase = \Illuminate\Support\Str::slug(strtolower($faseNombre), '');
+                    session(['prueba' . $nivel . $slugFase . '_superada' => true]);
+                }
             }
-            if ($nivelActual > 4) {
-                session(['prueba4arturo_superada' => true]);
-                session(['prueba_4_completada' => true]);
+
+            // Actualizar avatar o color si el jugador lo seleccionó en el form (opcional)
+            $updateData = [];
+            if ($request->filled('icono')) {
+                $updateData['icono'] = $request->icono;
             }
-            if ($nivelActual > 5) {
-                session(['prueba5eloy_superada' => true]);
-                session(['prueba_5_completada' => true]);
+            if ($request->filled('color_hex')) {
+                $updateData['color_hex'] = $request->color_hex;
             }
-            if ($nivelActual > 6) session(['prueba6migue_superada' => true]);
-            if ($nivelActual > 7) session(['prueba7dinamica_superada' => true]);
+            if (!empty($updateData)) {
+                $partidaExistente->update($updateData);
+            }
 
             // Redirigimos al QR (o a la prueba correspondiente)
             if ($redirDestino && str_starts_with($redirDestino, '/')) {
@@ -200,7 +202,7 @@ class JuegoController extends Controller
                     7 => route('prueba7'),
                     8 => route('final'),
                 ];
-                $destino = $destinos[$nivelActual] ?? route('prueba1');
+                $destino = $destinos[$nivelDB] ?? route('prueba1');
             }
 
             return redirect($destino);
@@ -208,12 +210,15 @@ class JuegoController extends Controller
 
         // ── REGISTRO NUEVO ────────────────────────────────────────────────
         Partida::create([
+            'uuid'              => (string) \Illuminate\Support\Str::uuid(),
             'email'             => $inscripcion->correo,
             'nombre_equipo'     => $inscripcion->nombre_equipo,
             'clase'             => $inscripcion->clase,
             'fase_actual'       => 'Prueba 1 Mario',
             'tiempo_segundos'   => 0,
-            'inicio_juego'      => Carbon::now()
+            'inicio_juego'      => Carbon::now(),
+            'icono'             => $request->input('icono', 'ph-first-aid'),
+            'color_hex'         => $request->input('color_hex', '#00ff88'),
         ]);
 
         session([

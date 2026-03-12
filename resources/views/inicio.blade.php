@@ -261,7 +261,6 @@
 
 <div class="screen">
   <div class="logo">DAWSCAPE</div>
-  <div class="subtitle">// AULA 115 · SISTEMA DE ESCAPE_</div>
   <div class="glitch-text">ACCESO RESTRINGIDO. IDENTIFÍQUESE.</div>
 
   <!-- BANNER INFORMATIVO -->
@@ -291,10 +290,37 @@
         <span class="helper-text">* Solo se permite el dominio @estudiante.xtart.com</span>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">NOMBRE DEL EQUIPO</label>
-        <input type="text" name="nombre_equipo" class="form-control" placeholder="Ej: Los Hackers" required autocomplete="off">
-        <span class="helper-text">Tal como lo registraste en la inscripción</span>
+      <input type="hidden" name="icono" id="icono_input" value="ph-first-aid">
+      <input type="hidden" name="color_hex" id="color_input" value="#00ff88">
+
+      <!-- SELECCIÓN DE AVATAR -->
+      <div class="form-group" style="margin-top: 1.5rem;">
+        <label class="form-label">SELECCIONA TU AVATAR</label>
+        <div class="grid-selector" id="icon-selector">
+          <div class="icon-btn active" data-val="ph-first-aid" title="Primeros Auxilios (Sanidad)"><i class="ph ph-first-aid"></i></div>
+          <div class="icon-btn" data-val="ph-heartbeat" title="Cardiología (Sanidad)"><i class="ph ph-heartbeat"></i></div>
+          <div class="icon-btn" data-val="ph-tooth" title="Odontólogo (Dentistas)"><i class="ph ph-tooth"></i></div>
+          <div class="icon-btn" data-val="ph-pill" title="Farmacia (Parafarmacia)"><i class="ph ph-pill"></i></div>
+          <div class="icon-btn" data-val="ph-fire-extinguisher" title="Extintor (Emergencias)"><i class="ph ph-fire-extinguisher"></i></div>
+          <div class="icon-btn" data-val="ph-siren" title="Ambulancia (Protección Civil)"><i class="ph ph-siren"></i></div>
+          <div class="icon-btn" data-val="ph-megaphone" title="Megáfono (Marketing)"><i class="ph ph-megaphone"></i></div>
+          <div class="icon-btn" data-val="ph-chart-line-up" title="Crecimiento (Marketing)"><i class="ph ph-chart-line-up"></i></div>
+        </div>
+      </div>
+
+      <!-- SELECCIÓN DE COLOR NEÓN -->
+      <div class="form-group" style="margin-top: 1rem; margin-bottom: 2.5rem;">
+        <label class="form-label">IDENTIFICADOR DE COLOR</label>
+        <div class="grid-selector" id="color-selector">
+          <div class="color-btn active" data-val="#00ff88" style="background:#00ff88;"></div>
+          <div class="color-btn" data-val="#00ffff" style="background:#00ffff;"></div>
+          <div class="color-btn" data-val="#ff00ff" style="background:#ff00ff;"></div>
+          <div class="color-btn" data-val="#ff2244" style="background:#ff2244;"></div>
+          <div class="color-btn" data-val="#ffcc00" style="background:#ffcc00;"></div>
+          <div class="color-btn" data-val="#b300ff" style="background:#b300ff;"></div>
+          <div class="color-btn" data-val="#ff6600" style="background:#ff6600;"></div>
+          <div class="color-btn" data-val="#ffffff" style="background:#ffffff;"></div>
+        </div>
       </div>
 
       <div class="form-group">
@@ -328,6 +354,29 @@
     c.appendChild(p);
   }
 })();
+
+// Lógica de Selectores (Icono y Color)
+const iconBtns = document.querySelectorAll('#icon-selector .icon-btn');
+const iconInput = document.getElementById('icono_input');
+
+iconBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    iconBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    iconInput.value = btn.getAttribute('data-val');
+  });
+});
+
+const colorBtns = document.querySelectorAll('#color-selector .color-btn');
+const colorInput = document.getElementById('color_input');
+
+colorBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    colorBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    colorInput.value = btn.getAttribute('data-val');
+  });
+});
 </script>
 <!-- Firma discreta -->
 <div style="position: fixed; bottom: 5px; right: 10px; font-family: monospace; font-size: 0.65rem; color: rgba(255, 255, 255, 0.3); z-index: 9999; text-align: right;">

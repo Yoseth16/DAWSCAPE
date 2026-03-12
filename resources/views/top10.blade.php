@@ -794,7 +794,7 @@
                     <div class="list-info">
                         <div class="list-heading">
                             <span class="list-terminal-prefix">user@dawscape:~$</span>
-                            <h4 style="color: ${colorCode};">${team.nombre_equipo} ${renderMedals(team.logros)} ${team.abandonado ? '(TIMEOUT)' : ''}</h4>
+                            <h4 style="color: ${colorCode};"><i class="ph-fill ${team.icono || 'ph-users'}" style="margin-right:8px; font-size:1.1em; vertical-align:middle;"></i>${team.nombre_equipo} ${renderMedals(team.logros)} ${team.abandonado ? '(TIMEOUT)' : ''}</h4>
                         </div>
                         <div class="list-phase">
                             <i class="ph ${team.abandonado ? 'ph-x-circle' : 'ph-spinner-gap ph-spin'}"></i>
@@ -863,7 +863,7 @@
                 <div class="podium-card ${rank===1 ? 'p1-card' : ''}" style="border-color: ${team.color_hex}80;">
                     ${badge}
                     <div style="font-size: 3rem; margin-bottom: 5px; color: ${team.color_hex}; text-shadow: 0 0 15px ${team.color_hex}80;"><i class="ph ${team.icono}"></i></div>
-                    <div class="podium-name" style="color: ${team.color_hex};">${team.nombre_equipo}</div>
+                    <div class="podium-name" style="color: ${team.color_hex};"><i class="ph-fill ${team.icono || 'ph-users'}" style="margin-right:5px;"></i>${team.nombre_equipo}</div>
                     <div style="margin-bottom: 15px;">${renderMedals(team.logros)}</div>
                     <div class="podium-time">${team.tiempo_formateado}</div>
                     ${gap}

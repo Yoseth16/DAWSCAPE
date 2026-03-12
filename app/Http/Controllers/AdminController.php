@@ -131,8 +131,8 @@ class AdminController extends Controller
                     'fase_actual' => $p->fase_actual,
                     'tiempo_segundos' => (int)$p->tiempo_segundos,
                     'tiempo_live' => $segsLive,
-                    'color_hex' => $p->color_hex ?? '#3b82f6',
-                    'icono' => $p->icono ?? 'ph-user-focus',
+                    'color_hex' => $p->color_hex,
+                    'icono' => $p->icono,
                     'logros' => $p->logros ?? [],
                     'avatar' => strtoupper(substr($p->nombre_equipo, 0, 1)),
                     'pistas_count' => $pistasCount

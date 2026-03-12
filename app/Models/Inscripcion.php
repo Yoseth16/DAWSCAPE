@@ -18,6 +18,7 @@ class Inscripcion extends Model
         'clase',
         'qr_token',
         'codigo_acceso',
+        'aceptado_manualmente',
     ];
 
     /**

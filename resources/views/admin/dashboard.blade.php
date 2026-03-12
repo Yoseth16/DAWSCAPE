@@ -248,7 +248,7 @@
 
         <!-- NUEVA SECCIÓN: INSCRIPCIONES PENDIENTES -->
         @if($inscritosNoIniciados > 0)
-        <div class="glass-panel" style="margin-bottom: 2.5rem; border-left: 4px solid #3b82f6;">
+        <div class="glass-panel" id="inscripciones-panel" style="margin-bottom: 2.5rem; border-left: 4px solid #3b82f6;">
             <div class="panel-heading"><i class="ph ph-clipboard-text"></i> Equipos Inscritos (Sin Iniciar)</div>
             <div style="max-height: 400px; overflow-y: auto; border-radius: 0 0 12px 12px;">
                 <div class="podium-list" style="margin: 0;">
@@ -352,8 +352,15 @@
                         <td style="color:var(--text-muted); font-weight:600;">#{{ str_pad($partida->id, 3, '0', STR_PAD_LEFT) }}</td>
                         <td>
                             <div class="team-cell">
-                                <div class="avatar">
-                                    {{ strtoupper(substr($partida->nombre_equipo, 0, 1)) }}
+                                @php
+                                    $bgAvatar = $partida->color_hex ? $partida->color_hex : 'linear-gradient(135deg, #60a5fa, #3b82f6)';
+                                @endphp
+                                <div class="avatar" style="background: {{ $bgAvatar }}; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; color: white;">
+                                    @if($partida->icono)
+                                        <i class="ph-fill {{ $partida->icono }}"></i>
+                                    @else
+                                        <span style="font-weight: bold; font-size: 1.2rem;">{{ strtoupper(substr($partida->nombre_equipo, 0, 1)) }}</span>
+                                    @endif
                                 </div>
                                 <div class="team-meta">
                                     <div class="t-name">{{ $partida->nombre_equipo }}</div>
@@ -363,13 +370,26 @@
                         </td>
                         <td><span style="background:#f1f5f9; padding:4px 10px; border-radius:6px; font-size:0.85rem; font-weight:600; color:var(--text-muted);">{{ $partida->clase }}</span></td>
                         <td>
-                            @if($partida->fase_actual === 'FINALIZADO')
-                                <span class="status-pill status-success"><i class="ph-fill ph-check-circle"></i> COMPLETADO</span>
-                            @elseif($partida->fase_actual === 'FINALIZADO_TIMEOUT')
-                                <span class="status-pill status-danger"><i class="ph-fill ph-clock"></i> TIMEOUT</span>
-                            @else
-                                <span class="status-pill status-warning"><i class="ph-fill ph-spinner-gap" style="animation: spin 2s linear infinite;"></i> {{ strtoupper($partida->fase_actual) }}</span>
-                            @endif
+                            @php
+                                $badges = [
+                                    'Prueba 1 Mario' => ['bg' => '#dbeafe', 'color' => '#1d4ed8', 'icon' => 'ph-spinner-gap'],
+                                    'Prueba 2 Yoseth' => ['bg' => '#f3e8ff', 'color' => '#6d28d9', 'icon' => 'ph-spinner-gap'],
+                                    'Prueba 3 Angel' => ['bg' => '#ffedd5', 'color' => '#c2410c', 'icon' => 'ph-spinner-gap'],
+                                    'Prueba 4 Arturo' => ['bg' => '#fee2e2', 'color' => '#b91c1c', 'icon' => 'ph-spinner-gap'],
+                                    'Prueba 5 Eloy' => ['bg' => '#cffafe', 'color' => '#0e7490', 'icon' => 'ph-spinner-gap'],
+                                    'Prueba 6 Migue' => ['bg' => '#fef08a', 'color' => '#a16207', 'icon' => 'ph-spinner-gap'],
+                                    'Prueba 7 Dinamica' => ['bg' => '#dcfce7', 'color' => '#15803d', 'icon' => 'ph-spinner-gap'],
+                                    'Prueba 8' => ['bg' => '#fce7f3', 'color' => '#be185d', 'icon' => 'ph-spinner-gap'],
+                                    'FINALIZADO' => ['bg' => '#d1fae5', 'color' => '#047857', 'icon' => 'ph-check-circle'],
+                                    'FINALIZADO_TIMEOUT' => ['bg' => '#f3f4f6', 'color' => '#374151', 'icon' => 'ph-clock']
+                                ];
+                                $badge = $badges[$partida->fase_actual] ?? ['bg' => '#f1f5f9', 'color' => '#475569', 'icon' => 'ph-spinner-gap'];
+                                $stageText = match($partida->fase_actual) { 'FINALIZADO' => 'COMPLETADO', 'FINALIZADO_TIMEOUT' => 'TIMEOUT', default => strtoupper($partida->fase_actual) };
+                            @endphp
+                            <span class="status-pill" style="background: {{ $badge['bg'] }}; color: {{ $badge['color'] }}; font-weight: 600; padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 4px; box-shadow: none;">
+                                <i class="ph-fill {{ $badge['icon'] }}" @if($badge['icon'] === 'ph-spinner-gap') style="animation: spin 2s linear infinite;" @endif></i> 
+                                {{ $stageText }}
+                            </span>
                         </td>
                         <td class="time-display">
                             @if($partida->fase_actual === 'FINALIZADO' || $partida->fase_actual === 'FINALIZADO_TIMEOUT')

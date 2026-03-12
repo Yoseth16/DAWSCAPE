@@ -26,20 +26,17 @@ class EmpezarPartidaRequest extends FormRequest
                     // Validar que el correo esté inscrito
                     $inscripcion = Inscripcion::where('correo', $value)->first();
                     if (!$inscripcion) {
-                        $fail('¡Tu correo no está registrado! Dirígete a /inscripción primero.');
+                        return $fail('¡Tu correo no está registrado! Dirígete a /inscripción primero.');
                     }
                 },
             ],
-            'nombre_equipo' => [
-                'required',
-                'min:2',
-                function ($attribute, $value, $fail) {
-                    // Validar que exista en inscripciones
-                    $inscripcion = Inscripcion::where('nombre_equipo', $value)->first();
-                    if (!$inscripcion) {
-                        $fail('¡El nombre del equipo no está registrado!');
-                    }
-                },
+            'icono' => [
+                'nullable',
+                'string',
+            ],
+            'color_hex' => [
+                'nullable',
+                'string',
             ],
             'codigo_acceso' => [
                 'required',
@@ -60,7 +57,6 @@ class EmpezarPartidaRequest extends FormRequest
     {
         return [
             'correo.required' => 'El correo es obligatorio.',
-            'nombre_equipo.required' => 'El nombre del equipo es obligatorio.',
             'codigo_acceso.required' => 'El código de acceso es obligatorio.',
             'codigo_acceso.size' => 'El código debe tener 6 caracteres.',
         ];
