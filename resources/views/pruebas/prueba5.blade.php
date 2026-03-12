@@ -349,6 +349,13 @@ setInterval(actualizarTimer, 1000);
 
   async function validarCodigo(decodedText) {
     setResult('Verificando código...');
+
+    if (decodedText.includes('dawscape.fun/qr/') || decodedText.includes('/qr/')) {
+        if (window.audioManager) window.audioManager.playSFX('correct');
+        window.location.href = decodedText;
+        return;
+    }
+
     try {
       const resp = await fetch('/validar-codigo-qr', {
         method: 'POST',
