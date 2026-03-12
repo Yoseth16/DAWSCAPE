@@ -90,9 +90,10 @@
 
   .subtitle {
     font-size: 0.85rem;
-    color: #007744;
+    color: #00cc66;
     letter-spacing: 0.3em;
     text-transform: uppercase;
+    text-shadow: 0 0 6px rgba(0, 204, 102, 0.2);
   }
 
   .intro-text {
@@ -180,7 +181,7 @@
     margin-bottom: 0.3rem;
   }
 
-  .lock-subtitle { font-size: 0.75rem; color: #007744; letter-spacing: 0.2em; }
+  .lock-subtitle { font-size: 0.75rem; color: #00cc66; letter-spacing: 0.2em; text-shadow: 0 0 6px rgba(0, 204, 102, 0.2); }
 
   .lock-panel {
     width: 100%;
@@ -213,9 +214,10 @@
 
   .digit-label {
     font-size: 0.6rem;
-    color: #007744;
+    color: #00cc66;
     letter-spacing: 0.15em;
     text-transform: uppercase;
+    text-shadow: 0 0 6px rgba(0, 204, 102, 0.2);
   }
 
   .digit-input {
@@ -247,7 +249,7 @@
   .hint-btn {
     font-family: 'Share Tech Mono', monospace;
     font-size: 0.65rem;
-    color: #007744;
+    color: #00cc66;
     background: transparent;
     border: 1px solid #00ff8830;
     padding: 0.4rem 0.6rem;
@@ -257,7 +259,7 @@
     text-transform: uppercase;
     white-space: nowrap;
     -webkit-tap-highlight-color: transparent;
-    min-height: 36px;
+    min-height: 44px;
   }
 
   .hint-btn:hover, .hint-btn:focus { border-color: var(--green); color: var(--green); background: #00ff8808; }
@@ -307,11 +309,12 @@
   }
 
   .hint-slot-label {
-    color: #007744;
+    color: #00cc66;
     font-size: 0.7rem;
     letter-spacing: 0.2em;
     margin-bottom: 0.6rem;
     text-transform: uppercase;
+    text-shadow: 0 0 6px rgba(0, 204, 102, 0.2);
   }
 
   .hint-location {
@@ -672,10 +675,12 @@ function checkCombination() {
   .then(data => {
     if (data.success) {
       // ✅ CORRECT
+      if (window.audioManager) window.audioManager.playSFX('correct');
       inputs.forEach(inp => { inp.classList.remove('wrong'); inp.classList.add('correct'); });
       showScreen('screen-win');
     } else {
       // ❌ WRONG
+      if (window.audioManager) window.audioManager.playSFX('error');
       intentosFallidos = data.intentos || (intentosFallidos + 1);
       inputs.forEach(inp => { inp.value = ''; inp.classList.remove('correct'); inp.classList.add('wrong'); });
       setFeedback('[ERROR] Secuencia incorrecta. Revisad los enigmas.', 'err');

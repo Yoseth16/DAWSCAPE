@@ -175,9 +175,10 @@
 
   .hud-label {
     font-size: 0.7rem;
-    color: #007744;
+    color: #00cc66;
     letter-spacing: 0.2em;
     text-transform: uppercase;
+    text-shadow: 0 0 6px rgba(0, 204, 102, 0.2);
   }
 
   .hud-val {
@@ -234,7 +235,7 @@
     border-bottom: 2px solid var(--green);
     color: var(--green);
     font-family: 'Share Tech Mono', monospace;
-    font-size: 1.3rem;
+    font-size: max(16px, 1.3rem);
     padding: 0.8rem 0.5rem;
     outline: none;
     letter-spacing: 0.15em;
@@ -288,7 +289,8 @@
     background: var(--panel);
     line-height: 2.2;
     font-size: 0.9rem;
-    color: #88ccaa;
+    color: #b0e0bf;
+    text-shadow: 0 0 4px rgba(176, 224, 191, 0.15);
   }
 
   .result-panel span { color: var(--green); font-size: 1.05rem; }
@@ -526,6 +528,7 @@ function checkAnswer() {
     input.classList.add('correct');
     document.getElementById('feedback').className = 'feedback ok';
     document.getElementById('feedback').textContent = '[OK] Parámetro válido — Nodos activados';
+    if (window.audioManager) window.audioManager.playSFX('correct');
     setTimeout(() => {
       currentQ++;
       if (currentQ >= questions.length) showWin();
@@ -539,6 +542,7 @@ function checkAnswer() {
     input.classList.add('wrong');
     document.getElementById('feedback').className = 'feedback err';
     document.getElementById('feedback').textContent = '[ERROR] Acceso denegado. Intuitiva incorrecta.';
+    if (window.audioManager) window.audioManager.playSFX('error');
     setTimeout(() => {
       input.classList.remove('wrong');
       input.value = '';

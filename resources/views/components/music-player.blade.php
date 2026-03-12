@@ -2,7 +2,7 @@
 <div id="music-player" class="music-player">
   <!-- Background gradient -->
   <div class="player-background"></div>
-  
+
   <!-- Container principal -->
   <div class="player-container">
     <!-- Título de la canción -->
@@ -17,12 +17,12 @@
         <button id="volumeDown" class="control-btn" title="Bajar volumen">
           <span>🔉</span>
         </button>
-        <input 
-          type="range" 
-          id="volumeSlider" 
+        <input
+          type="range"
+          id="volumeSlider"
           class="volume-slider"
-          min="0" 
-          max="100" 
+          min="0"
+          max="100"
           value="50"
           title="Ajustar volumen"
         >
@@ -271,7 +271,7 @@
     }
 
     .player-container {
-      width: 250px;
+      width: 220px;
       padding: 0.75rem;
       gap: 0.6rem;
     }

@@ -56,7 +56,6 @@
                     window.audioManager.isPlaying = true;
                     window.audioManager._fadeInMusic(2000);
                     window.audioManager._updateUI();
-                    console.log('▶ Música iniciada automáticamente:', TRACK_KEY);
                 })
                 .catch((err) => {
                     // Navegador bloqueó el autoplay (política de usuario)
@@ -82,7 +81,6 @@
                         window.audioManager.isPlaying = true;
                         window.audioManager._fadeInMusic(2000);
                         window.audioManager._updateUI();
-                        console.log('▶ Música desbloqueada por interacción del usuario.');
                     })
                     .catch((e) => {
                         console.error('No se pudo reproducir tras interacción:', e);

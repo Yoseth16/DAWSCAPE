@@ -286,7 +286,7 @@
 <div class="particles" id="particles"></div>
 
 <div class="screen">
-  
+
   <div class="alert-box">
     <p>La clave maestra de enrutamiento ha sido fragmentada por un malware. Los 5 paquetes de datos resultantes se han ocultado en la red de Nodos de Suministro (Máquinas Expendedoras) repartidos por todo el edificio.</p>
     <p><strong>Vuestra misión:</strong> Localizad las 5 máquinas de bebidas del instituto. Cada máquina tiene pegado un sector de memoria (una letra). Reunidlas todas y descifrad el anagrama para reconstruir el código de acceso.</p>
@@ -302,7 +302,7 @@
   </div>
 
   <div class="console-out" id="console-out"></div>
-  
+
   <a href="{{ route('prueba3') }}" class="btn" id="next-btn">PASAR A LA SIGUIENTE PRUEBA →</a>
 
 </div>
@@ -368,10 +368,12 @@ function submitAnswer() {
         solved = true;
         inputField.disabled = true;
         document.getElementById('submit-btn').disabled = true;
+        if (window.audioManager) window.audioManager.playSFX('correct');
         printSuccess();
         notifyServer();
     } else {
         failedAttempts++;
+        if (window.audioManager) window.audioManager.playSFX('error');
         printError("[ERROR] Clave no reconocida. Verificad los sectores de memoria.");
         if (failedAttempts >= 5) {
             hintBox.style.display = 'block';
@@ -412,7 +414,7 @@ function notifyServer() {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         },
-        body: JSON.stringify({ completed: true })
+        body: JSON.stringify({ answer: inputField.value.trim() })
     }).catch(err => console.error('Error:', err));
 }
 </script>

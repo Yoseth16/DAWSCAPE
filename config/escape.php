@@ -44,7 +44,8 @@ return [
             ['5x0lh8bx100127t'],
             ['201', 'doscientos uno']
         ],
-        // La prueba 2 la maneja el front-end con un anagrama "ROCIO"
+        // La prueba 2 la maneja el front-end con un anagrama, pero el back valida también
+        'prueba2' => 'rocio',
         'prueba3' => 103, // Checksum: 18 botones + 80 cents + 5 azucar
         'prueba4' => 141, // Checksum Oasis: 6 filas + cod 128 cafe + 7 items A1
         'prueba5' => 'zasielx', // Palabra espejo

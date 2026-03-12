@@ -230,7 +230,7 @@
         0%, 100% { text-shadow: 0 0 20px var(--green); }
         50% { text-shadow: 0 0 40px var(--green), 0 0 60px #00ff8840; }
       }
-      
+
       @keyframes glitch-blink {
         0%, 100% { opacity: 1; text-shadow: 0 0 20px var(--red); }
         50% { opacity: 0.8; text-shadow: 0 0 40px var(--red); }
@@ -277,7 +277,7 @@
     <div class="victory-box timeout">
       <div style="font-size:3rem; margin-bottom:1rem">🚫</div>
       <h1 class="title error">TIEMPO AGOTADO</h1>
-      
+
       <div class="subtitle-txt">
         Misión fallida, equipo <span class="highlight">{{ $partida->nombre_equipo }}</span> ({{ $partida->clase }}).<br><br>
         El sistema de seguridad ha bloqueado la salida y se acabó vuestro tiempo.
@@ -297,12 +297,12 @@
     <div class="victory-box">
       <div style="font-size:3.5rem; margin-bottom:1rem">🔓</div>
       <h1 class="title success">SISTEMA HACKEADO</h1>
-      
+
       <div class="subtitle-txt">
         Enhorabuena, equipo <span class="highlight">{{ $partida->nombre_equipo }}</span> ({{ $partida->clase }}).<br><br>
         Habéis conseguido escapar del edificio a tiempo cruzando el Firewall.
       </div>
-      
+
       <div style="color:#007744; font-size:0.8rem; letter-spacing:0.2em; text-transform:uppercase">// TIEMPO TOTAL DE OPERACIÓN</div>
       <div class="time-display">
         {{ floor($partida->tiempo_segundos / 60) }}m {{ $partida->tiempo_segundos % 60 }}s
@@ -312,7 +312,7 @@
           (Incluye {{ floor($partida->penalizacion_segundos / 60) }}m de penalización por pistas)
         </div>
       @endif
-      
+
       @if(isset($hitos) && count($hitos) > 0)
           <div class="breakdown-panel">
             <h4>>> INFORME DE RENDIMIENTO (POR FASE)_</h4>
@@ -335,8 +335,8 @@
         @if($top3->count() > 0)
           <ol class="ranking-list">
               @foreach($top3 as $equipo)
-                  <li class="{{ $equipo->email === $partida->email ? 'current-team' : '' }}">
-                      {{ $equipo->nombre_equipo }} ({{ $equipo->clase }}) <span style="font-family:'Orbitron', sans-serif; float:right">[{{ floor($equipo->tiempo_segundos / 60) }}m {{ $equipo->tiempo_segundos % 60 }}s]</span>
+                  <li class="{{ $equipo->email === $partida->email ? 'current-team' : '' }}" style="display:flex; justify-content:space-between; align-items:baseline; gap:0.5rem">
+                      <span>{{ $equipo->nombre_equipo }} ({{ $equipo->clase }})</span> <span style="font-family:'Orbitron', sans-serif; white-space:nowrap">[{{ floor($equipo->tiempo_segundos / 60) }}m {{ $equipo->tiempo_segundos % 60 }}s]</span>
                   </li>
               @endforeach
           </ol>

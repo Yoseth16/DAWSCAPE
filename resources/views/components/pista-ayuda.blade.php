@@ -160,7 +160,7 @@
     .pista-tooltip { bottom: 5rem; right: 0.8rem; font-size: 0.65rem; }
     .pista-bocadillo { width: 95%; max-width: 350px; }
     .pista-bocadillo-texto { font-size: clamp(0.75rem, 3vw, 0.95rem); top: 18%; left: 15%; right: 15%; bottom: 35%; padding: 1rem; }
-    .pista-penalizacion-aviso { font-size: 0.75rem; padding: 0.5rem 1rem; }
+    .pista-penalizacion-aviso { font-size: 0.75rem; padding: 0.5rem 1rem; white-space: normal; text-align: center; }
 }
 </style>
 

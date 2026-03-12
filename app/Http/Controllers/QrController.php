@@ -84,10 +84,7 @@ class QrController extends Controller
         if (!hash_equals($claveEsperada, $codigo)) {
             Log::info('QR inválido', [
                 'prueba'             => $prueba,
-                'codigo_raw'         => $codigoRaw,
-                'codigo_raw_hex'     => bin2hex($codigoRaw),
                 'codigo_normalizado' => $codigo,
-                'esperado'           => $claveEsperada,
             ]);
             return response()->json([
                 'success' => false,
@@ -226,7 +223,7 @@ class QrController extends Controller
 
         $faseActualNormalizada = trim(strtolower($partida->fase_actual ?? ''));
         $faseQrNormalizada = trim(strtolower($faseQrRequerida));
-        
+
         $nivelActual = $fasesOrdenadas[$faseActualNormalizada] ?? 0;
         $nivelQr = $fasesOrdenadas[$faseQrNormalizada] ?? 0;
 

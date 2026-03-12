@@ -259,9 +259,14 @@ class JuegoController extends Controller
 
     public function validarPrueba2(Request $request)
     {
+        $respuestaCorrecta = config('escape.respuestas.prueba2');
+        $input = strtolower(trim($request->input('answer', '')));
+        // Normalizar: quitar acentos
+        $input = preg_replace('/\pM/u', '', \Normalizer::normalize($input, \Normalizer::FORM_D));
 
-        // Validamos la respuesta aquí o lo podemos delegar puramente al check de JS también (como en prueba1).
-        // En este caso el front hace el chequeo, el back certifica el tick.
+        if ($input !== $respuestaCorrecta) {
+            return response()->json(['success' => false, 'message' => 'Respuesta incorrecta.']);
+        }
 
         session(['prueba2yoseth_superada' => true]);
 
@@ -300,20 +305,11 @@ class JuegoController extends Controller
         $CHECKSUM_CORRECTO = config('escape.respuestas.prueba3'); // 18 botones + 80 cents + 5 azucar
         $partida = $this->timerService->obtenerPartidaActiva();
 
-        // DEBUG: Log para verificar qué valores se están comparando
-        \Log::info('Prueba3 Validation', [
-            'input' => $request->checksum,
-            'expected' => $CHECKSUM_CORRECTO,
-            'input_type' => gettype($request->checksum),
-            'expected_type' => gettype($CHECKSUM_CORRECTO),
-            'int_input' => (int)$request->checksum
-        ]);
-
         // Normalizar entrada: trim espacios y convertir a integer
         $respuesta_usuario = (int)trim($request->checksum);
 
         if ($respuesta_usuario !== $CHECKSUM_CORRECTO) {
-            $this->logAccion($partida, 'Prueba 3 Angel', 'Intento fallido', ['input' => $request->checksum, 'corregido' => $respuesta_usuario, 'esperado' => $CHECKSUM_CORRECTO]);
+            $this->logAccion($partida, 'Prueba 3 Angel', 'Intento fallido', ['input' => $request->checksum]);
             return response()->json(['success' => false, 'message' => 'Checksum erróneo']);
         }
 
@@ -363,7 +359,7 @@ class JuegoController extends Controller
         $respuesta_usuario = (int)trim($request->checksum);
 
         if ($respuesta_usuario !== $CHECKSUM_OASIS) {
-            $this->logAccion($partida, 'Prueba 4 Arturo', 'Intento fallido', ['input' => $request->checksum, 'corregido' => $respuesta_usuario, 'esperado' => $CHECKSUM_OASIS]);
+            $this->logAccion($partida, 'Prueba 4 Arturo', 'Intento fallido', ['input' => $request->checksum]);
             return response()->json(['success' => false, 'message' => 'Checksum erróneo']);
         }
 
@@ -611,7 +607,7 @@ class JuegoController extends Controller
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $this->logAccion($partida, 'Prueba 7 Dinamica', 'Entra a la prueba (Códice Oculto)');
 
-        return view('pruebas.prueba7dinamica', compact('tiempo_transcurrido', 'combinacion', 'pistas', 'intentos_fallidos'));
+        return view('pruebas.prueba7dinamica', compact('tiempo_transcurrido', 'pistas', 'intentos_fallidos'));
     }
 
     public function validarPrueba7(Request $request)

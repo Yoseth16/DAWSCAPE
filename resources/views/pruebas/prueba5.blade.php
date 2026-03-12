@@ -362,6 +362,7 @@ setInterval(actualizarTimer, 1000);
 
       const data = await resp.json().catch(() => ({}));
       if (resp.ok && data && data.success === true && data.redirect_url) {
+        if (window.audioManager) window.audioManager.playSFX('correct');
         window.location.href = data.redirect_url;
         return;
       }
@@ -371,6 +372,7 @@ setInterval(actualizarTimer, 1000);
         (resp.status === 429
           ? 'Demasiados intentos. Espera un minuto e inténtalo de nuevo.'
           : 'No se pudo validar el código. Inténtalo de nuevo.');
+      if (window.audioManager) window.audioManager.playSFX('error');
       setResult(msg, true);
     } catch (err) {
       setResult('Error de red. Revisa tu conexión e inténtalo de nuevo.', true);
@@ -387,7 +389,8 @@ setInterval(actualizarTimer, 1000);
     if (readerEl) readerEl.innerHTML = '';
     setResult('Inicializando cámara...');
 
-    const config = { fps: 10, qrbox: { width: 250, height: 250 }, rememberLastUsedCamera: true };
+    const qrSize = Math.min(250, window.innerWidth - 80);
+    const config = { fps: 10, qrbox: { width: qrSize, height: qrSize }, rememberLastUsedCamera: true };
     scanner = new Html5QrcodeScanner('qr-reader', config, false);
     scanner.render(
       async (decodedText) => {

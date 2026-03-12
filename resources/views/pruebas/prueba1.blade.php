@@ -501,29 +501,29 @@ function loadQuestion() {
   const q = questions[currentQ];
   document.getElementById('question-card').setAttribute('data-label', q.label);
   document.getElementById('riddle-box').innerText = q.riddle;
-  
+
   const inp = document.getElementById('answer-input');
   const btn = document.getElementById('verify-btn');
-  
+
   inp.value = '';
   inp.className = 'answer-input';
   inp.disabled = false;
   if(btn) btn.disabled = false;
-  
+
   document.getElementById('feedback').textContent = '';
   document.getElementById('feedback').className = 'feedback';
   document.getElementById('q-counter').textContent = `${currentQ + 1} / ${questions.length}`;
   document.getElementById('progress-fill').style.width = (currentQ / questions.length * 100) + '%';
 
   // Solo se bindea cuando el componente está libre
-  inp.onkeydown = e => { 
+  inp.onkeydown = e => {
       if (e.key === 'Enter') {
           e.preventDefault(); // Evitamos acciones nativas
-          checkAnswer(); 
+          checkAnswer();
       }
   };
   inp.focus();
-  
+
   isTransitioning = false; // Liberamos el candado
 }
 
@@ -533,7 +533,7 @@ function checkAnswer() {
   const input = document.getElementById('answer-input');
   const btn = document.getElementById('verify-btn');
   const val = input.value;
-  
+
   if (!val.trim()) {
       input.classList.add('wrong');
       document.getElementById('feedback').className = 'feedback err';
@@ -561,6 +561,7 @@ function checkAnswer() {
     input.classList.add('correct');
     document.getElementById('feedback').className = 'feedback ok';
     document.getElementById('feedback').textContent = '[OK] Respuesta aceptada — Cortafuegos superado';
+    if (window.audioManager) window.audioManager.playSFX('correct');
     setTimeout(() => {
       currentQ++;
       if (currentQ >= questions.length) showWin();
@@ -570,10 +571,11 @@ function checkAnswer() {
     isTransitioning = true; // BLOQUEO TEMPORAL DURANTE EL ERROR
     input.disabled = true;
     if(btn) btn.disabled = true;
-    
+
     input.classList.add('wrong');
     document.getElementById('feedback').className = 'feedback err';
     document.getElementById('feedback').textContent = '[ERROR] Respuesta incorrecta. Inténtalo de nuevo.';
+    if (window.audioManager) window.audioManager.playSFX('error');
     setTimeout(() => {
       input.classList.remove('wrong');
       input.value = '';

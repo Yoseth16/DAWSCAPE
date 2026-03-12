@@ -118,6 +118,7 @@ function handleSectorTouch(sectorId, event) {
                 statusTxt.innerText = "[OK] FASE ESTABILIZADA";
                 statusTxt.className = "status-ok";
             }
+            if (window.audioManager) window.audioManager.playSFX('correct');
             playTone(S_OK, "triangle", 0.5);
 
             setTimeout(() => {
@@ -139,6 +140,7 @@ function handleSectorTouch(sectorId, event) {
             statusTxt.className = "status-info";
             statusTxt.style.color = "var(--red)";
         }
+        if (window.audioManager) window.audioManager.playSFX('error');
         playTone(S_ERR, "sawtooth", 0.8);
 
         // Penalizar al equipo con 480 segundos (8 minutos)
@@ -167,7 +169,7 @@ function winGame() {
     const csrfToken = document.querySelector('meta[name="csrf-token"]');
     if (!csrfToken) return;
 
-    fetch("/prueba6migue", {
+    fetch("/prueba6", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
