@@ -347,15 +347,8 @@ setInterval(actualizarTimer, 1000);
           ? 'Demasiados intentos. Espera un minuto e inténtalo de nuevo.'
           : 'No se pudo validar el código. Inténtalo de nuevo.');
       setResult(msg, true);
-
-      if (modal && modal.getAttribute('aria-hidden') === 'false') {
-        await startScanner();
-      }
     } catch (err) {
       setResult('Error de red. Revisa tu conexión e inténtalo de nuevo.', true);
-      if (modal && modal.getAttribute('aria-hidden') === 'false') {
-        await startScanner();
-      }
     }
   }
 
