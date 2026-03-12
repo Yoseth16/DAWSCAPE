@@ -154,8 +154,55 @@ class JuegoController extends Controller
                 'inscripcion_id' => $inscripcion->id,
             ]);
 
-            // Redirigimos al QR (o a prueba1 como fallback)
-            $destino = ($redirDestino && str_starts_with($redirDestino, '/')) ? $redirDestino : route('prueba1');
+            // Restaurar progreso en la sesión según la fase en BBDD
+            $fasesOrdenadas = [
+                'Prueba 1 Mario' => 1,
+                'Prueba 2 Yoseth' => 2,
+                'Prueba 3 Angel' => 3,
+                'Prueba 4 Arturo' => 4,
+                'Prueba 5 Eloy' => 5,
+                'Prueba 6 Migue' => 6,
+                'Prueba 7 Dinamica' => 7,
+                'FINALIZADO' => 8
+            ];
+
+            $nivelActual = $fasesOrdenadas[$partidaExistente->fase_actual] ?? 1;
+
+            if ($nivelActual > 1) session(['prueba1mario_superada' => true]);
+            if ($nivelActual > 2) session(['prueba2yoseth_superada' => true]);
+            if ($nivelActual > 3) {
+                session(['prueba3angel_superada' => true]);
+                session(['prueba_3_completada' => true]);
+            }
+            if ($nivelActual > 4) {
+                session(['prueba4arturo_superada' => true]);
+                session(['prueba_4_completada' => true]);
+            }
+            if ($nivelActual > 5) {
+                session(['prueba5eloy_superada' => true]);
+                session(['prueba_5_completada' => true]);
+            }
+            if ($nivelActual > 6) session(['prueba6migue_superada' => true]);
+            if ($nivelActual > 7) session(['prueba7dinamica_superada' => true]);
+
+            // Redirigimos al QR (o a la prueba correspondiente)
+            if ($redirDestino && str_starts_with($redirDestino, '/')) {
+                $destino = $redirDestino;
+            } else {
+                // Autocalcular destino según nivel
+                $destinos = [
+                    1 => route('prueba1'),
+                    2 => route('prueba2'),
+                    3 => route('prueba3'),
+                    4 => route('prueba4'),
+                    5 => route('prueba5'),
+                    6 => route('prueba6'),
+                    7 => route('prueba7'),
+                    8 => route('final'),
+                ];
+                $destino = $destinos[$nivelActual] ?? route('prueba1');
+            }
+
             return redirect($destino);
         }
 

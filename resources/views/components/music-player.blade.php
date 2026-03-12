@@ -1,46 +1,53 @@
-<!-- Mini Music Player - Esquina Inferior Izquierda -->
-<div id="music-player" class="music-player">
-  <!-- Background gradient -->
-  <div class="player-background"></div>
+<!-- Mini Music Player - Esquina Superior Izquierda (Dropdown) -->
+<div class="music-player-dropdown" id="music-player-wrapper">
+  <!-- Botón Toggle (Nota musical) -->
+  <button id="musicToggleBtn" class="music-toggle-btn" title="Reproductor de Música">
+    🎵
+  </button>
 
-  <!-- Container principal -->
-  <div class="player-container">
-    <!-- Título de la canción -->
-    <div class="track-title">
-      <div class="title-text" id="trackTitle">DAWSCAPE - Tema Principal</div>
-    </div>
+  <div id="music-player" class="music-player">
+    <!-- Background gradient -->
+    <div class="player-background"></div>
 
-    <!-- Controles -->
-    <div class="player-controls">
-      <!-- Volumen -->
-      <div class="control-group volume-control">
-        <button id="volumeDown" class="control-btn" title="Bajar volumen">
-          <span>🔉</span>
-        </button>
-        <input
-          type="range"
-          id="volumeSlider"
-          class="volume-slider"
-          min="0"
-          max="100"
-          value="50"
-          title="Ajustar volumen"
-        >
-        <button id="volumeUp" class="control-btn" title="Subir volumen">
-          <span>🔊</span>
+    <!-- Container principal -->
+    <div class="player-container">
+      <!-- Título de la canción -->
+      <div class="track-title">
+        <div class="title-text" id="trackTitle">DAWSCAPE - Tema Principal</div>
+      </div>
+
+      <!-- Controles -->
+      <div class="player-controls">
+        <!-- Volumen -->
+        <div class="control-group volume-control">
+          <button id="volumeDown" class="control-btn" title="Bajar volumen">
+            <span>🔉</span>
+          </button>
+          <input
+            type="range"
+            id="volumeSlider"
+            class="volume-slider"
+            min="0"
+            max="100"
+            value="50"
+            title="Ajustar volumen"
+          >
+          <button id="volumeUp" class="control-btn" title="Subir volumen">
+            <span>🔊</span>
+          </button>
+        </div>
+
+        <!-- Play/Pause -->
+        <button id="playPauseBtn" class="play-pause-btn" title="Pausa/Reproducción">
+          <span class="icon-play">▶</span>
+          <span class="icon-pause" style="display:none;">⏸</span>
         </button>
       </div>
 
-      <!-- Play/Pause -->
-      <button id="playPauseBtn" class="play-pause-btn" title="Pausa/Reproducción">
-        <span class="icon-play">▶</span>
-        <span class="icon-pause" style="display:none;">⏸</span>
-      </button>
-    </div>
-
-    <!-- Indicador de reproducción -->
-    <div class="player-indicator">
-      <div class="indicator-dot"></div>
+      <!-- Indicador de reproducción -->
+      <div class="player-indicator">
+        <div class="indicator-dot"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -53,13 +60,63 @@
     --music-player-text: #c8ffdf;
     --music-player-panel: #041a0e;
   }
-
-  .music-player {
+  
+  /* Estilos del wrapper y botón toggle */
+  .music-player-dropdown {
     position: fixed;
-    bottom: 1rem;
+    top: 4rem; /* Debajo del header (.game-header suele tener unos 3-4rem) */
     left: 1rem;
-    z-index: 90;
+    z-index: 900;
     font-family: 'Share Tech Mono', monospace;
+  }
+
+  .music-toggle-btn {
+    background: rgba(2, 12, 6, 0.85);
+    border: 1px solid var(--music-player-border);
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--music-player-primary);
+    box-shadow: 0 4px 15px rgba(0, 255, 136, 0.2);
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+  }
+
+  .music-toggle-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 25px rgba(0, 255, 136, 0.4);
+    border-color: var(--music-player-primary);
+  }
+  
+  .music-toggle-btn.active {
+    background: rgba(0, 255, 136, 0.15);
+    border-color: var(--music-player-primary);
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+  }
+
+  /* El panel del reproductor (oculto por defecto) */
+  .music-player {
+    position: absolute;
+    top: 3rem; /* Espacio para el botón toggle */
+    left: 0;
+    width: max-content;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+    pointer-events: none; /* No clickear cuando está oculto */
+  }
+
+  .music-player.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto; /* Activar clicks cuando se muestra */
   }
 
   .player-background {
@@ -411,6 +468,23 @@
         e.preventDefault();
         if (window.audioManager) window.audioManager.decreaseVolume(0.05);
       }
+    });
+
+    // Lógica para desplegar / contraer el menú
+    const toggleBtn = document.getElementById('musicToggleBtn');
+    
+    toggleBtn.addEventListener('click', (e) => {
+        musicPlayer.classList.toggle('show');
+        toggleBtn.classList.toggle('active');
+        e.stopPropagation(); // Evitar que se cierre inmediatamente por el clic fuera
+    });
+
+    // Cerrar si se clica fuera del panel
+    document.addEventListener('click', (e) => {
+        if (!musicPlayer.contains(e.target) && e.target !== toggleBtn) {
+            musicPlayer.classList.remove('show');
+            toggleBtn.classList.remove('active');
+        }
     });
 
     // Inicialización visual

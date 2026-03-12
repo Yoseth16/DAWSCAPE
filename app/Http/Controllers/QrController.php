@@ -64,12 +64,17 @@ class QrController extends Controller
         }
 
         // Códigos secretos válidos.
-        // Comprobamos coincidencia exacta (tras normalización) para garantizar
-        // que cada prueba solo acepte SU QR correspondiente.
+        // Comprobamos si el código mandado (que puede ser la URL completa o el código plano) coincide
         $codigosValidos = [
             3 => 'ACCESO_FASE_3',
             4 => 'ACCESO_FASE_4',
             5 => 'ACCESO_FASE_5',
+        ];
+
+        $urlsAdmitidas = [
+            3 => 'PRUEBA3ANGEL',
+            4 => 'PRUEBA4ARTURO',
+            5 => 'PRUEBA5ELOY',
         ];
 
         if (!array_key_exists($prueba, $codigosValidos)) {
@@ -80,11 +85,19 @@ class QrController extends Controller
         }
 
         $claveEsperada = $codigosValidos[$prueba];
+        $urlAdmitida = $urlsAdmitidas[$prueba];
+        
+        // Quitar guiones para facilitar búsquedas tipo "prueba-3-angel" => "prueba3angel"
+        $codigoLimpiado = strtoupper(trim(str_replace('-', '', $codigo)));
 
-        if (!hash_equals($claveEsperada, $codigo)) {
+        // Acepta coincidencia exacta del código viejo, o que el texto escaneado contenga el slug esperado.
+        $esValido = hash_equals($claveEsperada, $codigoLimpiado) || str_contains($codigoLimpiado, $urlAdmitida);
+
+        if (!$esValido) {
             Log::info('QR inválido', [
                 'prueba'             => $prueba,
-                'codigo_normalizado' => $codigo,
+                'codigo_normalizado' => $codigoLimpiado,
+                'codigo_original'    => $codigo,
             ]);
             return response()->json([
                 'success' => false,
@@ -136,7 +149,8 @@ class QrController extends Controller
     public function guardarQr(GuardarQrRequest $request)
     {
         $baseUrl = rtrim(config('app.url', 'https://dawscape.fun'), '/');
-        $slug = \Illuminate\Support\Str::slug($request->nombre) . '-' . uniqid();
+        // Quitar guiones para conseguir slugs de tipo 'prueba3angel'
+        $slug = str_replace('-', '', \Illuminate\Support\Str::slug($request->nombre));
         $url = $baseUrl . '/qr/' . $slug;
 
         \App\Models\Qr::create([
