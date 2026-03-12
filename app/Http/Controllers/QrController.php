@@ -8,6 +8,7 @@ use App\Services\GameTimerService;
 use App\Http\Requests\GuardarQrRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class QrController extends Controller
 {
@@ -29,7 +30,10 @@ class QrController extends Controller
             'prueba' => ['required', 'integer', 'between:3,5'],
         ]);
 
-        $codigo = trim($data['codigo']);
+        // Normalizar texto QR: quitar invisibles/espacios y forzar mayúsculas
+        $codigoRaw = (string) $data['codigo'];
+        $codigo = preg_replace('/[[:^print:]]/u', '', $codigoRaw) ?? $codigoRaw; // quita \r \n etc.
+        $codigo = strtoupper(trim($codigo));
         $prueba = (int) $data['prueba'];
 
         // Anti-salto: alinear con las claves reales de progreso del JuegoController
@@ -74,6 +78,14 @@ class QrController extends Controller
         }
 
         if (!hash_equals($codigosValidos[$prueba], $codigo)) {
+            // Log de diagnóstico (solo servidor) para ver qué está llegando realmente
+            Log::info('QR inválido', [
+                'prueba' => $prueba,
+                'codigo_raw' => $codigoRaw,
+                'codigo_raw_hex' => bin2hex($codigoRaw),
+                'codigo_normalizado' => $codigo,
+                'esperado' => $codigosValidos[$prueba],
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Código incorrecto. Inténtalo de nuevo.',
