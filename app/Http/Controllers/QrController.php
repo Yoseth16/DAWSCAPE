@@ -178,35 +178,71 @@ class QrController extends Controller
 
     public function escanearQR($identificador)
     {
-        // ── GUARD: solo equipos con sesión activa pueden acceder (anti-trampas) ──
+        // 1. Autenticación: verificar que existe sesión activa
         if (!session()->has('email')) {
             return redirect('/')
-                ->with('error', '⚠️ Acceso denegado. Escanea el QR con el mismo navegador donde empezasteis a jugar.');
+                ->with('error', 'Inicia sesión con tu equipo para ver esta pista.');
         }
+
+        $identificadorMap = [
+            'prueba3angel' => 'Prueba 3 Angel',
+            'prueba4arturo' => 'Prueba 4 Arturo',
+            'prueba5eloy' => 'Prueba 5 Eloy'
+        ];
+
+        $identificadorNormalizado = strtolower(trim($identificador));
 
         // Buscamos el QR en la BBDD
         $qr = \App\Models\Qr::where('url', 'LIKE', '%/qr/' . $identificador)->first();
 
-        if (!$qr) {
-            abort(404, 'Código QR no reconocido en el sistema.');
+        // Si existe un mapeo específico requerido o el QR lo dicta
+        $faseQrRequerida = null;
+        if (isset($identificadorMap[$identificadorNormalizado])) {
+            $faseQrRequerida = $identificadorMap[$identificadorNormalizado];
+        } elseif ($qr && !empty($qr->fase_requerida)) {
+            $faseQrRequerida = $qr->fase_requerida;
+        } else {
+            // Que no exista ningún caso donde un QR genérico dé acceso a cualquier prueba
+            abort(404, 'Código QR no reconocido o sin prueba asignada.');
         }
 
-        // Recuperamos la partida — tiempo calculado en el servidor (no manipulable)
+        // Recuperamos la partida
         $partida = $this->timerService->obtenerPartidaActiva();
 
         if (!$partida) {
             return redirect('/')->with('error', 'No se encontró una partida activa para este equipo.');
         }
 
-        // ── Validamos que estén en la fase correcta ──
-        if (!empty($qr->fase_requerida)) {
-            if (trim(strtolower($partida->fase_actual)) !== trim(strtolower($qr->fase_requerida))) {
-                $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
-                return view('qr.error-fase', [
-                    'mensaje' => '¡Eh, listillos! Aún no estáis en esta fase. Resolved la prueba actual primero.',
-                    'tiempo_transcurrido' => $tiempo_transcurrido
-                ]);
-            }
+        $fasesOrdenadas = [
+            'prueba 1 mario' => 1,
+            'prueba 2 yoseth' => 2,
+            'prueba 3 angel' => 3,
+            'prueba 4 arturo' => 4,
+            'prueba 5 eloy' => 5,
+            'prueba 6 migue' => 6,
+            'prueba 7 dinamica' => 7,
+            'finalizado' => 8
+        ];
+
+        $faseActualNormalizada = trim(strtolower($partida->fase_actual ?? ''));
+        $faseQrNormalizada = trim(strtolower($faseQrRequerida));
+        
+        $nivelActual = $fasesOrdenadas[$faseActualNormalizada] ?? 0;
+        $nivelQr = $fasesOrdenadas[$faseQrNormalizada] ?? 0;
+
+        $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
+
+        // 2 y 3. Fase correcta y QR correcto
+        if ($nivelActual < $nivelQr) {
+            return view('qr.error-fase', [
+                'mensaje' => '¡Eh, listillos! Aún no estáis en esta fase. Resolved la prueba actual primero.',
+                'tiempo_transcurrido' => $tiempo_transcurrido
+            ]);
+        } elseif ($nivelActual > $nivelQr) {
+            return view('qr.error-fase', [
+                'mensaje' => 'Ya habéis superado esta fase. Continuad con vuestra prueba actual.',
+                'tiempo_transcurrido' => $tiempo_transcurrido
+            ]);
         }
 
         // ── Si el tiempo expiró, cerramos la prueba ──
@@ -214,23 +250,19 @@ class QrController extends Controller
             return redirect('/final')->with('timeout', true);
         }
 
-        // ── ÉXITO: renderizar el reto QR (igual que el admin tester, pero con tiempo real) ──
+        // ── ÉXITO: renderizar el reto QR ──
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
-        $titulo_prueba = $qr->nombre;
-
-        $fase = strtolower(trim($qr->fase_requerida ?? ''));
-        $identificadorNormalizado = strtolower($identificador);
-        $nombreQrNormalizado = strtolower($qr->nombre);
+        $titulo_prueba = $qr->nombre ?? $faseQrRequerida;
 
         $vistaEspecial = match(true) {
             // Por fase_requerida (el campo más fiable)
-            str_contains($fase, 'angel')  || str_contains($fase, 'prueba 3') => 'qr.maquina-cafe',
-            str_contains($fase, 'arturo') || str_contains($fase, 'prueba 4') => 'qr.maquina-snacks',
-            str_contains($fase, 'eloy')   || str_contains($fase, 'prueba 5') => 'qr.taquillas',
-            // Fallback por nombre/slug
-            str_contains($identificadorNormalizado, 'cafe')     || str_contains($nombreQrNormalizado, 'cafe')    => 'qr.maquina-cafe',
-            str_contains($identificadorNormalizado, 'snacks')   || str_contains($nombreQrNormalizado, 'oasis')   => 'qr.maquina-snacks',
-            str_contains($identificadorNormalizado, 'taquilla') || str_contains($nombreQrNormalizado, 'taquilla') => 'qr.taquillas',
+            str_contains($faseQrNormalizada, 'angel')  || str_contains($faseQrNormalizada, 'prueba 3') => 'qr.maquina-cafe',
+            str_contains($faseQrNormalizada, 'arturo') || str_contains($faseQrNormalizada, 'prueba 4') => 'qr.maquina-snacks',
+            str_contains($faseQrNormalizada, 'eloy')   || str_contains($faseQrNormalizada, 'prueba 5') => 'qr.taquillas',
+            // Fallback por slug
+            str_contains($identificadorNormalizado, 'cafe')    => 'qr.maquina-cafe',
+            str_contains($identificadorNormalizado, 'snacks')  => 'qr.maquina-snacks',
+            str_contains($identificadorNormalizado, 'taquilla')=> 'qr.taquillas',
             default => 'qr.maquina-cafe'
         };
 
@@ -270,7 +302,7 @@ class QrController extends Controller
         // Guard: requiere sesión activa de equipo
         if (!session()->has('email')) {
             return redirect('/')
-                ->with('error', '⚠️ Acceso denegado. Escanea el QR con el mismo navegador donde empezasteis a jugar.');
+                ->with('error', 'Inicia sesión con tu equipo para ver esta pista.');
         }
 
         // Verificar que el equipo está en la fase correcta
@@ -280,11 +312,31 @@ class QrController extends Controller
             return redirect('/')->with('error', 'No se encontró una partida activa para este equipo.');
         }
 
-        $faseActual = strtolower(trim($partida->fase_actual));
-        if (!str_contains($faseActual, 'prueba 7') && !str_contains($faseActual, 'dinamica')) {
-            $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
+        $fasesOrdenadas = [
+            'prueba 1 mario' => 1,
+            'prueba 2 yoseth' => 2,
+            'prueba 3 angel' => 3,
+            'prueba 4 arturo' => 4,
+            'prueba 5 eloy' => 5,
+            'prueba 6 migue' => 6,
+            'prueba 7 dinamica' => 7,
+            'finalizado' => 8
+        ];
+
+        $faseActualNormalizada = trim(strtolower($partida->fase_actual ?? ''));
+        $nivelActual = $fasesOrdenadas[$faseActualNormalizada] ?? 0;
+        $nivelQr = $fasesOrdenadas['prueba 7 dinamica'];
+
+        $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
+
+        if ($nivelActual < $nivelQr) {
             return view('qr.error-fase', [
-                'mensaje' => '¡Eh, listillos! Aún no estáis en la Prueba 7. Completad las pruebas anteriores primero.',
+                'mensaje' => '¡Eh, listillos! Aún no estáis en esta fase. Resolved la prueba actual primero.',
+                'tiempo_transcurrido' => $tiempo_transcurrido
+            ]);
+        } elseif ($nivelActual > $nivelQr) {
+            return view('qr.error-fase', [
+                'mensaje' => 'Ya habéis superado esta fase. Continuad con vuestra prueba actual.',
                 'tiempo_transcurrido' => $tiempo_transcurrido
             ]);
         }
