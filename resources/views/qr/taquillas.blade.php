@@ -69,15 +69,15 @@
     letter-spacing: 0.1em;
   }
 
-  .screen { 
-      display: none; 
-      flex-direction: column; 
-      align-items: center; 
-      justify-content: center; 
-      padding: 1rem; 
+  .screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
       padding-top: 5rem;
       padding-bottom: 2rem;
-      min-height: 100vh; 
+      min-height: 100vh;
       width: 100%;
       animation: fadeIn 0.5s ease;
   }
@@ -119,12 +119,12 @@
     font-size: 0.7rem;
     letter-spacing: 0.2em;
   }
-  
+
   .intro-text strong {
       color: var(--green);
       font-weight: normal;
   }
-  
+
   .term-list {
       list-style-type: none;
       margin: 1rem 0;
@@ -132,13 +132,13 @@
       border-left: 2px solid var(--border);
       font-size: 0.9em;
   }
-  
+
   .term-list li {
       margin-bottom: 0.6rem;
       position: relative;
       padding-left: 0.8rem;
   }
-  
+
   .term-list li::before {
       content: '>';
       position: absolute;
@@ -192,7 +192,7 @@
     text-align: center;
     transition: all 0.2s;
   }
-  
+
   .answer-input::placeholder {
       color: #00ff8840;
   }
@@ -311,7 +311,7 @@
     <p style="margin-top:0.5rem; color:#668877;">Nueva tabla de conversión:</p>
     <p style="color:var(--green); letter-spacing:0.1em; text-align:center; padding: 0.5rem; background: var(--terminal); border: 1px dashed #00ff8840; margin: 0.5rem 0;">Z = 1 &nbsp; Y = 2 &nbsp; X = 3 &nbsp; ... &nbsp; A = 26</p>
     <p style="margin-top:0.5rem;">El núcleo del sistema está oculto en varias unidades numeradas del 1 al 64. Cada número representa una letra bajo el Protocolo Espejo.</p>
-    
+
     <div style="margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1rem;">
         <p style="color:var(--red); font-size: 0.9em;">// INSTRUCCIONES DEL SISTEMA:</p>
         <ul class="term-list">
@@ -326,7 +326,7 @@
     </div>
 
     <p style="text-align: center; font-size: 0.9em;"><strong>Introduce la palabra clave reconstruida:</strong></p>
-    
+
     <div class="form-group">
         <label style="font-size: 0.8rem; color: #445544; display:none;">// INPUT</label>
         <input class="answer-input" id="checksum-input" type="text" placeholder="_______" autocomplete="off" spellcheck="false" autocapitalize="off" maxlength="7">
@@ -337,6 +337,15 @@
     <div class="hint-box" id="hint-box">
         <strong>[PISTA DEL SISTEMA]</strong><br>La palabra que buscas ya está escrita en la pantalla. Solo necesitas encontrarla en las taquillas correctas. Revisa la tabla de descifrado detalladamente.
     </div>
+  </div>
+
+  <!-- Escáner QR alternativo -->
+  <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border);">
+    <p style="text-align: center; color: #668877; margin-bottom: 1rem;">
+      <strong>¿Prefieres escanear?</strong><br>
+      Usa el escáner QR para encontrar las letras de las taquillas.
+    </p>
+    @include('components.qr-scanner', ['route' => '/prueba5', 'successMessage' => 'Código QR validado correctamente'])
   </div>
 </div>
 
@@ -353,6 +362,9 @@
       </div>
   </div>
 </div>
+
+<!-- Iconos Phosphor -->
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
 
 <script>
 // --- TIMER LOGIC ---
@@ -395,7 +407,7 @@ input.addEventListener('keypress', function (e) {
 function verificarChecksum() {
     if (isProcessing) return;
     const value = input.value.trim();
-    
+
     if (value === "") {
         showError("Introduce una palabra válida.");
         return;
@@ -422,14 +434,14 @@ function verificarChecksum() {
             feedback.textContent = "[OK] PROTOCOLO ESPEJO DESCIFRADO.";
             feedback.className = "feedback ok";
             input.classList.add('correct');
-            
+
             setTimeout(() => {
                 triggerWinSequence(data.mensaje);
             }, 800);
         } else {
             failedAttempts++;
             showError("[ERROR] Palabra clave inválida.");
-            
+
             if (failedAttempts >= 5) {
                 document.getElementById('hint-box').style.display = 'block';
             }
@@ -444,9 +456,9 @@ function showError(msg) {
     input.classList.add('wrong');
     feedback.textContent = msg;
     feedback.className = "feedback err";
-    
+
     if(navigator.vibrate) navigator.vibrate(200);
-    
+
     setTimeout(() => {
         input.classList.remove('wrong');
         input.value = '';
@@ -460,7 +472,7 @@ function showError(msg) {
 function triggerWinSequence(mensajeNarrativo) {
     document.getElementById('screen-hacking').classList.remove('active');
     document.getElementById('screen-win').classList.add('active');
-    
+
     document.getElementById('l4').innerText = mensajeNarrativo;
 
     const lines = [

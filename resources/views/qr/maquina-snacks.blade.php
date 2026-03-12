@@ -69,15 +69,15 @@
     letter-spacing: 0.1em;
   }
 
-  .screen { 
-      display: none; 
-      flex-direction: column; 
-      align-items: center; 
-      justify-content: center; 
-      padding: 1.5rem; 
-      padding-top: 5rem; 
+  .screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      padding-top: 5rem;
       padding-bottom: 2rem;
-      min-height: 100vh; 
+      min-height: 100vh;
       width: 100%;
       animation: fadeIn 0.5s ease;
   }
@@ -118,25 +118,25 @@
     font-size: 0.7rem;
     letter-spacing: 0.2em;
   }
-  
+
   .intro-text strong {
       color: var(--green);
       font-weight: normal;
   }
-  
+
   .term-list {
       list-style-type: none;
       margin: 1.2rem 0;
       padding-left: 0.5rem;
       border-left: 2px solid var(--border);
   }
-  
+
   .term-list li {
       margin-bottom: 0.8rem;
       position: relative;
       padding-left: 1rem;
   }
-  
+
   .term-list li::before {
       content: '>';
       position: absolute;
@@ -282,10 +282,10 @@
 <div class="screen active" id="screen-hacking">
   <div class="logo">TERMINAL OASIS</div>
   <div class="intro-text">
-    <p style="color:var(--red)">Acceso al núcleo denegado.</p> 
+    <p style="color:var(--red)">Acceso al núcleo denegado.</p>
     <p style="margin-top:0.5rem;">El cortafuegos de la red Oasis requiere una suma de verificación (checksum) basada en el inventario de hardware actual.</p>
     <p style="margin-top:0.5rem; color:#668877;">Para generar el código de bypass, combina estos tres factores de la unidad de suministros:</p>
-    
+
     <ul class="term-list">
         <li>Censo total de ranuras de almacenamiento (número de bandejas o filas horizontales visibles).</li>
         <li>Valor numérico identificador asignado al producto de café (código indicado en la máquina) de la unidad lateral.</li>
@@ -293,7 +293,7 @@
     </ul>
 
     <p style="text-align: center; margin-top: 1.5rem; font-size: 0.9em;"><strong>Introduce la suma total para purgar el sistema.</strong></p>
-    
+
     <div class="form-group">
         <label style="font-size: 0.8rem; color: #445544;">// WAITING_CHECKSUM</label>
         <input class="answer-input" id="checksum-input" type="number" inputmode="numeric" pattern="[0-9]*" placeholder="___" autocomplete="off">
@@ -304,6 +304,15 @@
     <div class="hint-box" id="hint-box">
         <strong>[PISTA DEL SISTEMA]</strong><br>La respuesta es la suma de tres números. Cuenta las filas horizontales, averigua el código numérico del café y suma cuántos productos exactos entran en el alambre del hueco A1.
     </div>
+  </div>
+
+  <!-- Escáner QR alternativo -->
+  <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border);">
+    <p style="text-align: center; color: #668877; margin-bottom: 1rem;">
+      <strong>¿Necesitas ayuda?</strong><br>
+      Escanea el código QR de la máquina Oasis para obtener la respuesta.
+    </p>
+    @include('components.qr-scanner', ['route' => '/prueba4', 'successMessage' => 'Código QR validado correctamente'])
   </div>
 </div>
 
@@ -320,6 +329,9 @@
       </div>
   </div>
 </div>
+
+<!-- Iconos Phosphor -->
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
 
 <script>
 // --- TIMER LOGIC ---
@@ -360,7 +372,7 @@ input.addEventListener('keypress', function (e) {
 function verificarChecksum() {
     if (isProcessing) return;
     const value = input.value.trim();
-    
+
     if (value === "") {
         showError("Introduce un número válido.");
         return;
@@ -387,14 +399,14 @@ function verificarChecksum() {
             feedback.textContent = "[OK] SUMA DE VERIFICACIÓN ACEPTADA.";
             feedback.className = "feedback ok";
             input.classList.add('correct');
-            
+
             setTimeout(() => {
                 triggerWinSequence(data.mensaje);
             }, 800);
         } else {
             failedAttempts++;
             showError("[ERROR] Checksum inválido.");
-            
+
             if (failedAttempts >= 5) {
                 document.getElementById('hint-box').style.display = 'block';
             }
@@ -409,10 +421,10 @@ function showError(msg) {
     input.classList.add('wrong');
     feedback.textContent = msg;
     feedback.className = "feedback err";
-    
+
     // Vibración haptica sutil en móviles que lo soporten
     if(navigator.vibrate) navigator.vibrate(200);
-    
+
     setTimeout(() => {
         input.classList.remove('wrong');
         input.value = '';
@@ -427,7 +439,7 @@ function showError(msg) {
 function triggerWinSequence(mensajeNarrativo) {
     document.getElementById('screen-hacking').classList.remove('active');
     document.getElementById('screen-win').classList.add('active');
-    
+
     // Inyectamos el texto final desde backend
     document.getElementById('l4').innerText = mensajeNarrativo;
 

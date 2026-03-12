@@ -21,11 +21,11 @@
 <div class="screen active" id="screen-hacking">
   <div class="logo">PANEL DE MANTENIMIENTO</div>
   <div class="intro-text">
-    <p style="color:var(--red)">No puedes entrar al sistema.</p> 
+    <p style="color:var(--red)">No puedes entrar al sistema.</p>
     <p>La seguridad física necesita una clave especial que se crea con los datos actuales de la máquina.</p>
     <br>
     <p>Para conseguir esa clave, mezcla estos tres datos del equipo:</p>
-    
+
     <ul class="term-list">
         <li>El censo total de disparadores táctiles (botones) de la máquina.</li>
         <li>El valor nominal (en céntimos) de la esencia de cítricos (Té al Limón).</li>
@@ -33,7 +33,7 @@
     </ul>
 
     <p style="text-align: center; margin-top: 2rem;"><strong>Introduce la suma total para purgar el sistema... si te atreves.</strong></p>
-    
+
     <div class="form-group">
         <label style="font-size: 0.8rem; color: #445544;">// CHECKSUM_REQUIRED</label>
         <input class="answer-input" id="checksum-input" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="___" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
@@ -44,6 +44,15 @@
     <div class="hint-box" id="hint-box">
         <strong>[PISTA DEL SISTEMA]</strong> — La respuesta es una suma de TRES números. Cuenta bien todos los botones de la máquina (incluidos los de Start/Stop, Azúcar, etc).
     </div>
+  </div>
+
+  <!-- Escáner QR alternativo -->
+  <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border);">
+    <p style="text-align: center; color: #668877; margin-bottom: 1rem;">
+      <strong>¿No puedes contar los botones?</strong><br>
+      Escanea el código QR de la máquina para obtener la respuesta directamente.
+    </p>
+    @include('components.qr-scanner', ['route' => '/prueba3', 'successMessage' => 'Código QR validado correctamente'])
   </div>
 </div>
 
@@ -60,6 +69,9 @@
       </div>
   </div>
 </div>
+
+<!-- Iconos Phosphor -->
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
 
 <script>
 // --- TIMER LOGIC ---
@@ -99,7 +111,7 @@ input.addEventListener('keypress', function (e) {
 function verificarChecksum() {
     if (isProcessing) return;
     const value = input.value.trim();
-    
+
     if (value === "") {
         showError("Introduce un valor numérico válido.");
         return;
@@ -125,14 +137,14 @@ function verificarChecksum() {
             feedback.textContent = "[OK] SUMA DE VERIFICACIÓN ACEPTADA.";
             feedback.className = "feedback ok";
             input.classList.add('correct');
-            
+
             setTimeout(() => {
                 triggerWinSequence(data.mensaje);
             }, 1000);
         } else {
             failedAttempts++;
             showError("[ERROR] Checksum inválido o corrupto.");
-            
+
             if (failedAttempts >= 5) {
                 document.getElementById('hint-box').style.display = 'block';
             }
@@ -147,7 +159,7 @@ function showError(msg) {
     input.classList.add('wrong');
     feedback.textContent = msg;
     feedback.className = "feedback err";
-    
+
     setTimeout(() => {
         input.classList.remove('wrong');
         input.value = '';
@@ -162,7 +174,7 @@ function showError(msg) {
 function triggerWinSequence(mensajeNarrativo) {
     document.getElementById('screen-hacking').classList.remove('active');
     document.getElementById('screen-win').classList.add('active');
-    
+
     // Inyectamos el texto final desde backend
     document.getElementById('l4').innerText = mensajeNarrativo;
 
