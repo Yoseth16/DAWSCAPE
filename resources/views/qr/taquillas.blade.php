@@ -338,15 +338,6 @@
         <strong>[PISTA DEL SISTEMA]</strong><br>La palabra que buscas ya está escrita en la pantalla. Solo necesitas encontrarla en las taquillas correctas. Revisa la tabla de descifrado detalladamente.
     </div>
   </div>
-
-  <!-- Escáner QR alternativo -->
-  <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border);">
-    <p style="text-align: center; color: #668877; margin-bottom: 1rem;">
-      <strong>¿Prefieres escanear?</strong><br>
-      Usa el escáner QR para encontrar las letras de las taquillas.
-    </p>
-    @include('components.qr-scanner', ['route' => '/prueba5', 'successMessage' => 'Código QR validado correctamente'])
-  </div>
 </div>
 
 <!-- TERMINAL WIN -->

@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use App\Services\GameTimerService;
 use App\Http\Requests\GuardarQrRequest;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class QrController extends Controller
 {
@@ -15,6 +16,75 @@ class QrController extends Controller
     public function __construct(GameTimerService $timerService)
     {
         $this->timerService = $timerService;
+    }
+
+    // =====================================================
+    // VALIDACIÓN DE CÓDIGOS QR (texto plano) Pruebas 3-5
+    // Endpoint: POST /validar-codigo-qr (auth + throttle)
+    // =====================================================
+    public function validar(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'codigo' => ['required', 'string'],
+            'prueba' => ['required', 'integer', 'between:3,5'],
+        ]);
+
+        $codigo = trim($data['codigo']);
+        $prueba = (int) $data['prueba'];
+
+        // Anti-salto: exigir que la prueba anterior esté completada en sesión
+        // (para Prueba 3 exige prueba_2_completada, etc.)
+        $pruebaAnterior = $prueba - 1;
+        if ($pruebaAnterior >= 1) {
+            $keyAnterior = 'prueba_' . $pruebaAnterior . '_completada';
+            if (!session()->get($keyAnterior, false)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No tienes acceso a esta prueba todavía. Completa la prueba anterior.',
+                ], 403);
+            }
+        }
+
+        // Si ya estaba completada, devolvemos éxito idempotente
+        $keyActual = 'prueba_' . $prueba . '_completada';
+        if (session()->get($keyActual, false)) {
+            return response()->json([
+                'success' => true,
+                'redirect_url' => route('prueba' . ($prueba + 1)),
+            ]);
+        }
+
+        // Códigos secretos válidos (SOLO backend)
+        $codigosValidos = [
+            3 => 'ACCESO_FASE_3',
+            4 => 'ACCESO_FASE_4',
+            5 => 'ACCESO_FASE_5',
+        ];
+
+        if (!array_key_exists($prueba, $codigosValidos)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Prueba no válida.',
+            ], 422);
+        }
+
+        if (!hash_equals($codigosValidos[$prueba], $codigo)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Código incorrecto. Inténtalo de nuevo.',
+            ], 422);
+        }
+
+        // Marcar completada en sesión
+        session([$keyActual => true]);
+
+        // (Opcional) Persistencia en BBDD si existe un modelo/tabla de progreso:
+        // - Puedes integrarlo aquí (GameState/Progress) usando auth()->id()
+
+        return response()->json([
+            'success' => true,
+            'redirect_url' => route('prueba' . ($prueba + 1)),
+        ]);
     }
 
 

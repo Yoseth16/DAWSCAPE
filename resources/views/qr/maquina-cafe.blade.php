@@ -46,14 +46,6 @@
     </div>
   </div>
 
-  <!-- Escáner QR alternativo -->
-  <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border);">
-    <p style="text-align: center; color: #668877; margin-bottom: 1rem;">
-      <strong>¿No puedes contar los botones?</strong><br>
-      Escanea el código QR de la máquina para obtener la respuesta directamente.
-    </p>
-    @include('components.qr-scanner', ['route' => '/prueba3', 'successMessage' => 'Código QR validado correctamente'])
-  </div>
 </div>
 
 <!-- TERMINAL WIN -->

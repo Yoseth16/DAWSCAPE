@@ -74,6 +74,13 @@ foreach (range(0, 9) as $digito) {
 // Enrutamiento Inteligente de Escaneo QR
 Route::get('/qr/{id}', [QrController::class, 'escanearQr'])->name('qr.scan');
 
+// Validación de códigos QR (texto plano secreto) para Pruebas 3-5
+Route::post('/validar-codigo-qr', [QrController::class, 'validar'])
+    // Para ALUMNOS: usamos la sesión de juego (middleware check.fase),
+    // no el login de profesor (auth). Mantiene rate limiting.
+    ->middleware(['web', 'check.fase', 'throttle:5,1'])
+    ->name('qr.validar');
+
 
 // ==========================================
 // ZONA PRIVADA - PANEL DE PROFESORES
@@ -105,7 +112,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/prueba/prueba2', [JuegoController::class, 'mostrarPrueba2'])->name('admin.prueba.prueba2');
     Route::get('/prueba/prueba3', function () {
         // Crear sesión temporal para admin con email falso
-        session(['email' => 'admin-test@prueba3.test', 'nombre_equipo' => 'ADMIN TEST', 'clase' => 'Pruebas']);
+        // Además, marcamos progreso mínimo para que el validador QR (anti-salto) permita entrar
+        session([
+            'email' => 'admin-test@prueba3.test',
+            'nombre_equipo' => 'ADMIN TEST',
+            'clase' => 'Pruebas',
+            'prueba_2_completada' => true,
+        ]);
         return view('qr.maquina-cafe', [
             'tiempo_transcurrido' => 0,
             'titulo_prueba' => '[ADMIN TEST] Máquina de Café',
@@ -115,7 +128,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/prueba/prueba4', function () {
         // Crear sesión temporal para admin con email falso
-        session(['email' => 'admin-test@prueba4.test', 'nombre_equipo' => 'ADMIN TEST', 'clase' => 'Pruebas']);
+        session([
+            'email' => 'admin-test@prueba4.test',
+            'nombre_equipo' => 'ADMIN TEST',
+            'clase' => 'Pruebas',
+            'prueba_3_completada' => true,
+        ]);
         return view('qr.maquina-snacks', [
             'tiempo_transcurrido' => 0,
             'titulo_prueba' => '[ADMIN TEST] Máquina Oasis',
@@ -125,7 +143,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/prueba/prueba5', function () {
         // Crear sesión temporal para admin con email falso
-        session(['email' => 'admin-test@prueba5.test', 'nombre_equipo' => 'ADMIN TEST', 'clase' => 'Pruebas']);
+        session([
+            'email' => 'admin-test@prueba5.test',
+            'nombre_equipo' => 'ADMIN TEST',
+            'clase' => 'Pruebas',
+            'prueba_4_completada' => true,
+        ]);
         return view('qr.taquillas', [
             'tiempo_transcurrido' => 0,
             'titulo_prueba' => '[ADMIN TEST] Protocolo Espejo',

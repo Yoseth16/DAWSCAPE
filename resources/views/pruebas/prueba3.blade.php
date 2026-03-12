@@ -130,6 +130,78 @@
     .intro-text { font-size: 0.95rem !important; padding: 1.2rem 1rem; }
     .logo { font-size: clamp(1.5rem, 7vw, 3rem) !important; letter-spacing: 0.05em; }
   }
+
+  /* ===========================
+     QR MODAL (Prueba 3)
+     - Overlay oscuro
+     - Centrado
+     - Z-index > scanlines (body::before)
+  ============================ */
+  #qr-modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 3000;
+  }
+  #qr-modal[aria-hidden="false"] { display: flex; }
+  .qr-panel {
+    width: 100%;
+    max-width: 520px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    box-shadow: 0 0 35px rgba(0,255,136,0.15);
+    padding: 1rem;
+  }
+  .qr-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+  }
+  .qr-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.95rem;
+    letter-spacing: 0.12em;
+    color: var(--green);
+  }
+  .btn {
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: rgba(0,255,136,0.08);
+    color: var(--text);
+    padding: 0.65rem 0.85rem;
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: transform .08s ease, background .15s ease, border-color .15s ease;
+  }
+  .btn:hover { background: rgba(0,255,136,0.14); border-color: rgba(0,255,136,0.6); }
+  .btn:active { transform: translateY(1px); }
+  .btn-danger { background: rgba(255,34,68,0.10); border-color: rgba(255,34,68,0.40); }
+  .btn-danger:hover { background: rgba(255,34,68,0.18); border-color: rgba(255,34,68,0.65); }
+  #qr-reader {
+    width: 100%;
+    border: 1px dashed var(--border);
+    background: rgba(2, 12, 6, 0.35);
+    padding: 0.5rem;
+  }
+  #qr-result {
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    color: #b0e0bf;
+    line-height: 1.5;
+    min-height: 1.4rem;
+  }
+  .qr-hint {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: #7aa88c;
+    opacity: 0.9;
+  }
 </style>
 </head>
 <body>
@@ -149,9 +221,28 @@
     <br>
     <p><strong>Busca la fuente de energía líquida donde los profesores se resetean cada mañana.</strong></p>
     <br>
-    <p style="font-size: 0.85rem; color:#445544; margin-top: 1rem;">// Escanea el código en la localización física para continuar.</p>
+    <p style="font-size: 0.85rem; color:#445544; margin-top: 1rem;">// Continúa cuando encuentres la pista en la localización física.</p>
+    <div style="margin-top: 1.25rem; display:flex; justify-content:center;">
+      <button id="btn-scan" type="button" class="btn">📷 Escanear QR</button>
+    </div>
   </div>
 </div>
+
+<!-- Modal / Overlay QR -->
+<div id="qr-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Escáner QR">
+  <div class="qr-panel">
+    <div class="qr-panel-header">
+      <div class="qr-title">ESCÁNER QR // PRUEBA 3</div>
+      <button id="btn-close-modal" class="btn btn-danger" type="button">✕ Cerrar</button>
+    </div>
+    <div id="qr-reader"></div>
+    <p id="qr-result">Pulsa "📷 Escanear QR" para iniciar la cámara.</p>
+    <div class="qr-hint">// Si no aparece la cámara, revisa permisos del navegador.</div>
+  </div>
+</div>
+
+<!-- Librería html5-qrcode (CDN) -->
+<script src="https://unpkg.com/html5-qrcode"></script>
 
 <script>
 let tiempoInicial = parseInt("{{ $tiempo_transcurrido ?? 0 }}");
@@ -177,6 +268,149 @@ function actualizarTimer() {
 
 actualizarTimer();
 setInterval(actualizarTimer, 1000);
+</script>
+
+<script>
+// Escaneo QR (html5-qrcode) — Prueba 3
+(function () {
+  const PRUEBA_NUMERO = 3;
+
+  const btnScan  = document.getElementById('btn-scan');
+  const modal    = document.getElementById('qr-modal');
+  const btnClose = document.getElementById('btn-close-modal');
+  const resultEl = document.getElementById('qr-result');
+  const readerEl = document.getElementById('qr-reader');
+
+  const csrfToken =
+    document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+  let scanner = null;
+  let isStopping = false;
+
+  function setResult(msg, isError = false) {
+    if (!resultEl) return;
+    resultEl.textContent = msg;
+    resultEl.style.color = isError ? '#ff8aa0' : '#b0e0bf';
+  }
+
+  async function stopScanner() {
+    if (!scanner || isStopping) return;
+    isStopping = true;
+    try {
+      await scanner.clear();
+    } catch (e) {
+    } finally {
+      scanner = null;
+      isStopping = false;
+      if (readerEl) readerEl.innerHTML = '';
+    }
+  }
+
+  function openModal() {
+    if (!modal) return;
+    modal.setAttribute('aria-hidden', 'false');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  async function closeModal() {
+    await stopScanner();
+    if (!modal) return;
+    modal.setAttribute('aria-hidden', 'true');
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+    setResult('Escáner cerrado. Puedes volver a intentarlo cuando quieras.');
+  }
+
+  async function validarCodigo(decodedText) {
+    setResult('Verificando código...');
+    try {
+      const resp = await fetch('/validar-codigo-qr', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': csrfToken,
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ codigo: decodedText, prueba: PRUEBA_NUMERO })
+      });
+
+      const data = await resp.json().catch(() => ({}));
+      if (resp.ok && data && data.success === true && data.redirect_url) {
+        window.location.href = data.redirect_url;
+        return;
+      }
+
+      const msg =
+        data?.message ||
+        (resp.status === 429
+          ? 'Demasiados intentos. Espera un minuto e inténtalo de nuevo.'
+          : 'No se pudo validar el código. Inténtalo de nuevo.');
+      setResult(msg, true);
+
+      if (modal && modal.getAttribute('aria-hidden') === 'false') {
+        await startScanner();
+      }
+    } catch (err) {
+      setResult('Error de red. Revisa tu conexión e inténtalo de nuevo.', true);
+      if (modal && modal.getAttribute('aria-hidden') === 'false') {
+        await startScanner();
+      }
+    }
+  }
+
+  async function startScanner() {
+    if (typeof Html5QrcodeScanner === 'undefined') {
+      setResult('No se pudo cargar la librería del escáner. Recarga la página.', true);
+      return;
+    }
+
+    await stopScanner();
+    if (readerEl) readerEl.innerHTML = '';
+    setResult('Inicializando cámara...');
+
+    const config = {
+      fps: 10,
+      qrbox: { width: 250, height: 250 },
+      rememberLastUsedCamera: true,
+    };
+
+    scanner = new Html5QrcodeScanner('qr-reader', config, /* verbose= */ false);
+    scanner.render(
+      async (decodedText) => {
+        await stopScanner();
+        await validarCodigo(decodedText);
+      },
+      () => {
+        // errores normales de escaneo, los ignoramos
+      }
+    );
+
+    setTimeout(() => {
+      const hasVideo = readerEl?.querySelector('video');
+      if (!hasVideo && modal && modal.getAttribute('aria-hidden') === 'false') {
+        setResult('No se pudo acceder a la cámara. Revisa permisos o usa otro dispositivo.', true);
+      }
+    }, 1200);
+  }
+
+  btnScan?.addEventListener('click', async () => {
+    openModal();
+    await startScanner();
+  });
+
+  btnClose?.addEventListener('click', closeModal);
+
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal && modal.getAttribute('aria-hidden') === 'false') {
+      closeModal();
+    }
+  });
+})();
 </script>
 </body>
 </html>

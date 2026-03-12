@@ -305,15 +305,6 @@
         <strong>[PISTA DEL SISTEMA]</strong><br>La respuesta es la suma de tres números. Cuenta las filas horizontales, averigua el código numérico del café y suma cuántos productos exactos entran en el alambre del hueco A1.
     </div>
   </div>
-
-  <!-- Escáner QR alternativo -->
-  <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border);">
-    <p style="text-align: center; color: #668877; margin-bottom: 1rem;">
-      <strong>¿Necesitas ayuda?</strong><br>
-      Escanea el código QR de la máquina Oasis para obtener la respuesta.
-    </p>
-    @include('components.qr-scanner', ['route' => '/prueba4', 'successMessage' => 'Código QR validado correctamente'])
-  </div>
 </div>
 
 <!-- TERMINAL WIN -->

@@ -17,7 +17,16 @@ class CheckFase
             if ($request->wantsJson() || $request->isMethod('post')) {
                 return response()->json(['success' => false, 'message' => 'Sesión no activa. Registra tu equipo primero.'], 403);
             }
-            return redirect()->route('inicio')->with('error', 'Debes registrar tu equipo antes de jugar.');
+            // Preservar destino para que, tras iniciar conexión, vuelvan a la URL solicitada (ej: /prueba3)
+            $destino = '/' . ltrim($request->path(), '/');
+            $qs = $request->getQueryString();
+            if (!empty($qs)) {
+                $destino .= '?' . $qs;
+            }
+
+            return redirect()
+                ->route('inicio', ['redirect_to' => $destino])
+                ->with('error', 'Debes registrar tu equipo antes de jugar.');
         }
 
         return $next($request);
