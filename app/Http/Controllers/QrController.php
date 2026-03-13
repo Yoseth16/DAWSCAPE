@@ -94,6 +94,41 @@ class QrController extends Controller
         $esValido = hash_equals($claveEsperada, $codigoLimpiado) || str_contains($codigoLimpiado, $urlAdmitida);
 
         if (!$esValido) {
+            // Buscar en base de datos si es una URL dinámica generada
+            // El código suele ser una URL completa tipo https://dawscape.fun/qr/algo
+            $qrEnBD = \App\Models\Qr::where('url', $codigo)->first();
+            
+            // Si no coincide la URL exacta, intentamos buscar si el slug de la URL coincide en la BD
+            if (!$qrEnBD) {
+                $pos = strrpos($codigo, '/qr/');
+                if ($pos !== false) {
+                    $slug = substr($codigo, $pos + 4);
+                    $qrEnBD = \App\Models\Qr::where('url', 'LIKE', '%/qr/' . $slug)->first();
+                }
+            }
+
+            if ($qrEnBD) {
+                // El QR existe en la BD. Verificar la fase asignada.
+                $faseEsperada = match($prueba) {
+                    3 => 'Prueba 3 Angel',
+                    4 => 'Prueba 4 Arturo',
+                    5 => 'Prueba 5 Eloy',
+                    default => ''
+                };
+
+                // Normalizamos ambas cadenas para comparar sin fallos de espacios
+                if (strtolower(trim($qrEnBD->fase_requerida)) === strtolower(trim($faseEsperada))) {
+                    $esValido = true;
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Este código QR pertenece a otra prueba.',
+                    ], 422);
+                }
+            }
+        }
+
+        if (!$esValido) {
             Log::info('QR inválido', [
                 'prueba'             => $prueba,
                 'codigo_normalizado' => $codigoLimpiado,

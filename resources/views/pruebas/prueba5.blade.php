@@ -430,14 +430,6 @@ setInterval(actualizarTimer, 1000);
     setResult('');
   }
 
-  // Slugs válidos que activan esta prueba (URL-type QR)
-  const SLUGS_VALIDOS = ['prueba5eloy', 'prueba-5-eloy', 'prueba5', 'acceso_fase_5'];
-
-  function esQrValido(text) {
-    const t = text.toLowerCase().replace(/[^a-z0-9_]/g, '');
-    return SLUGS_VALIDOS.some(s => t.includes(s.replace(/[^a-z0-9_]/g, '')));
-  }
-
   function activarChallenge() {
     if (window.audioManager) window.audioManager.playSFX('correct');
     closeModal();
@@ -448,13 +440,6 @@ setInterval(actualizarTimer, 1000);
   async function validarCodigo(decodedText) {
     setResult('Verificando código...');
 
-    // 1. Si el QR contiene una URL con slug válido, activar directamente
-    if (esQrValido(decodedText)) {
-      activarChallenge();
-      return;
-    }
-
-    // 2. Fallback: validar vía servidor
     try {
       const resp = await fetch('/validar-codigo-qr', {
         method: 'POST',
