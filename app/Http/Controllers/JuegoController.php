@@ -567,13 +567,13 @@ class JuegoController extends Controller
             return response()->json(['success' => false, 'message' => 'No hay partida activa.'], 403);
         }
 
-        // Penalizar con 480 segundos (8 minutos)
-        $penalizacion = 480;
+        // Penalizar con 30 segundos
+        $penalizacion = 30;
         $partida->increment('penalizacion_segundos', $penalizacion);
 
         $this->logAccion($partida, 'Prueba 6 Migue', 'Penalización por fallo en Simón Dice', [
             'penalizacion' => $penalizacion,
-            'mensaje' => '¡Te quitamos 8 min porque eres tonto! Es un simón dice'
+            'mensaje' => '[PENALIZACIÓN] Secuencia incorrecta. +30 segundos añadidos al tiempo.'
         ]);
 
         return response()->json([

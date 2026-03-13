@@ -9,6 +9,8 @@
         <p>Apunta la cámara hacia el código QR</p>
     </div>
 
+    <div id="reader" class="qr-reader"></div>
+
     <div id="qr-result" class="qr-result" style="display: none;">
         <div class="qr-success">
             <i class="ph-fill ph-check-circle"></i>
@@ -21,11 +23,9 @@
         <span id="qr-error-message">Error al escanear</span>
     </div>
 
-    <input type="file" accept="image/*" capture="environment" id="qr-input" style="display:none">
-    <button id="btn-scan-native" class="btn-scanner" onclick="document.getElementById('qr-input').click()">
-        <i class="ph ph-camera"></i> ESCANEAR
+    <button id="toggle-scanner" class="btn-scanner" onclick="toggleScanner()">
+        <i class="ph ph-camera"></i> Activar Escáner
     </button>
-    <div id="dummy-reader" style="visibility:hidden; width:1px; height:1px; position:absolute;"></div>
 </div>
 
 <style>
@@ -176,48 +176,98 @@
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
+let html5QrCode = null;
+let isScanning = false;
 const targetRoute = "{{ $route ?? '/qr' }}";
 const successMessage = "{{ $successMessage ?? 'QR escaneado correctamente' }}";
 
-document.getElementById('qr-input')?.addEventListener('change', async (e) => {
-    if (e.target.files && e.target.files.length > 0) {
-        const file = e.target.files[0];
-        
-        // UI Feedback
-        document.getElementById('qr-result').style.display = 'flex';
-        document.getElementById('qr-error').style.display = 'none';
-        document.getElementById('qr-message').textContent = 'Procesando imagen...';
-        document.getElementById('btn-scan-native').style.display = 'none';
-        
-        try {
-            if (typeof Html5Qrcode === 'undefined') {
-                showError('Error al cargar escáner. Recarga la página.');
-                return;
-            }
-            const html5QrCode = new Html5Qrcode("dummy-reader");
-            const decodedText = await html5QrCode.scanFile(file, true);
-            
-            // Éxito: vibrar y enviar
-            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-            sendQRToServer(decodedText);
-            
-        } catch (err) {
-            console.error('Error procesando código QR desde imagen', err);
-            showError('No se encontró un código QR válido en la imagen. Inténtalo de nuevo.');
-            if (navigator.vibrate) navigator.vibrate(200);
-            
-            setTimeout(() => {
-                document.getElementById('btn-scan-native').style.display = 'flex';
-                document.getElementById('qr-result').style.display = 'none';
-            }, 2500);
-        }
-        
-        e.target.value = ''; // Reset input
+function toggleScanner() {
+    const readerDiv = document.getElementById('reader');
+    const toggleBtn = document.getElementById('toggle-scanner');
+    const resultDiv = document.getElementById('qr-result');
+    const errorDiv = document.getElementById('qr-error');
+
+    if (!isScanning) {
+        // Activar escáner
+        readerDiv.classList.add('active');
+        toggleBtn.classList.add('active');
+        toggleBtn.innerHTML = '<i class="ph ph-x"></i> Detener Escáner';
+        resultDiv.style.display = 'none';
+        errorDiv.style.display = 'none';
+
+        startScanner();
+    } else {
+        // Detener escáner
+        stopScanner();
+        readerDiv.classList.remove('active');
+        toggleBtn.classList.remove('active');
+        toggleBtn.innerHTML = '<i class="ph ph-camera"></i> Activar Escáner';
     }
-});
+}
+
+function startScanner() {
+    html5QrCode = new Html5Qrcode("reader");
+
+    const config = {
+        fps: 10,
+        qrbox: { width: 250, height: 250 },
+        aspectRatio: 1.0
+    };
+
+    html5QrCode.start(
+        { facingMode: "environment" },
+        config,
+        onScanSuccess,
+        onScanError
+    ).then(() => {
+        isScanning = true;
+    }).catch(err => {
+        console.error("Error al iniciar escáner:", err);
+        showError("No se pudo acceder a la cámara. Verifica los permisos.");
+        document.getElementById('reader').classList.remove('active');
+        document.getElementById('toggle-scanner').classList.remove('active');
+        document.getElementById('toggle-scanner').innerHTML = '<i class="ph ph-camera"></i> Activar Escáner';
+    });
+}
+
+function stopScanner() {
+    if (html5QrCode && isScanning) {
+        html5QrCode.stop().then(() => {
+            isScanning = false;
+            html5QrCode.clear();
+        }).catch(err => {
+            console.error("Error al detener escáner:", err);
+        });
+    }
+}
+
+function onScanSuccess(decodedText, decodedResult) {
+    // Detener el escáner inmediatamente
+    stopScanner();
+
+    // Mostrar mensaje de éxito
+    document.getElementById('qr-message').textContent = successMessage;
+    document.getElementById('qr-result').style.display = 'flex';
+    document.getElementById('reader').classList.remove('active');
+    document.getElementById('toggle-scanner').style.display = 'none';
+
+    // Vibración háptica si está disponible
+    if (navigator.vibrate) {
+        navigator.vibrate([100, 50, 100]);
+    }
+
+    // Enviar el código QR al servidor
+    sendQRToServer(decodedText);
+}
+
+function onScanError(errorMessage) {
+    // Ignorar errores de escaneo continuo (son normales)
+    // Solo mostrar errores críticos
+}
 
 function sendQRToServer(qrData) {
-    document.getElementById('qr-message').textContent = 'Validando en servidor...';
+    // Mostrar indicador de carga
+    document.getElementById('qr-message').textContent = 'Procesando...';
 
     fetch(targetRoute, {
         method: 'POST',
@@ -231,6 +281,8 @@ function sendQRToServer(qrData) {
     .then(data => {
         if (data.success) {
             document.getElementById('qr-message').textContent = data.message || successMessage;
+
+            // Redirigir si se proporciona una URL
             if (data.redirect) {
                 setTimeout(() => {
                     window.location.href = data.redirect;
@@ -238,17 +290,19 @@ function sendQRToServer(qrData) {
             }
         } else {
             showError(data.message || 'QR inválido o no reconocido');
+            // Permitir escanear de nuevo
             setTimeout(() => {
-                document.getElementById('btn-scan-native').style.display = 'flex';
+                document.getElementById('toggle-scanner').style.display = 'block';
                 document.getElementById('qr-result').style.display = 'none';
                 document.getElementById('qr-error').style.display = 'none';
             }, 2000);
         }
     })
     .catch(error => {
+        console.error('Error:', error);
         showError('Error de conexión con el servidor');
         setTimeout(() => {
-            document.getElementById('btn-scan-native').style.display = 'flex';
+            document.getElementById('toggle-scanner').style.display = 'block';
             document.getElementById('qr-result').style.display = 'none';
             document.getElementById('qr-error').style.display = 'none';
         }, 2000);
@@ -264,4 +318,11 @@ function showError(message) {
         navigator.vibrate(200);
     }
 }
+
+// Limpiar al salir de la página
+window.addEventListener('beforeunload', () => {
+    if (isScanning) {
+        stopScanner();
+    }
+});
 </script>

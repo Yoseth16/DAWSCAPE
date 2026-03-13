@@ -51,6 +51,9 @@ let isPlaying = false;
 // DOM refs
 let statusTxt, rondaVal, pasosVal, board;
 
+// Penalización local aplicada al cronómetro (en segundos)
+let addLocalPenalty = null;
+
 function lightUp(sectorId, isPlayer = false) {
     const btn = document.getElementById("btn-" + sectorId);
     if (!btn) return;
@@ -136,14 +139,14 @@ function handleSectorTouch(sectorId, event) {
         if (board) board.style.animation = "shake 0.4s";
         if (statusTxt) {
             statusTxt.innerText =
-                "[ERROR] DESINCRONIZACIÓN. ¡Te quitamos 8 min porque eres tonto! Es un simón dice. REINICIANDO FASE...";
+                "[PENALIZACIÓN] Secuencia incorrecta. +30 segundos añadidos a tu tiempo. REINICIANDO FASE...";
             statusTxt.className = "status-info";
             statusTxt.style.color = "var(--red)";
         }
         if (window.audioManager) window.audioManager.playSFX('error');
         playTone(S_ERR, "sawtooth", 0.8);
 
-        // Penalizar al equipo con 480 segundos (8 minutos)
+        // Penalizar al equipo con 30 segundos
         const csrfToken = document.querySelector('meta[name="csrf-token"]');
         if (csrfToken) {
             fetch("/prueba6/penalizar", {
@@ -152,7 +155,14 @@ function handleSectorTouch(sectorId, event) {
                     "Content-Type": "application/json",
                     "X-CSRF-TOKEN": csrfToken.getAttribute("content"),
                 },
-            }).catch((err) => console.error("Error al penalizar:", err));
+            })
+                .then((r) => r.json())
+                .then((data) => {
+                    if (data && data.success && typeof addLocalPenalty === "function") {
+                        addLocalPenalty(data.penalizacion || 30);
+                    }
+                })
+                .catch((err) => console.error("Error al penalizar:", err));
         }
 
         setTimeout(() => {
@@ -188,7 +198,7 @@ function winGame() {
 // AUTO-INICIALIZACIÓN (se ejecuta cuando el módulo carga)
 // =====================================================
 document.addEventListener("DOMContentLoaded", function () {
-    // ── TIMER ──
+    // ── TIMER ─
     const configEl = document.getElementById("prueba6-config");
     const timerDisplay = document.getElementById("cronometro");
     const MAX_MINUTOS = 90;
@@ -196,10 +206,16 @@ document.addEventListener("DOMContentLoaded", function () {
     if (configEl && timerDisplay) {
         let tiempoInicial = parseInt(configEl.dataset.tiempo || "0", 10);
         const loadTimeMs = Date.now();
+        let penaltySeconds = 0;
+
+        // función usada por la penalización para sumar 30s al cronómetro local
+        addLocalPenalty = function (segundos) {
+            penaltySeconds += segundos;
+        };
 
         function actualizarTimer() {
-            let tiempo =
-                tiempoInicial + Math.floor((Date.now() - loadTimeMs) / 1000);
+            const elapsed = Math.floor((Date.now() - loadTimeMs) / 1000);
+            let tiempo = tiempoInicial + penaltySeconds + elapsed;
             let minutos = parseInt(tiempo / 60, 10);
             let segundos = parseInt(tiempo % 60, 10);
             let m = minutos < 10 ? "0" + minutos : minutos;

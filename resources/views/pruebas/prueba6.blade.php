@@ -40,10 +40,10 @@
 
     <!-- Tablero 2x2 -->
     <div class="simon-board" id="board">
-        <div class="sector" id="btn-0" onmousedown="touchSector(0, event)" ontouchstart="touchSector(0, event)"></div>
-        <div class="sector" id="btn-1" onmousedown="touchSector(1, event)" ontouchstart="touchSector(1, event)"></div>
-        <div class="sector" id="btn-2" onmousedown="touchSector(2, event)" ontouchstart="touchSector(2, event)"></div>
-        <div class="sector" id="btn-3" onmousedown="touchSector(3, event)" ontouchstart="touchSector(3, event)"></div>
+        <div class="sector" id="btn-0"></div>
+        <div class="sector" id="btn-1"></div>
+        <div class="sector" id="btn-2"></div>
+        <div class="sector" id="btn-3"></div>
     </div>
 
 </div>
