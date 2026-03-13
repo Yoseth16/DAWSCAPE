@@ -16,13 +16,12 @@
         <div class="title-text" id="trackTitle">DAWSCAPE - Tema Principal</div>
       </div>
 
-      <!-- Controles -->
-      <div class="player-controls">
-        <!-- Volumen -->
-        <div class="control-group volume-control">
-          <button id="volumeDown" class="control-btn" title="Bajar volumen">
-            <span>🔉</span>
-          </button>
+      <!-- Controles de volumen -->
+      <div class="volume-section">
+        <button id="volumeMuteBtn" class="volume-icon-btn" title="Silenciar/Activar">
+          <span id="volumeIcon">🔊</span>
+        </button>
+        <div class="volume-slider-wrap">
           <input
             type="range"
             id="volumeSlider"
@@ -32,12 +31,12 @@
             value="50"
             title="Ajustar volumen"
           >
-          <button id="volumeUp" class="control-btn" title="Subir volumen">
-            <span>🔊</span>
-          </button>
         </div>
+        <span class="volume-pct" id="volumePct">50%</span>
+      </div>
 
-        <!-- Play/Pause -->
+      <!-- Controles de reproducción -->
+      <div class="playback-controls">
         <button id="playPauseBtn" class="play-pause-btn" title="Pausa/Reproducción">
           <span class="icon-play">▶</span>
           <span class="icon-pause" style="display:none;">⏸</span>
@@ -55,27 +54,27 @@
 <style>
   :root {
     --music-player-primary: #00ff88;
-    --music-player-bg: rgba(2, 12, 6, 0.85);
+    --music-player-bg: rgba(2, 12, 6, 0.92);
     --music-player-border: #00ff8840;
     --music-player-text: #c8ffdf;
     --music-player-panel: #041a0e;
   }
-  
-  /* Estilos del wrapper y botón toggle */
+
+  /* Wrapper y botón toggle */
   .music-player-dropdown {
     position: fixed;
-    top: 4rem; /* Debajo del header (.game-header suele tener unos 3-4rem) */
+    top: 4rem;
     left: 1rem;
     z-index: 900;
     font-family: 'Share Tech Mono', monospace;
   }
 
   .music-toggle-btn {
-    background: rgba(2, 12, 6, 0.85);
+    background: var(--music-player-bg);
     border: 1px solid var(--music-player-border);
     border-radius: 50%;
-    width: 42px;
-    height: 42px;
+    width: 44px;
+    height: 44px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -85,6 +84,7 @@
     box-shadow: 0 4px 15px rgba(0, 255, 136, 0.2);
     backdrop-filter: blur(5px);
     transition: all 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .music-toggle-btn:hover {
@@ -92,31 +92,31 @@
     box-shadow: 0 4px 25px rgba(0, 255, 136, 0.4);
     border-color: var(--music-player-primary);
   }
-  
+
   .music-toggle-btn.active {
     background: rgba(0, 255, 136, 0.15);
     border-color: var(--music-player-primary);
     box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
   }
 
-  /* El panel del reproductor (oculto por defecto) */
+  /* Panel del reproductor */
   .music-player {
     position: absolute;
-    top: 3rem; /* Espacio para el botón toggle */
+    top: 3rem;
     left: 0;
     width: max-content;
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
     transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
-    pointer-events: none; /* No clickear cuando está oculto */
+    pointer-events: none;
   }
 
   .music-player.show {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
-    pointer-events: auto; /* Activar clicks cuando se muestra */
+    pointer-events: auto;
   }
 
   .player-background {
@@ -124,9 +124,9 @@
     inset: 0;
     background: var(--music-player-bg);
     border: 1px solid var(--music-player-border);
-    border-radius: 8px;
+    border-radius: 10px;
     backdrop-filter: blur(10px);
-    box-shadow: 0 4px 20px rgba(0, 255, 136, 0.1);
+    box-shadow: 0 4px 24px rgba(0, 255, 136, 0.12);
   }
 
   .player-container {
@@ -134,15 +134,14 @@
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    padding: 0.875rem;
+    padding: 1rem;
     width: 280px;
-    min-height: 100px;
   }
 
-  /* Título de la canción */
+  /* Título */
   .track-title {
     overflow: hidden;
-    height: 2.5rem;
+    height: 1.6rem;
     display: flex;
     align-items: center;
   }
@@ -159,114 +158,138 @@
   }
 
   @keyframes scrollTitle {
-    0% {
-      transform: translateX(0);
-    }
-    20% {
-      transform: translateX(0);
-    }
-    80% {
-      transform: translateX(-100%);
-    }
-    100% {
-      transform: translateX(-100%);
-    }
+    0%  { transform: translateX(0); }
+    20% { transform: translateX(0); }
+    80% { transform: translateX(-100%); }
+    100%{ transform: translateX(-100%); }
   }
 
-  /* Controles */
-  .player-controls {
+  /* ═══ Sección de volumen ═══ */
+  .volume-section {
     display: flex;
+    align-items: center;
     gap: 0.5rem;
-    align-items: center;
-    justify-content: space-between;
+    background: rgba(0, 255, 136, 0.04);
+    padding: 0.5rem 0.6rem;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 255, 136, 0.15);
   }
 
-  .control-group {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    flex: 1;
-  }
-
-  .volume-control {
-    background: rgba(0, 255, 136, 0.05);
-    padding: 0.4rem;
-    border-radius: 4px;
-    border: 1px solid rgba(0, 255, 136, 0.2);
-  }
-
-  .control-btn {
+  .volume-icon-btn {
     background: none;
     border: none;
     color: var(--music-player-primary);
     cursor: pointer;
-    font-size: 1rem;
-    padding: 0.25rem;
-    transition: all 0.2s ease;
+    font-size: 1.15rem;
+    padding: 0.3rem;
+    min-width: 32px;
+    min-height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.2s ease;
+    border-radius: 6px;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  .control-btn:hover {
-    transform: scale(1.15);
-    text-shadow: 0 0 10px rgba(0, 255, 136, 0.8);
+  .volume-icon-btn:hover {
+    background: rgba(0, 255, 136, 0.1);
   }
 
-  .control-btn:active {
-    transform: scale(0.95);
+  .volume-icon-btn:active {
+    transform: scale(0.9);
+  }
+
+  .volume-slider-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: 6px 0;
   }
 
   .volume-slider {
-    width: 60px;
-    height: 4px;
+    width: 100%;
+    height: 6px;
     cursor: pointer;
-    accent-color: var(--music-player-primary);
     -webkit-appearance: none;
     appearance: none;
-    background: rgba(0, 255, 136, 0.2);
-    border-radius: 2px;
+    background: rgba(0, 255, 136, 0.15);
+    border-radius: 3px;
     outline: none;
+    transition: height 0.15s ease;
+  }
+
+  /* Filled track via JS-set CSS variable */
+  .volume-slider {
+    background: linear-gradient(
+      to right,
+      var(--music-player-primary) 0%,
+      var(--music-player-primary) var(--vol-pct, 50%),
+      rgba(0, 255, 136, 0.15) var(--vol-pct, 50%),
+      rgba(0, 255, 136, 0.15) 100%
+    );
   }
 
   .volume-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 12px;
-    height: 12px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     background: var(--music-player-primary);
     cursor: pointer;
-    box-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
-    transition: all 0.2s ease;
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.6);
+    transition: box-shadow 0.2s ease, transform 0.15s ease;
+    border: 2px solid #041a0e;
   }
 
   .volume-slider::-webkit-slider-thumb:hover {
-    box-shadow: 0 0 15px rgba(0, 255, 136, 0.9);
-    transform: scale(1.2);
+    box-shadow: 0 0 18px rgba(0, 255, 136, 0.9);
+    transform: scale(1.15);
   }
 
   .volume-slider::-moz-range-thumb {
-    width: 12px;
-    height: 12px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     background: var(--music-player-primary);
-    border: none;
+    border: 2px solid #041a0e;
     cursor: pointer;
-    box-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
-    transition: all 0.2s ease;
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.6);
   }
 
-  /* Play/Pause Button */
+  .volume-slider::-moz-range-track {
+    height: 6px;
+    background: transparent;
+    border: none;
+  }
+
+  .volume-pct {
+    font-size: 0.7rem;
+    color: var(--music-player-primary);
+    min-width: 2.2rem;
+    text-align: right;
+    font-weight: bold;
+    opacity: 0.8;
+    user-select: none;
+  }
+
+  /* ═══ Controles de reproducción ═══ */
+  .playback-controls {
+    display: flex;
+    justify-content: center;
+  }
+
   .play-pause-btn {
     background: linear-gradient(135deg, rgba(0, 255, 136, 0.3), rgba(0, 255, 136, 0.1));
     border: 2px solid var(--music-player-primary);
     color: var(--music-player-primary);
     cursor: pointer;
-    width: 50px;
-    height: 50px;
+    width: 48px;
+    height: 48px;
     border-radius: 8px;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: bold;
     transition: all 0.3s ease;
     display: flex;
@@ -274,6 +297,7 @@
     justify-content: center;
     box-shadow: 0 0 20px rgba(0, 255, 136, 0.3), inset 0 0 10px rgba(0, 255, 136, 0.1);
     line-height: 1;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .play-pause-btn:hover {
@@ -284,10 +308,9 @@
 
   .play-pause-btn:active {
     transform: scale(0.92);
-    box-shadow: 0 0 15px rgba(0, 255, 136, 0.4), inset 0 0 8px rgba(0, 255, 136, 0.3);
   }
 
-  /* Indicador de reproducción */
+  /* Indicador */
   .player-indicator {
     display: flex;
     align-items: center;
@@ -310,39 +333,35 @@
   }
 
   @keyframes pulse {
-    0%, 100% {
-      transform: scale(1);
-      opacity: 0.8;
-    }
-    50% {
-      transform: scale(1.5);
-      opacity: 1;
-    }
+    0%, 100% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.5); opacity: 1; }
   }
 
-  /* Responsive - Mobile */
+  /* ═══ Mobile ═══ */
   @media (max-width: 480px) {
-    .music-player {
-      bottom: 0.5rem;
+    .music-player-dropdown {
+      top: 3.5rem;
       left: 0.5rem;
     }
 
     .player-container {
-      width: 220px;
-      padding: 0.75rem;
+      width: 260px;
+      padding: 0.85rem;
       gap: 0.6rem;
     }
 
-    .track-title {
-      height: 2rem;
+    .volume-slider::-webkit-slider-thumb {
+      width: 22px;
+      height: 22px;
     }
 
-    .title-text {
-      font-size: 0.7rem;
+    .volume-slider::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
     }
 
     .volume-slider {
-      width: 50px;
+      height: 8px;
     }
 
     .play-pause-btn {
@@ -352,56 +371,69 @@
     }
   }
 
-  /* Tablet */
+  /* Tablet+ */
   @media (min-width: 768px) {
     .player-container {
       width: 300px;
     }
 
     .play-pause-btn {
-      width: 55px;
-      height: 55px;
-      font-size: 1.8rem;
+      width: 52px;
+      height: 52px;
+      font-size: 1.6rem;
     }
-  }
-
-  /* Estados */
-  .music-player.minimized {
-    bottom: 1rem;
-    left: 1rem;
-    width: 50px;
-  }
-
-  .music-player.minimized .track-title,
-  .music-player.minimized .player-controls {
-    display: none;
-  }
-
-  .music-player.minimized .player-container {
-    width: 50px;
-    height: 50px;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-  }
-</style>
-
 <script>
-  // Sistema de controles del reproductor de música
   (function() {
     const musicPlayer = document.getElementById('music-player');
     const playPauseBtn = document.getElementById('playPauseBtn');
     const volumeSlider = document.getElementById('volumeSlider');
-    const volumeDown = document.getElementById('volumeDown');
-    const volumeUp = document.getElementById('volumeUp');
+    const volumeMuteBtn = document.getElementById('volumeMuteBtn');
+    const volumeIcon = document.getElementById('volumeIcon');
+    const volumePct = document.getElementById('volumePct');
     const trackTitle = document.getElementById('trackTitle');
     const indicatorDot = document.querySelector('.indicator-dot');
+    const toggleBtn = document.getElementById('musicToggleBtn');
 
-    // Event listener para cambios de estado de audio
-    document.addEventListener('audioStateChanged', (e) => {
+    let previousVolume = 0.5; // Para restaurar al desmutear
+
+    /**
+     * Actualiza el icono de volumen según el nivel
+     */
+    function updateVolumeIcon(vol) {
+      if (vol <= 0) {
+        volumeIcon.textContent = '🔇';
+      } else if (vol < 0.35) {
+        volumeIcon.textContent = '🔈';
+      } else if (vol < 0.7) {
+        volumeIcon.textContent = '🔉';
+      } else {
+        volumeIcon.textContent = '🔊';
+      }
+    }
+
+    /**
+     * Actualiza la barra de relleno del slider
+     */
+    function updateSliderFill(pct) {
+      volumeSlider.style.setProperty('--vol-pct', pct + '%');
+    }
+
+    /**
+     * Sincroniza todos los controles visuales con un valor de volumen
+     */
+    function syncVolumeUI(vol) {
+      const pct = Math.round(vol * 100);
+      volumeSlider.value = pct;
+      volumePct.textContent = pct + '%';
+      updateVolumeIcon(vol);
+      updateSliderFill(pct);
+    }
+
+    // Estado de audio → UI
+    document.addEventListener('audioStateChanged', function(e) {
       const { isPlaying, trackInfo, volume } = e.detail;
 
-      // Actualizar botón play/pause
+      // Play/Pause
       const playIcon = playPauseBtn.querySelector('.icon-play');
       const pauseIcon = playPauseBtn.querySelector('.icon-pause');
 
@@ -415,47 +447,50 @@
         indicatorDot.classList.remove('playing');
       }
 
-      // Actualizar título
+      // Título
       if (trackInfo && trackInfo.title) {
         trackTitle.textContent = trackInfo.title;
       }
 
-      // Actualizar volumen slider
-      volumeSlider.value = Math.round(volume * 100);
+      // Volumen
+      syncVolumeUI(volume);
     });
 
     // Play/Pause
-    playPauseBtn.addEventListener('click', () => {
+    playPauseBtn.addEventListener('click', function() {
       if (window.audioManager) {
         window.audioManager.togglePlayPause();
+      }
+    });
+
+    // Volume slider — input para respuesta en tiempo real
+    volumeSlider.addEventListener('input', function(e) {
+      if (window.audioManager) {
+        var val = parseInt(e.target.value, 10) / 100;
+        window.audioManager.setVolume(val);
+        previousVolume = val > 0 ? val : previousVolume;
+      }
+    });
+
+    // Soporte táctil explícito para slider en móvil
+    volumeSlider.addEventListener('touchstart', function(e) {
+      e.stopPropagation(); // Evitar que el contenedor capture el toque
+    }, { passive: true });
+
+    // Mute/Unmute
+    volumeMuteBtn.addEventListener('click', function() {
+      if (!window.audioManager) return;
+
+      if (window.audioManager.currentVolume > 0) {
+        previousVolume = window.audioManager.currentVolume;
+        window.audioManager.setVolume(0);
       } else {
-        console.warn('audioManager no disponible');
+        window.audioManager.setVolume(previousVolume || 0.5);
       }
     });
 
-    // Volume slider
-    volumeSlider.addEventListener('input', (e) => {
-      if (window.audioManager) {
-        const value = e.target.value / 100;
-        window.audioManager.setVolume(value);
-      }
-    });
-
-    // Volume buttons
-    volumeDown.addEventListener('click', () => {
-      if (window.audioManager) {
-        window.audioManager.decreaseVolume(0.1);
-      }
-    });
-
-    volumeUp.addEventListener('click', () => {
-      if (window.audioManager) {
-        window.audioManager.increaseVolume(0.1);
-      }
-    });
-
-    // Keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
+    // Atajos de teclado
+    document.addEventListener('keydown', function(e) {
       if (e.code === 'Space' && e.target === document.body) {
         e.preventDefault();
         if (window.audioManager) window.audioManager.togglePlayPause();
@@ -468,31 +503,47 @@
         e.preventDefault();
         if (window.audioManager) window.audioManager.decreaseVolume(0.05);
       }
+      if (e.code === 'KeyM' && e.ctrlKey) {
+        e.preventDefault();
+        volumeMuteBtn.click();
+      }
     });
 
-    // Lógica para desplegar / contraer el menú
-    const toggleBtn = document.getElementById('musicToggleBtn');
-    
-    toggleBtn.addEventListener('click', (e) => {
-        musicPlayer.classList.toggle('show');
-        toggleBtn.classList.toggle('active');
-        e.stopPropagation(); // Evitar que se cierre inmediatamente por el clic fuera
+    // Toggle panel
+    toggleBtn.addEventListener('click', function(e) {
+      musicPlayer.classList.toggle('show');
+      toggleBtn.classList.toggle('active');
+      e.stopPropagation();
     });
 
     // Cerrar si se clica fuera del panel
-    document.addEventListener('click', (e) => {
-        if (!musicPlayer.contains(e.target) && e.target !== toggleBtn) {
-            musicPlayer.classList.remove('show');
-            toggleBtn.classList.remove('active');
-        }
+    document.addEventListener('click', function(e) {
+      if (!musicPlayer.contains(e.target) && e.target !== toggleBtn) {
+        musicPlayer.classList.remove('show');
+        toggleBtn.classList.remove('active');
+      }
     });
 
-    // Inicialización visual
-    if (window.audioManager && window.audioManager.isPlaying) {
-      const playIcon = playPauseBtn.querySelector('.icon-play');
-      const pauseIcon = playPauseBtn.querySelector('.icon-pause');
-      playIcon.style.display = 'none';
-      pauseIcon.style.display = 'inline';
+    // Inicialización: sincronizar UI con el estado actual del AudioManager
+    function initPlayerUI() {
+      if (window.audioManager) {
+        syncVolumeUI(window.audioManager.currentVolume);
+        previousVolume = window.audioManager.targetVolume || 0.5;
+
+        if (window.audioManager.isPlaying) {
+          var playIcon = playPauseBtn.querySelector('.icon-play');
+          var pauseIcon = playPauseBtn.querySelector('.icon-pause');
+          playIcon.style.display = 'none';
+          pauseIcon.style.display = 'inline';
+          indicatorDot.classList.add('playing');
+        }
+      }
     }
+
+    // Ejecutar init cuando el audioManager esté listo
+    if (window.audioManager) {
+      initPlayerUI();
+    } else {
+      document.addEventListener('audioManagerReady', initPlayerUI, { once: true });
   })();
 </script>

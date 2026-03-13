@@ -4,6 +4,7 @@
 --}}
 @php
     $imagenCara = $pistaConfig['imagen'] ?? 'mario.png';
+    $imagenHabla = $pistaConfig['imagen_habla'] ?? null;
     $creador    = $pistaConfig['creador'] ?? 'Ayudante';
     $pruebaNum  = $pruebaNumero ?? 1;
     $usada      = $yaUsada ?? false;
@@ -121,16 +122,11 @@
     object-fit: cover;
     image-rendering: pixelated;
     display: block;
-    transition: transform 0.08s ease;
 }
-/* Animación de boca: alterna escala vertical para simular habla */
-.pista-character-frame.talking img {
-    animation: pista-mouth-anim 0.2s steps(2) infinite;
-}
-@keyframes pista-mouth-anim {
-    0%   { transform: scaleY(1); }
-    50%  { transform: scaleY(0.95) translateY(2px); }
-    100% { transform: scaleY(1); }
+/* Indicador visual de que está hablando (borde animado) */
+.pista-character-frame.talking {
+    border-color: #66ffaa;
+    box-shadow: 0 0 30px rgba(0,255,136,0.6), 0 8px 25px rgba(0,0,0,0.6);
 }
 .pista-character-name {
     margin-top: 0.5rem;
@@ -339,7 +335,9 @@
     <!-- Personaje arriba -->
     <div class="pista-character-area">
         <div class="pista-character-frame" id="pistaCharFrame">
-            <img src="/images/pistas/{{ $imagenCara }}" alt="{{ $creador }}" id="pistaCharImg">
+            <img src="/images/pistas/{{ $imagenCara }}" alt="{{ $creador }}" id="pistaCharImg"
+                 data-img-closed="/images/pistas/{{ $imagenCara }}"
+                 data-img-open="/images/pistas/{{ $imagenHabla ?? $imagenCara }}">
         </div>
         <div class="pista-character-name">{{ $creador }}</div>
     </div>
@@ -366,18 +364,22 @@
     var PRUEBA_NUMERO = {{ $pruebaNum }};
     var PENALIZACION_SEGUNDOS = 480; // 8 minutos
     var VELOCIDAD_TEXTO = 35; // ms por carácter
+    var MOUTH_INTERVAL_MS = 150; // velocidad alternancia boca (natural ~120-180ms)
     var pistaYaUsada = {{ $usada ? 'true' : 'false' }};
     var pistaTextoCache = null;
     var fetchEnCurso = false;
     var typewriterInterval = null;
     var speakingAudio = null;
+    var mouthAnimInterval = null;
     var dialogoActivo = false;
+    var mouthOpen = false;
 
     // ═══ ELEMENTOS DOM ═══
     var btn = document.getElementById('pistaBtn');
     var tooltipEl = document.getElementById('pistaTooltip');
     var overlay = document.getElementById('pistaDialogOverlay');
     var charFrame = document.getElementById('pistaCharFrame');
+    var charImg = document.getElementById('pistaCharImg');
     var speechText = document.getElementById('pistaSpeechText');
     var buttonsDiv = document.getElementById('pistaButtons');
     var btnSi = document.getElementById('pistaBtnSi');
@@ -385,7 +387,42 @@
     var closeBtn = document.getElementById('pistaCloseDialog');
     var bannerEl = document.getElementById('pistaPenaltyBanner');
 
-    if (!btn || !overlay) return;
+    if (!btn || !overlay || !charImg) return;
+
+    // ═══ IMÁGENES DE BOCA ═══
+    var imgClosed = charImg.getAttribute('data-img-closed');
+    var imgOpen = charImg.getAttribute('data-img-open');
+    var hasSpeakingFrames = imgClosed !== imgOpen;
+
+    // Precargar imagen de boca abierta para evitar parpadeos
+    if (hasSpeakingFrames) {
+        var preload = new Image();
+        preload.src = imgOpen;
+    }
+
+    // ═══ ANIMACIÓN DE BOCA (alternancia de imágenes) ═══
+    function iniciarAnimBoca() {
+        charFrame.classList.add('talking');
+        if (!hasSpeakingFrames) return;
+
+        mouthOpen = false;
+        mouthAnimInterval = setInterval(function() {
+            mouthOpen = !mouthOpen;
+            charImg.src = mouthOpen ? imgOpen : imgClosed;
+        }, MOUTH_INTERVAL_MS);
+    }
+
+    function detenerAnimBoca() {
+        charFrame.classList.remove('talking');
+        if (mouthAnimInterval) {
+            clearInterval(mouthAnimInterval);
+            mouthAnimInterval = null;
+        }
+        mouthOpen = false;
+        if (hasSpeakingFrames) {
+            charImg.src = imgClosed;
+        }
+    }
 
     // ═══ SONIDO DE HABLA ═══
     function iniciarSonidoHabla() {
@@ -393,7 +430,12 @@
             if (speakingAudio) { speakingAudio.pause(); }
             speakingAudio = new Audio('/sonido/hablando-pista.mp3');
             speakingAudio.loop = true;
-            speakingAudio.volume = 0.3;
+            // Respetar el volumen global del AudioManager
+            var vol = 0.3;
+            if (window.audioManager) {
+                vol = Math.min(0.4, window.audioManager.currentVolume * 0.6);
+            }
+            speakingAudio.volume = vol;
             speakingAudio.play().catch(function() {});
         } catch(e) {}
     }
@@ -404,15 +446,6 @@
             speakingAudio.currentTime = 0;
             speakingAudio = null;
         }
-    }
-
-    // ═══ ANIMACIÓN DE BOCA ═══
-    function iniciarAnimBoca() {
-        charFrame.classList.add('talking');
-    }
-
-    function detenerAnimBoca() {
-        charFrame.classList.remove('talking');
     }
 
     // ═══ TYPEWRITER (estilo Pokémon) ═══

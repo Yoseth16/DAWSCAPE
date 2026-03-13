@@ -13,12 +13,16 @@ class AudioManager {
     this.currentTrach = null;
     this.isPlaying = false;
     this.isFading = false;
-    this.currentVolume = 0.5;
-    this.targetVolume = 0.5;
 
-    // Efectos de sonido
+    // Restaurar volumen guardado o usar 0.5 por defecto
+    const savedVol = parseFloat(localStorage.getItem('audioVolume'));
+    const initialVol = (!isNaN(savedVol) && savedVol >= 0 && savedVol <= 1) ? savedVol : 0.5;
+    this.currentVolume = initialVol;
+    this.targetVolume = initialVol;
+
+    // Efectos de sonido (proporción respecto al master)
     this.sfx = {};
-    this.sfxVolume = 0.7;
+    this.sfxRatio = 0.85;
 
     // Base URL resuelta por Laravel asset() desde el layout.
     // Fallback a '/sonido' si la variable no fue inyectada.
@@ -104,7 +108,17 @@ class AudioManager {
     Object.keys(this.sfxFiles).forEach((key) => {
       this.sfx[key] = new Audio(this._url(this.sfxFiles[key]));
       this.sfx[key].crossOrigin = 'anonymous';
-      this.sfx[key].volume = this.sfxVolume;
+      this.sfx[key].volume = this.targetVolume * this.sfxRatio;
+    });
+  }
+
+  /**
+   * Actualizar volumen de todos los SFX proporcionalmente al master
+   */
+  _syncSFXVolume() {
+    const sfxVol = this.targetVolume * this.sfxRatio;
+    Object.keys(this.sfx).forEach((key) => {
+      this.sfx[key].volume = sfxVol;
     });
   }
 
@@ -160,7 +174,6 @@ class AudioManager {
     this.bgMusic.src = url;
     this.bgMusic.volume = 0;
     this.currentVolume = 0;
-    this.targetVolume = 0.5;
     this.currentTrach = trackKey;
 
     this.bgMusic
@@ -184,19 +197,21 @@ class AudioManager {
     this.isFading = true;
     const startTime = Date.now();
     const step = 50;
+    const target = this.targetVolume;
 
     const fadeInterval = setInterval(() => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
 
-      this.currentVolume = 0.5 * progress;
+      this.currentVolume = target * progress;
       this.bgMusic.volume = this.currentVolume;
 
       if (progress >= 1) {
         clearInterval(fadeInterval);
         this.isFading = false;
-        this.currentVolume = 0.5;
-        this.bgMusic.volume = 0.5;
+        this.currentVolume = target;
+        this.bgMusic.volume = target;
+        this._updateUI();
       }
     }, step);
   }
@@ -281,12 +296,15 @@ class AudioManager {
    * @param {number} value
    */
   setVolume(value) {
-    // ⚠ Corrección: Math.max (no Math.Max)
     const vol = Math.max(0, Math.min(1, value));
     this.targetVolume = vol;
-    this.bgMusic.volume = vol;
     this.currentVolume = vol;
-    localStorage.setItem('audioVolume', vol);
+    // Solo actualizar bgMusic.volume si no estamos en fade
+    if (!this.isFading) {
+      this.bgMusic.volume = vol;
+    }
+    this._syncSFXVolume();
+    localStorage.setItem('audioVolume', vol.toFixed(3));
     this._updateUI();
   }
 
@@ -355,8 +373,11 @@ class AudioManager {
    */
   restoreSettings() {
     const savedVolume = localStorage.getItem('audioVolume');
-    if (savedVolume) {
-      this.setVolume(parseFloat(savedVolume));
+    if (savedVolume !== null) {
+      const vol = parseFloat(savedVolume);
+      if (!isNaN(vol) && vol >= 0 && vol <= 1) {
+        this.setVolume(vol);
+      }
     }
   }
 }
