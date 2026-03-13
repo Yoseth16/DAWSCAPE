@@ -70,7 +70,7 @@
   }
 
   .screen {
-      display: flex;
+      display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -80,6 +80,7 @@
       min-height: 100vh;
       animation: fadeIn 1s ease;
   }
+  .screen.active { display: flex; }
 
   .logo {
     font-family: 'Orbitron', sans-serif;
@@ -227,6 +228,56 @@
     justify-content: center;
     font-size: 1.1rem;
   }
+
+  /* === CHALLENGE & WIN SCREENS === */
+  #screen-challenge .intro-text::before { content: '// FIREWALL OASIS_NET'; color: var(--red); }
+  .term-list { list-style-type: none; margin: 1.2rem 0; padding-left: 0.5rem; border-left: 2px solid var(--border); }
+  .term-list li { margin-bottom: 0.8rem; position: relative; padding-left: 1rem; }
+  .term-list li::before { content: '>'; position: absolute; left: 0; color: var(--green); }
+  .form-group { margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem; align-items: center; width: 100%; }
+  .answer-input {
+    width: 100%; max-width: 350px; background: #0a0a0a; border: 2px solid var(--border);
+    color: var(--green); font-family: 'Share Tech Mono', monospace;
+    font-size: max(16px, clamp(1.5rem, 6vw, 2.2rem)); padding: 1rem; border-radius: 8px;
+    outline: none; letter-spacing: 0.2em; text-align: center; transition: all 0.2s;
+  }
+  .answer-input::placeholder { color: #00ff8840; }
+  .answer-input:focus { box-shadow: 0 0 20px rgba(0,255,136,0.3); border-color: var(--green); }
+  .answer-input.wrong { border-color: var(--red); color: var(--red); animation: shake 0.4s ease; }
+  .answer-input.correct { border-color: var(--green); background: #00ff8811; }
+  .challenge-btn {
+    font-family: 'Orbitron', sans-serif; font-size: 1rem; font-weight: 700;
+    letter-spacing: 0.15em; padding: 1.2rem; border: 2px solid var(--green);
+    background: #00ff8811; color: var(--green); border-radius: 8px; cursor: pointer;
+    text-transform: uppercase; transition: all 0.25s; width: 100%; max-width: 350px;
+    text-decoration: none; text-align: center; display: block;
+  }
+  .challenge-btn:active { transform: scale(0.98); background: var(--green); color: var(--bg); }
+  .challenge-btn:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+  .feedback { text-align: center; font-size: 0.9rem; min-height: 1.5rem; margin-top: 0.2rem; letter-spacing: 0.05em; width: 100%; }
+  .feedback.ok { color: var(--green); }
+  .feedback.err { color: var(--red); }
+  .hint-box {
+    display: none; margin-top: 1.5rem; padding: 1.2rem; border: 1px dashed #aa9900;
+    color: #ddcc44; font-size: 0.95rem; line-height: 1.5; background: rgba(40,40,0,0.6);
+    animation: fadeIn 0.5s ease; border-radius: 6px;
+  }
+  #term-win {
+    width: 100%; max-width: 600px; background: #0a0a0a; border: 1px solid var(--green);
+    padding: 1.5rem; font-size: clamp(1rem, 4vw, 1.1rem); line-height: 1.8;
+    color: var(--green); box-shadow: inset 0 0 20px rgba(0,255,136,0.1); border-radius: 8px;
+  }
+  .term-line { opacity: 0; }
+  .term-line.show { opacity: 1; animation: slideRight 0.3s ease; }
+  .term-line.narrative { color: #88ccaa; margin-top: 1.5rem; border-top: 1px dashed var(--border); padding-top: 1.5rem; }
+  @keyframes slideRight { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-5px); }
+    80% { transform: translateX(5px); }
+  }
 </style>
 </head>
 <body>
@@ -239,7 +290,7 @@
   <div class="header-timer" id="cronometro">--:--</div>
 </div>
 
-<div class="screen">
+<div class="screen active" id="screen-scan">
   <div class="logo">OPERACIÓN REPUESTOS</div>
   <div class="intro-text">
     <span class="icon">🔌</span>
@@ -258,6 +309,45 @@
     <button id="btn-close-modal" class="btn btn-danger btn-close-scanner" type="button">✕</button>
     <div id="qr-reader"></div>
     <p id="qr-result"></p>
+  </div>
+</div>
+
+<!-- CHALLENGE SCREEN (contenido integrado — antes en vista QR separada) -->
+<div class="screen" id="screen-challenge">
+  <div class="logo">TERMINAL OASIS</div>
+  <div class="intro-text">
+    <p style="color:var(--red)">Acceso al núcleo denegado.</p>
+    <p style="margin-top:0.5rem;">El cortafuegos de la red Oasis requiere una suma de verificación (checksum) basada en el inventario de hardware actual.</p>
+    <p style="margin-top:0.5rem; color:#668877;">Para generar el código de bypass, combina estos tres factores de la unidad de suministros:</p>
+    <ul class="term-list">
+        <li>Censo total de ranuras de almacenamiento (número de bandejas o filas horizontales visibles).</li>
+        <li>Valor numérico identificador asignado al producto de café (código indicado en la máquina) de la unidad lateral.</li>
+        <li>Índice de capacidad de la ranura A1 (número de productos que caben en el primer espiral de arriba a la izquierda).</li>
+    </ul>
+    <p style="text-align: center; margin-top: 1.5rem; font-size: 0.9em;"><strong>Introduce la suma total para purgar el sistema.</strong></p>
+    <div class="form-group">
+        <label style="font-size: 0.8rem; color: #445544;">// WAITING_CHECKSUM</label>
+        <input class="answer-input" id="checksum-input" type="number" inputmode="numeric" pattern="[0-9]*" placeholder="___" autocomplete="off">
+        <div class="feedback" id="feedback-msg"></div>
+        <button class="challenge-btn" id="btn-verificar" type="button">EJECUTAR BYPASS →</button>
+    </div>
+    <div class="hint-box" id="hint-box">
+        <strong>[PISTA DEL SISTEMA]</strong><br>La respuesta es la suma de tres números. Cuenta las filas horizontales, averigua el código numérico del café y suma cuántos productos exactos entran en el alambre del hueco A1.
+    </div>
+  </div>
+</div>
+
+<!-- WIN SCREEN -->
+<div class="screen" id="screen-win">
+  <div class="logo">OASIS HACKEADO</div>
+  <div id="term-win">
+      <div class="term-line" id="l1">[OK] Validating checksum... 100%</div>
+      <div class="term-line" id="l2">[OK] Inyección de código completada en el sector Oasis.</div>
+      <div class="term-line" id="l3">[OK] Acceso concedido al núcleo del sistema DAW.</div>
+      <div class="term-line narrative" id="l4">-- NO MESSAGE --</div>
+      <div class="term-line" id="l5" style="margin-top: 2rem; text-align: center;">
+          <a href="{{ route('prueba5') }}" class="challenge-btn" style="display:inline-block;">PASAR A LA SIGUIENTE PRUEBA →</a>
+      </div>
   </div>
 </div>
 
@@ -332,12 +422,6 @@ setInterval(actualizarTimer, 1000);
   async function validarCodigo(decodedText) {
     setResult('Verificando código...');
 
-    if (decodedText.includes('dawscape.fun/qr/') || decodedText.includes('/qr/')) {
-      if (window.audioManager) window.audioManager.playSFX('correct');
-      window.location.href = decodedText;
-      return;
-    }
-
     try {
       const resp = await fetch('/validar-codigo-qr', {
         method: 'POST',
@@ -350,9 +434,11 @@ setInterval(actualizarTimer, 1000);
       });
 
       const data = await resp.json().catch(() => ({}));
-      if (resp.ok && data && data.success === true && data.redirect_url) {
+      if (resp.ok && data && data.success === true) {
         if (window.audioManager) window.audioManager.playSFX('correct');
-        window.location.href = data.redirect_url;
+        await closeModal();
+        document.getElementById('screen-scan').classList.remove('active');
+        document.getElementById('screen-challenge').classList.add('active');
         return;
       }
 
@@ -402,6 +488,88 @@ setInterval(actualizarTimer, 1000);
   modal?.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
   window.addEventListener('beforeunload', () => { if (isScanning) stopScanner(); });
+})();
+</script>
+
+<script>
+// Challenge logic (contenido integrado de vista QR maquina-snacks)
+(function() {
+  let challengeFailedAttempts = 0;
+  let challengeProcessing = false;
+  const challengeInput = document.getElementById('checksum-input');
+  const challengeBtn = document.getElementById('btn-verificar');
+  const challengeFeedback = document.getElementById('feedback-msg');
+
+  challengeInput?.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); challengeInput.blur(); verificarChecksum(); }
+  });
+  challengeBtn?.addEventListener('click', verificarChecksum);
+
+  function verificarChecksum() {
+    if (challengeProcessing) return;
+    const value = challengeInput.value.trim();
+    if (value === '') { showChallengeError('Introduce un número válido.'); return; }
+
+    challengeProcessing = true;
+    challengeInput.blur();
+    challengeInput.disabled = true;
+    challengeBtn.disabled = true;
+    challengeFeedback.textContent = 'Analizando bloque de datos...';
+    challengeFeedback.className = 'feedback';
+
+    fetch('/prueba4', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      },
+      body: JSON.stringify({ checksum: value })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        if (window.audioManager) window.audioManager.playSFX('correct');
+        challengeFeedback.textContent = '[OK] SUMA DE VERIFICACIÓN ACEPTADA.';
+        challengeFeedback.className = 'feedback ok';
+        challengeInput.classList.add('correct');
+        setTimeout(() => triggerWinSequence(data.mensaje), 800);
+      } else {
+        challengeFailedAttempts++;
+        if (window.audioManager) window.audioManager.playSFX('error');
+        showChallengeError('[ERROR] Checksum inválido.');
+        if (challengeFailedAttempts >= 5) document.getElementById('hint-box').style.display = 'block';
+      }
+    })
+    .catch(() => showChallengeError('Error de comunicación.'));
+  }
+
+  function showChallengeError(msg) {
+    challengeInput.classList.add('wrong');
+    challengeFeedback.textContent = msg;
+    challengeFeedback.className = 'feedback err';
+    if (navigator.vibrate) navigator.vibrate(200);
+    setTimeout(() => {
+      challengeInput.classList.remove('wrong');
+      challengeInput.value = '';
+      challengeInput.disabled = false;
+      challengeBtn.disabled = false;
+      challengeFeedback.textContent = '';
+      challengeProcessing = false;
+    }, 1200);
+  }
+
+  function triggerWinSequence(mensajeNarrativo) {
+    document.getElementById('screen-challenge').classList.remove('active');
+    document.getElementById('screen-win').classList.add('active');
+    document.getElementById('l4').innerText = mensajeNarrativo;
+    [
+      { id: 'l1', delay: 400 }, { id: 'l2', delay: 1200 },
+      { id: 'l3', delay: 1800 }, { id: 'l4', delay: 2800 },
+      { id: 'l5', delay: 3500 }
+    ].forEach(line => {
+      setTimeout(() => document.getElementById(line.id).classList.add('show'), line.delay);
+    });
+  }
 })();
 </script>
 </body>

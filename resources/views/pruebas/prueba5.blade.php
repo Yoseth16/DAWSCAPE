@@ -70,7 +70,7 @@
   }
 
   .screen {
-      display: flex;
+      display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -80,6 +80,7 @@
       min-height: 100vh;
       animation: fadeIn 1s ease;
   }
+  .screen.active { display: flex; }
 
   .logo {
     font-family: 'Orbitron', sans-serif;
@@ -227,6 +228,56 @@
     justify-content: center;
     font-size: 1.1rem;
   }
+
+  /* === CHALLENGE & WIN SCREENS === */
+  #screen-challenge .intro-text::before { content: '// FIREWALL ALMACÉN'; color: var(--red); }
+  .term-list { list-style-type: none; margin: 1.2rem 0; padding-left: 0.5rem; border-left: 2px solid var(--border); }
+  .term-list li { margin-bottom: 0.8rem; position: relative; padding-left: 1rem; }
+  .term-list li::before { content: '>'; position: absolute; left: 0; color: var(--green); }
+  .form-group { margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem; align-items: center; width: 100%; }
+  .answer-input {
+    width: 100%; max-width: 350px; background: #0a0a0a; border: 2px solid var(--border);
+    color: var(--green); font-family: 'Share Tech Mono', monospace;
+    font-size: max(16px, clamp(1.5rem, 6vw, 2rem)); padding: 0.8rem; border-radius: 8px;
+    outline: none; letter-spacing: 0.1em; text-align: center; transition: all 0.2s;
+  }
+  .answer-input::placeholder { color: #00ff8840; }
+  .answer-input:focus { box-shadow: 0 0 20px rgba(0,255,136,0.3); border-color: var(--green); }
+  .answer-input.wrong { border-color: var(--red); color: var(--red); animation: shake 0.4s ease; }
+  .answer-input.correct { border-color: var(--green); background: #00ff8811; }
+  .challenge-btn {
+    font-family: 'Orbitron', sans-serif; font-size: 1rem; font-weight: 700;
+    letter-spacing: 0.1em; padding: 1rem; border: 2px solid var(--green);
+    background: #00ff8811; color: var(--green); border-radius: 8px; cursor: pointer;
+    text-transform: uppercase; transition: all 0.25s; width: 100%; max-width: 350px;
+    text-decoration: none; text-align: center; display: block;
+  }
+  .challenge-btn:active { transform: scale(0.98); background: var(--green); color: var(--bg); }
+  .challenge-btn:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+  .feedback { text-align: center; font-size: 0.85rem; min-height: 1.2rem; margin-top: 0.2rem; letter-spacing: 0.05em; width: 100%; }
+  .feedback.ok { color: var(--green); }
+  .feedback.err { color: var(--red); }
+  .hint-box {
+    display: none; margin-top: 1rem; padding: 1rem; border: 1px dashed #aa9900;
+    color: #ddcc44; font-size: 0.9rem; line-height: 1.4; background: rgba(40,40,0,0.6);
+    animation: fadeIn 0.5s ease; border-radius: 6px;
+  }
+  #term-win {
+    width: 100%; max-width: 600px; background: #0a0a0a; border: 1px solid var(--green);
+    padding: 1.5rem; font-size: clamp(0.9rem, 4vw, 1rem); line-height: 1.6;
+    color: var(--green); box-shadow: inset 0 0 20px rgba(0,255,136,0.1); border-radius: 8px;
+  }
+  .term-line { opacity: 0; margin-bottom: 0.5rem; }
+  .term-line.show { opacity: 1; animation: slideRight 0.3s ease; }
+  .term-line.narrative { color: #88ccaa; margin-top: 1.5rem; border-top: 1px dashed var(--border); padding-top: 1.5rem; }
+  @keyframes slideRight { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-5px); }
+    80% { transform: translateX(5px); }
+  }
 </style>
 </head>
 <body>
@@ -239,7 +290,7 @@
   <div class="header-timer" id="cronometro">--:--</div>
 </div>
 
-<div class="screen">
+<div class="screen active" id="screen-scan">
   <div class="logo">PROTOCOLO ESPEJO</div>
   <div class="intro-text">
     <span class="icon">🪞</span>
@@ -263,6 +314,51 @@
     <button id="btn-close-modal" class="btn btn-danger btn-close-scanner" type="button">✕</button>
     <div id="qr-reader"></div>
     <p id="qr-result"></p>
+  </div>
+</div>
+
+<!-- CHALLENGE SCREEN (contenido integrado — antes en vista QR separada) -->
+<div class="screen" id="screen-challenge">
+  <div class="logo">SISTEMA ESPEJO ACTIVADO</div>
+  <div class="intro-text">
+    <p>El abecedario ha sido invertido para proteger la clave. La correspondencia original ha sido corrompida.</p>
+    <p style="margin-top:0.5rem; color:#668877;">Nueva tabla de conversión:</p>
+    <p style="color:var(--green); letter-spacing:0.1em; text-align:center; padding: 0.5rem; background: #0a0a0a; border: 1px dashed #00ff8840; margin: 0.5rem 0;">Z = 1 &nbsp; Y = 2 &nbsp; X = 3 &nbsp; ... &nbsp; A = 26</p>
+    <p style="margin-top:0.5rem;">El núcleo del sistema está oculto en varias unidades numeradas del 1 al 64. Cada número representa una letra bajo el Protocolo Espejo.</p>
+    <div style="margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1rem;">
+        <p style="color:var(--red); font-size: 0.9em;">// INSTRUCCIONES DEL SISTEMA:</p>
+        <ul class="term-list">
+            <li>Traducir cada letra a su número correspondiente.</li>
+            <li>Buscar las taquillas cuyo número coincida.</li>
+            <li>Recuperar las letras almacenadas en su interior y ordenarlas.</li>
+        </ul>
+    </div>
+    <div style="margin: 1.5rem 0; padding: 1rem; background: #0a0a0a; border: 1px dashed var(--green); text-align: center; font-family: 'Orbitron', sans-serif;">
+        <div style="color: #88ccaa; font-size: 0.95rem;">→ Taquillas a visitar: 1 – 26 – 8 – 18 – 22 – 15 – 3</div>
+    </div>
+    <p style="text-align: center; font-size: 0.9em;"><strong>Introduce la palabra clave reconstruida:</strong></p>
+    <div class="form-group">
+        <input class="answer-input" id="checksum-input" type="text" placeholder="_______" autocomplete="off" spellcheck="false" autocapitalize="off" maxlength="7">
+        <div class="feedback" id="feedback-msg"></div>
+        <button class="challenge-btn" id="btn-verificar" type="button">DESCIFRAR NÚCLEO →</button>
+    </div>
+    <div class="hint-box" id="hint-box">
+        <strong>[PISTA DEL SISTEMA]</strong><br>La palabra que buscas ya está escrita en la pantalla. Solo necesitas encontrarla en las taquillas correctas. Revisa la tabla de descifrado detalladamente.
+    </div>
+  </div>
+</div>
+
+<!-- WIN SCREEN -->
+<div class="screen" id="screen-win">
+  <div class="logo">NÚCLEO RESTAURADO</div>
+  <div id="term-win">
+      <div class="term-line" id="l1">[OK] Descifrando alfabeto espejo… 100%</div>
+      <div class="term-line" id="l2">[OK] Fragmentos recuperados correctamente.</div>
+      <div class="term-line" id="l3">[OK] Palabra clave validada.</div>
+      <div class="term-line narrative" id="l4">-- NO MESSAGE --</div>
+      <div class="term-line" id="l5" style="margin-top: 2rem; text-align: center;">
+          <a href="{{ route('prueba6') }}" class="challenge-btn" style="display:inline-block;">PASAR A LA SIGUIENTE PRUEBA →</a>
+      </div>
   </div>
 </div>
 
@@ -337,12 +433,6 @@ setInterval(actualizarTimer, 1000);
   async function validarCodigo(decodedText) {
     setResult('Verificando código...');
 
-    if (decodedText.includes('dawscape.fun/qr/') || decodedText.includes('/qr/')) {
-      if (window.audioManager) window.audioManager.playSFX('correct');
-      window.location.href = decodedText;
-      return;
-    }
-
     try {
       const resp = await fetch('/validar-codigo-qr', {
         method: 'POST',
@@ -355,9 +445,11 @@ setInterval(actualizarTimer, 1000);
       });
 
       const data = await resp.json().catch(() => ({}));
-      if (resp.ok && data && data.success === true && data.redirect_url) {
+      if (resp.ok && data && data.success === true) {
         if (window.audioManager) window.audioManager.playSFX('correct');
-        window.location.href = data.redirect_url;
+        await closeModal();
+        document.getElementById('screen-scan').classList.remove('active');
+        document.getElementById('screen-challenge').classList.add('active');
         return;
       }
 
@@ -407,6 +499,88 @@ setInterval(actualizarTimer, 1000);
   modal?.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
   window.addEventListener('beforeunload', () => { if (isScanning) stopScanner(); });
+})();
+</script>
+
+<script>
+// Challenge logic (contenido integrado de vista QR taquillas)
+(function() {
+  let challengeFailedAttempts = 0;
+  let challengeProcessing = false;
+  const challengeInput = document.getElementById('checksum-input');
+  const challengeBtn = document.getElementById('btn-verificar');
+  const challengeFeedback = document.getElementById('feedback-msg');
+
+  challengeInput?.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); challengeInput.blur(); verificarChecksum(); }
+  });
+  challengeBtn?.addEventListener('click', verificarChecksum);
+
+  function verificarChecksum() {
+    if (challengeProcessing) return;
+    const value = challengeInput.value.trim();
+    if (value === '') { showChallengeError('Introduce una palabra válida.'); return; }
+
+    challengeProcessing = true;
+    challengeInput.blur();
+    challengeInput.disabled = true;
+    challengeBtn.disabled = true;
+    challengeFeedback.textContent = 'Analizando bloque de datos...';
+    challengeFeedback.className = 'feedback';
+
+    fetch('/prueba5', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      },
+      body: JSON.stringify({ checksum: value })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        if (window.audioManager) window.audioManager.playSFX('correct');
+        challengeFeedback.textContent = '[OK] PROTOCOLO ESPEJO DESCIFRADO.';
+        challengeFeedback.className = 'feedback ok';
+        challengeInput.classList.add('correct');
+        setTimeout(() => triggerWinSequence(data.mensaje), 800);
+      } else {
+        challengeFailedAttempts++;
+        if (window.audioManager) window.audioManager.playSFX('error');
+        showChallengeError('[ERROR] Palabra clave inválida.');
+        if (challengeFailedAttempts >= 5) document.getElementById('hint-box').style.display = 'block';
+      }
+    })
+    .catch(() => showChallengeError('Error de comunicación con el núcleo.'));
+  }
+
+  function showChallengeError(msg) {
+    challengeInput.classList.add('wrong');
+    challengeFeedback.textContent = msg;
+    challengeFeedback.className = 'feedback err';
+    if (navigator.vibrate) navigator.vibrate(200);
+    setTimeout(() => {
+      challengeInput.classList.remove('wrong');
+      challengeInput.value = '';
+      challengeInput.disabled = false;
+      challengeBtn.disabled = false;
+      challengeFeedback.textContent = '';
+      challengeProcessing = false;
+    }, 1200);
+  }
+
+  function triggerWinSequence(mensajeNarrativo) {
+    document.getElementById('screen-challenge').classList.remove('active');
+    document.getElementById('screen-win').classList.add('active');
+    document.getElementById('l4').innerText = mensajeNarrativo;
+    [
+      { id: 'l1', delay: 400 }, { id: 'l2', delay: 1200 },
+      { id: 'l3', delay: 1800 }, { id: 'l4', delay: 2800 },
+      { id: 'l5', delay: 3500 }
+    ].forEach(line => {
+      setTimeout(() => document.getElementById(line.id).classList.add('show'), line.delay);
+    });
+  }
 })();
 </script>
 </body>
