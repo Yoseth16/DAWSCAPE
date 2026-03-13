@@ -213,6 +213,7 @@
         .btn:hover::before { left: 0; }
         .btn:hover { color: var(--bg); box-shadow: 0 0 20px var(--green); }
         .btn { min-height: 52px; -webkit-tap-highlight-color: transparent; }
+        .btn + .btn { margin-top: 1.5rem; }
 
         .btn-secondary {
             border-color: rgba(255, 255, 255, 0.2);
@@ -350,7 +351,7 @@
 
       <button type="submit" class="btn">Registrar Equipo</button>
 
-      <a href="{{ route('inicio') }}" class="btn btn-secondary" style="margin-top: 2rem;">Volver</a>
+      <a href="{{ route('inicio') }}" class="btn btn-secondary">Volver</a>
     </form>
   </div>
 </div>
