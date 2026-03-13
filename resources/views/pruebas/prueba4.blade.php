@@ -419,9 +419,31 @@ setInterval(actualizarTimer, 1000);
     setResult('');
   }
 
+  // Slugs válidos que activan esta prueba (URL-type QR)
+  const SLUGS_VALIDOS = ['prueba4arturo', 'prueba-4-arturo', 'prueba4', 'acceso_fase_4'];
+
+  function esQrValido(text) {
+    const t = text.toLowerCase().replace(/[^a-z0-9_]/g, '');
+    return SLUGS_VALIDOS.some(s => t.includes(s.replace(/[^a-z0-9_]/g, '')));
+  }
+
+  function activarChallenge() {
+    if (window.audioManager) window.audioManager.playSFX('correct');
+    closeModal();
+    document.getElementById('screen-scan').classList.remove('active');
+    document.getElementById('screen-challenge').classList.add('active');
+  }
+
   async function validarCodigo(decodedText) {
     setResult('Verificando código...');
 
+    // 1. Si el QR contiene una URL con slug válido, activar directamente
+    if (esQrValido(decodedText)) {
+      activarChallenge();
+      return;
+    }
+
+    // 2. Fallback: validar vía servidor
     try {
       const resp = await fetch('/validar-codigo-qr', {
         method: 'POST',
@@ -435,10 +457,7 @@ setInterval(actualizarTimer, 1000);
 
       const data = await resp.json().catch(() => ({}));
       if (resp.ok && data && data.success === true) {
-        if (window.audioManager) window.audioManager.playSFX('correct');
-        await closeModal();
-        document.getElementById('screen-scan').classList.remove('active');
-        document.getElementById('screen-challenge').classList.add('active');
+        activarChallenge();
         return;
       }
 
