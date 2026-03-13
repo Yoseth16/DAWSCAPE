@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -6,142 +6,224 @@
     <title>DAWSCAPE | Inscripción de Equipos</title>
     <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
 
+    <!-- ICONOS -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 
     <!-- Vite CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+
+        :root {
+            --green: #00ff88;
+            --red: #ff2244;
+            --bg: #020c06;
+            --panel: #041a0e;
+            --border: #00ff8840;
+            --text: #c8ffdf;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Share Tech Mono', monospace;
             min-height: 100vh;
-            color: #e2e8f0;
+            overflow-x: hidden;
         }
 
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,136,0.013) 2px, rgba(0,255,136,0.013) 4px);
+            pointer-events: none;
+            z-index: 1000;
         }
 
-        .card {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            border-radius: 1rem;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(34, 197, 94, 0.1);
-            overflow: hidden;
+        .screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1.5rem;
+            position: relative;
+            z-index: 10;
         }
 
-        .card-header {
-            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(16, 185, 129, 0.05));
-            border-bottom: 2px solid rgba(34, 197, 94, 0.3);
-            padding: 3rem 2rem;
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            color: var(--green);
+            text-shadow: 0 0 20px var(--green), 0 0 60px #00ff8840;
+            letter-spacing: 0.2em;
+            animation: pulse-glow 2.5s ease-in-out infinite;
+            margin-bottom: 0.5rem;
             text-align: center;
         }
 
-        .card-header h1 {
-            font-family: 'Orbitron', monospace;
-            font-size: 3.5rem;
-            font-weight: 900;
-            color: #22c55e;
-            text-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
-            letter-spacing: 2px;
-            margin-bottom: 0.5rem;
+        .subtitle {
+            font-size: 0.85rem;
+            color: #007744;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            text-align: center;
         }
 
-        .card-header p {
-            font-size: 1.1rem;
-            color: #86efac;
-            font-weight: 500;
+        .glitch-text {
+            animation: blink 2s infinite;
+            color: var(--red);
+            font-size: 0.9rem;
+            text-shadow: 0 0 10px var(--red);
+            letter-spacing: 0.1em;
+            text-align: center;
+            margin-bottom: 2rem;
         }
 
-        .card-body {
-            padding: 1.5rem;
-        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-        .intro-box {
-            background: rgba(34, 197, 94, 0.05);
-            border-left: 4px solid #22c55e;
-            padding: 1.5rem;
-            border-radius: 0.5rem;
-            margin-bottom: 3rem;
-            border-left: 4px solid #22c55e;
-            padding: 1.5rem;
-            border-radius: 0.5rem;
-            margin-bottom: 3rem;
-        }
-
-        .intro-box h2 {
-            color: #22c55e;
-            margin-bottom: 0.75rem;
-            font-size: 1.3rem;
-        }
-
-        .intro-box p {
-            color: #cbd5e1;
-            line-height: 1.6;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            color: #22c55e;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            font-size: 0.95rem;
-        }
-
-        .form-group input[type="text"],
-        .form-group input[type="email"],
-        .form-group select {
+        .login-card {
             width: 100%;
-            background: rgba(30, 41, 59, 0.8);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-            border-radius: 0.5rem;
-            padding: 0.75rem 1rem;
-            color: #e2e8f0;
-            font-size: 1rem;
-            transition: all 0.3s ease;
+            max-width: 520px;
+            border: 1px solid var(--border);
+            background: var(--panel);
+            padding: clamp(1.5rem, 5vw, 2.5rem) clamp(1rem, 4vw, 2rem);
+            position: relative;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.1);
+            border-radius: 0.7rem;
         }
 
-        .form-group input[type="text"]:focus,
-        .form-group input[type="email"]:focus,
-        .form-group select:focus {
+        .login-card::before {
+            content: '// INSCRIPCIÓN';
+            position: absolute;
+            top: -0.7rem; left: 1rem;
+            background: var(--bg);
+            padding: 0 0.5rem;
+            color: var(--green);
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+        }
+
+        .form-group { margin-bottom: 1.8rem; }
+
+        .form-label {
+            display: block;
+            font-size: 0.75rem;
+            color: #007744;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid #00ff8840;
+            color: var(--green);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: max(16px, 1.1rem);
+            padding: 0.8rem 0.5rem;
             outline: none;
-            border-color: #22c55e;
-            box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
-            background: rgba(30, 41, 59, 0.9);
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
-        .form-group input::placeholder {
-            color: #64748b;
+        .form-control::placeholder { color: #88ccaa60; }
+        .form-control:focus { border-bottom-color: var(--green); box-shadow: 0 4px 15px -10px var(--green); }
+
+        .helper-text { display: block; margin-top: 0.4rem; color: #445544; font-size: 0.7rem; letter-spacing: 0.05em; }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
         }
 
-        .error-message {
-            color: #ff6b6b;
-            font-size: 0.875rem;
-            margin-top: 0.5rem;
+        input[type="checkbox"] {
+            appearance: none;
+            background-color: transparent;
+            margin: 0;
+            margin-top: 0.15rem;
+            font: inherit;
+            color: currentColor;
+            width: 1.25em;
+            height: 1.25em;
+            border: 1px solid var(--green);
+            display: grid;
+            place-content: center;
+            cursor: pointer;
         }
+
+        input[type="checkbox"]::before {
+            content: "";
+            width: 0.65em;
+            height: 0.65em;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em var(--green);
+            background-color: var(--green);
+        }
+
+        input[type="checkbox"]:checked::before { transform: scale(1); }
+
+        .checkbox-label { font-size: 0.85rem; color: #669977; line-height: 1.5; cursor: pointer; }
+
+        .btn {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            letter-spacing: 0.3em;
+            padding: 1.2rem;
+            border: 2px solid var(--green);
+            background: transparent;
+            color: var(--green);
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.25s;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            font-weight: 700;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: var(--green);
+            transition: left 0.3s;
+            z-index: -1;
+        }
+
+        .btn:hover::before { left: 0; }
+        .btn:hover { color: var(--bg); box-shadow: 0 0 20px var(--green); }
+        .btn { min-height: 52px; -webkit-tap-highlight-color: transparent; }
+
+        .btn-secondary {
+            border-color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .btn-secondary:hover { color: var(--green); }
 
         .alert {
             padding: 1rem;
             border-radius: 0.5rem;
             margin-bottom: 1.5rem;
             border: 1px solid;
+            font-size: 0.9rem;
         }
 
         .alert-success {
@@ -156,257 +238,139 @@
             color: #ff9999;
         }
 
-        .legal-section {
-            background: rgba(241, 245, 249, 0.05);
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            border-radius: 0.5rem;
-            padding: 1.5rem;
-            margin-bottom: 0.75rem;
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
         }
 
-        .legal-content {
-            font-size: 0.85rem;
-            color: #cbd5e1;
-            line-height: 1.6;
+        @keyframes pulse-glow {
+            0%, 100% { text-shadow: 0 0 20px var(--green), 0 0 50px #00ff8860; }
+            50% { text-shadow: 0 0 40px var(--green), 0 0 90px #00ff8840; }
         }
 
-        .legal-content p {
-            margin-bottom: 0.75rem;
+        /* Particles */
+        .particles { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
+        .particle {
+            position: absolute;
+            width: 2px; height: 2px;
+            background: var(--green);
+            border-radius: 50%;
+            opacity: 0;
+            animation: float linear infinite;
+        }
+        @keyframes float {
+            0% { opacity: 0; transform: translateY(100vh); }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.3; }
+            100% { opacity: 0; transform: translateY(-10vh); }
         }
 
-        .legal-content strong {
-            color: #22c55e;
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .checkbox-group input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            margin-top: 2px;
-            accent-color: #22c55e;
-            cursor: pointer;
-        }
-
-        .checkbox-group label {
-            margin: 0;
-            color: #cbd5e1;
-            font-weight: 400;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-        }
-
-        .checkbox-group a {
-            color: #22c55e;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .checkbox-group a:hover {
-            color: #16a34a;
-            text-decoration: underline;
-        }
-
-        .button-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .btn {
-            padding: 0.85rem 1.5rem;
-            font-size: 1rem;
-            font-weight: 600;
-            border: none;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            text-align: center;
-            display: inline-block;
-        }
-
-        .btn-primary {
-            background: #22c55e;
-            color: #0f172a;
-            box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
-        }
-
-        .btn-primary:hover {
-            background: #16a34a;
-            box-shadow: 0 0 30px rgba(34, 197, 94, 0.5);
-            transform: translateY(-2px);
-        }
-
-        .btn-primary:disabled {
-            background: #64748b;
-            color: #334155;
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
-        }
-
-        .btn-secondary {
-            background: rgba(148, 163, 184, 0.1);
-            color: #cbd5e1;
-            border: 1px solid rgba(148, 163, 184, 0.3);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(148, 163, 184, 0.2);
-            border-color: rgba(148, 163, 184, 0.5);
-            transform: translateY(-2px);
-        }
-
-        @media (max-width: 640px) {
-            .card-header h1 {
-                font-size: 2.5rem;
-            }
-
-            .button-group {
-                grid-template-columns: 1fr;
-            }
-
-            .legal-section {
-                max-height: 250px;
-            }
-        }
-
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(30, 41, 59, 0.8);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #22c55e;
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #16a34a;
+        /* MOBILE */
+        @media (max-width: 600px) {
+            .screen { padding: 1rem; padding-top: 1.5rem; }
+            .login-card { padding: 1.2rem 1rem; }
+            .form-control { font-size: max(16px, 1rem); }
+            .btn { font-size: 0.85rem; letter-spacing: 0.15em; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="card">
-            <!-- Header -->
-            <div class="card-header">
-                <h1>⟨DAWSCAPE⟩</h1>
-                <p>Sistema de Inscripción de Equipos</p>
-            </div>
 
-            <!-- Body -->
-            <div class="card-body">
-                <!-- Description Box -->
-                <div class="intro-box">
-                    <h2>Bienvenido al Desafío</h2>
-                    <p>
-                        Estás a punto de entrar en un <strong>Escape Room digital</strong> lleno de misterios.
-                        Resuelve acertijos, descifra códigos, escanea códigos QR ocultos en el mundo real y trabaja en equipo.
-                        ¿Aceptas el reto?                    </p>
-                </div>
-                <!-- Success/Error Messages -->
-                @if (session('success'))
-                    <div class="alert alert-success">
-                        ✓ {{ session('success') }}
-                    </div>
-                @endif
+<div class="particles" id="particles"></div>
 
-                @if ($errors->any())
-                    <div class="alert alert-error">
-                        <strong>⚠ Se encontraron errores:</strong>
-                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
+<div class="screen">
+  <div class="logo">DAWSCAPE</div>
+  <div class="subtitle">// INSCRIPCIÓN DE EQUIPOS</div>
+  <div class="glitch-text">COMPLETA LOS DATOS Y GANA TU CÓDIGO QR</div>
 
-                <!-- Registration Form -->
-                <form method="POST" action="{{ route('inscripcion.guardar') }}" class="form">
-                    @csrf
+  <div style="max-width: 500px; margin-bottom: 2rem; padding: 1.5rem; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 0.5rem; color: #cbd5e1; text-align: center; font-size: 0.95rem; line-height: 1.6;">
+    <p style="margin-bottom: 1rem;"><strong style="color: #22c55e;">IMPORTANTE:</strong> Utiliza un correo del dominio <code>@estudiante.xtart.com</code> para poder acceder después.</p>
+    <p>Una vez inscrito recibirás tu código QR y podrás iniciar la experiencia desde cualquier dispositivo.</p>
+  </div>
 
-                    <!-- Nombre del Equipo -->
-                    <div class="form-group">
-                        <label for="nombre_equipo">Nombre del Equipo *</label>
-                        <input type="text" id="nombre_equipo" name="nombre_equipo"
-                               placeholder="Ej: Los Detectives Digitales"
-                               value="{{ old('nombre_equipo') }}"
-                               required maxlength="60">
-                        @error('nombre_equipo')
-                            <div class="error-message">{{ $message }}</div>
-                        @enderror
-                    </div>
+  <div class="login-card">
+    <form method="POST" action="{{ route('inscripcion.guardar') }}">
+      @csrf
 
-                    <!-- Correo Electrónico -->
-                    <div class="form-group">
-                        <label for="correo">Correo Electrónico *</label>
-                        <input type="email" id="correo" name="correo"
-                               placeholder="ejemplo@estudiante.xtart.com"
-                               value="{{ old('correo') }}"
-                               required maxlength="120">
-                        @error('correo')
-                            <div class="error-message">{{ $message }}</div>
-                        @enderror
-                    </div>
+      @if (session('success'))
+        <div class="alert alert-success">✓ {{ session('success') }}</div>
+      @endif
 
-                    <!-- Clase / Grupo -->
-                    <div class="form-group">
-                        <label for="clase">Clase / Grupo *</label>
-                        <select id="clase" name="clase" required>
-                            <option value="">-- Selecciona tu clase --</option>
-                            @foreach ($clases as $clase)
-                                <option value="{{ $clase }}"
-                                        @if(old('clase') === $clase) selected @endif>
-                                    {{ $clase }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('clase')
-                            <div class="error-message">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Checkbox to Accept Terms -->
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="acepta_terminos" name="acepta_terminos" value="1" required>
-                        <label for="acepta_terminos">
-                            He leído y acepto el <a href="{{ route('legal') }}" target="_blank"> Aviso Legal</a>. Entiendo que participo bajo mi propia responsabilidad.
-                        </label>
-                    </div>
-                    @error('acepta_terminos')
-                        <div class="error-message">{{ $message }}</div>
-                    @enderror
-
-                    <!-- Buttons -->
-                    <div class="button-group">
-                        <button type="submit" class="btn btn-primary">
-                            Registrar Equipo
-                        </button>
-                        <a href="{{ route('inicio') }}" class="btn btn-secondary">
-                            Volver
-                        </a>
-                    </div>
-                </form>
-            </div>
+      @if ($errors->any())
+        <div class="alert alert-error">
+          <strong>⚠ Se encontraron errores:</strong>
+          <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+            @foreach ($errors->all() as $error)
+              <li>{{ $error }}</li>
+            @endforeach
+          </ul>
         </div>
-    </div>
+      @endif
 
+      <div class="form-group">
+        <label class="form-label" for="nombre_equipo">Nombre del Equipo *</label>
+        <input type="text" name="nombre_equipo" id="nombre_equipo" class="form-control" placeholder="Ej: Los Detectives Digitales" value="{{ old('nombre_equipo') }}" required maxlength="60">
+        @error('nombre_equipo')
+          <div class="error-message">{{ $message }}</div>
+        @enderror
+      </div>
 
+      <div class="form-group">
+        <label class="form-label" for="correo">Correo Electrónico *</label>
+        <input type="email" name="correo" id="correo" class="form-control" placeholder="ejemplo@estudiante.xtart.com" value="{{ old('correo') }}" required maxlength="120">
+        @error('correo')
+          <div class="error-message">{{ $message }}</div>
+        @enderror
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="clase">Clase / Grupo *</label>
+        <select id="clase" name="clase" class="form-control" required>
+            <option value="">-- Selecciona tu clase --</option>
+            @foreach ($clases as $clase)
+                <option value="{{ $clase }}" @if(old('clase') === $clase) selected @endif>{{ $clase }}</option>
+            @endforeach
+        </select>
+        @error('clase')
+          <div class="error-message">{{ $message }}</div>
+        @enderror
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="acepta_terminos" name="acepta_terminos" value="1" required>
+        <label class="checkbox-label" for="acepta_terminos">He leído y acepto el <a href="{{ route('legal') }}" target="_blank">Aviso Legal</a>. Entiendo que participo bajo mi propia responsabilidad.</label>
+      </div>
+      @error('acepta_terminos')
+        <div class="error-message">{{ $message }}</div>
+      @enderror
+
+      <button type="submit" class="btn">Registrar Equipo</button>
+
+      <a href="{{ route('inicio') }}" class="btn btn-secondary" style="margin-top: 1rem;">Volver</a>
+    </form>
+  </div>
+</div>
+
+<script>
+// Partículas
+(function() {
+  const c = document.getElementById('particles');
+  for (let i = 0; i < 25; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDuration = (10 + Math.random() * 14) + 's';
+    p.style.animationDelay = (Math.random() * 12) + 's';
+    c.appendChild(p);
+  }
+})();
+</script>
+
+<!-- Firma discreta -->
+<div style="position: fixed; bottom: 5px; right: 10px; font-family: monospace; font-size: 0.65rem; color: rgba(255, 255, 255, 0.3); z-index: 9999; text-align: right;">
+    DAWSCAPE SYSTEM // DAW <br>
+    <a href="{{ route('legal') }}" style="color: rgba(255, 255, 255, 0.3); text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='#00ff88'" onmouseout="this.style.color='rgba(255, 255, 255, 0.3)'">AVISO LEGAL Y RGPD</a>
+</div>
 </body>
 </html>
-

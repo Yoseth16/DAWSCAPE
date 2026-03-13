@@ -206,16 +206,10 @@ document.addEventListener("DOMContentLoaded", function () {
     if (configEl && timerDisplay) {
         let tiempoInicial = parseInt(configEl.dataset.tiempo || "0", 10);
         const loadTimeMs = Date.now();
-        let penaltySeconds = 0;
-
-        // función usada por la penalización para sumar 30s al cronómetro local
-        addLocalPenalty = function (segundos) {
-            penaltySeconds += segundos;
-        };
 
         function actualizarTimer() {
-            const elapsed = Math.floor((Date.now() - loadTimeMs) / 1000);
-            let tiempo = tiempoInicial + penaltySeconds + elapsed;
+            let tiempo =
+                tiempoInicial + Math.floor((Date.now() - loadTimeMs) / 1000);
             let minutos = parseInt(tiempo / 60, 10);
             let segundos = parseInt(tiempo % 60, 10);
             let m = minutos < 10 ? "0" + minutos : minutos;
@@ -226,6 +220,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
         }
+        window.actualizarTimer = actualizarTimer;
         actualizarTimer();
         setInterval(actualizarTimer, 1000);
     }
