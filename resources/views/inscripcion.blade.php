@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -8,11 +8,6 @@
 
     <!-- ICONOS -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 
     <!-- Vite CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -73,11 +68,12 @@
 
         .subtitle {
             font-size: 0.85rem;
-            color: #007744;
+            color: #00ff88;
             letter-spacing: 0.3em;
             text-transform: uppercase;
             margin-bottom: 2rem;
             text-align: center;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
         }
 
         .glitch-text {
@@ -94,13 +90,12 @@
 
         .login-card {
             width: 100%;
-            max-width: 520px;
+            max-width: 500px;
             border: 1px solid var(--border);
             background: var(--panel);
             padding: clamp(1.5rem, 5vw, 2.5rem) clamp(1rem, 4vw, 2rem);
             position: relative;
             box-shadow: 0 0 30px rgba(0, 255, 136, 0.1);
-            border-radius: 0.7rem;
         }
 
         .login-card::before {
@@ -119,10 +114,11 @@
         .form-label {
             display: block;
             font-size: 0.75rem;
-            color: #007744;
+            color: #00ff88;
             letter-spacing: 0.15em;
             text-transform: uppercase;
             margin-bottom: 0.5rem;
+            text-shadow: 0 0 6px rgba(0, 255, 136, 0.15);
         }
 
         .form-control {
@@ -141,7 +137,14 @@
         .form-control::placeholder { color: #88ccaa60; }
         .form-control:focus { border-bottom-color: var(--green); box-shadow: 0 4px 15px -10px var(--green); }
 
-        .helper-text { display: block; margin-top: 0.4rem; color: #445544; font-size: 0.7rem; letter-spacing: 0.05em; }
+        .helper-text {
+            display: block;
+            margin-top: 0.4rem;
+            color: #88ccaa;
+            font-size: 0.7rem;
+            letter-spacing: 0.05em;
+            text-shadow: 0 0 4px rgba(136, 204, 170, 0.15);
+        }
 
         .checkbox-group {
             display: flex;
@@ -181,7 +184,6 @@
         .checkbox-label { font-size: 0.85rem; color: #669977; line-height: 1.5; cursor: pointer; }
 
         .btn {
-            display: block;
             font-family: 'Orbitron', sans-serif;
             font-size: 1rem;
             letter-spacing: 0.3em;
@@ -196,8 +198,6 @@
             overflow: hidden;
             width: 100%;
             font-weight: 700;
-            text-align: center;
-            text-decoration: none;
         }
 
         .btn::before {
@@ -213,11 +213,14 @@
         .btn:hover::before { left: 0; }
         .btn:hover { color: var(--bg); box-shadow: 0 0 20px var(--green); }
         .btn { min-height: 52px; -webkit-tap-highlight-color: transparent; }
-        .btn + .btn { margin-top: 1.5rem; }
 
         .btn-secondary {
             border-color: rgba(255, 255, 255, 0.2);
             color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            margin-top: 1.5rem;
         }
 
         .btn-secondary:hover { color: var(--green); }
@@ -372,9 +375,23 @@
 </script>
 
 <!-- Firma discreta -->
-<div style="position: fixed; bottom: 5px; right: 10px; font-family: monospace; font-size: 0.65rem; color: rgba(255, 255, 255, 0.3); z-index: 9999; text-align: right;">
-    DAWSCAPE SYSTEM // DAW <br>
-    <a href="{{ route('legal') }}" style="color: rgba(255, 255, 255, 0.3); text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='#00ff88'" onmouseout="this.style.color='rgba(255, 255, 255, 0.3)'">AVISO LEGAL Y RGPD</a>
+<div style="
+    position: fixed;
+    inset-inline: 0;
+    bottom: 4px;
+    padding: 0 8px;
+    font-family: monospace;
+    font-size: 0.55rem;
+    color: rgba(255, 255, 255, 0.16);
+    z-index: 50;
+    text-align: right;
+    pointer-events: none;
+">
+    <span>DAWSCAPE SYSTEM // DAW</span>
+    <span style="margin-inline: 4px;">·</span>
+    <a href="{{ route('legal') }}" style="color: inherit; text-decoration: none; pointer-events: auto;">
+        AVISO LEGAL Y RGPD
+    </a>
 </div>
 </body>
 </html>

@@ -291,7 +291,7 @@
       </div>
 
       <input type="hidden" name="icono" id="icono_input" value="ph-first-aid">
-      <input type="hidden" name="color_hex" id="color_input" value="#00ff88">
+      <input type="hidden" name="color_hex" id="color_input" value="#ff69b4">
 
       <!-- SELECCIÓN DE AVATAR -->
       <div class="form-group" style="margin-top: 1.5rem;">
@@ -312,14 +312,14 @@
       <div class="form-group" style="margin-top: 1rem; margin-bottom: 2.5rem;">
         <label class="form-label">IDENTIFICADOR DE COLOR</label>
         <div class="grid-selector" id="color-selector">
-          <div class="color-btn active" data-val="#00ff88" style="background:#00ff88;"></div>
-          <div class="color-btn" data-val="#00ffff" style="background:#00ffff;"></div>
-          <div class="color-btn" data-val="#ff00ff" style="background:#ff00ff;"></div>
-          <div class="color-btn" data-val="#ff2244" style="background:#ff2244;"></div>
-          <div class="color-btn" data-val="#ffcc00" style="background:#ffcc00;"></div>
-          <div class="color-btn" data-val="#b300ff" style="background:#b300ff;"></div>
-          <div class="color-btn" data-val="#ff6600" style="background:#ff6600;"></div>
-          <div class="color-btn" data-val="#ffffff" style="background:#ffffff;"></div>
+          <div class="color-btn active" data-val="#ff69b4" style="background:#ff69b4;" title="Rosa"></div>
+          <div class="color-btn" data-val="#8b00ff" style="background:#8b00ff;" title="Morado"></div>
+          <div class="color-btn" data-val="#ff6600" style="background:#ff6600;" title="Naranja"></div>
+          <div class="color-btn" data-val="#0066ff" style="background:#0066ff;" title="Azul"></div>
+          <div class="color-btn" data-val="#00cc44" style="background:#00cc44;" title="Verde"></div>
+          <div class="color-btn" data-val="#ffdd00" style="background:#ffdd00;" title="Amarillo"></div>
+          <div class="color-btn" data-val="#ff1a1a" style="background:#ff1a1a;" title="Rojo"></div>
+          <div class="color-btn" data-val="#ffffff" style="background:#ffffff;" title="Blanco"></div>
         </div>
       </div>
 
@@ -379,9 +379,23 @@ colorBtns.forEach(btn => {
 });
 </script>
 <!-- Firma discreta -->
-<div style="position: fixed; bottom: 5px; right: 10px; font-family: monospace; font-size: 0.65rem; color: rgba(255, 255, 255, 0.3); z-index: 9999; text-align: right;">
-    DAWSCAPE SYSTEM // DAW <br>
-    <a href="{{ route('legal') }}" style="color: rgba(255, 255, 255, 0.3); text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='#00ff88'" onmouseout="this.style.color='rgba(255, 255, 255, 0.3)'">AVISO LEGAL Y RGPD</a>
+<div style="
+    position: fixed;
+    inset-inline: 0;
+    bottom: 4px;
+    padding: 0 8px;
+    font-family: monospace;
+    font-size: 0.55rem;
+    color: rgba(255, 255, 255, 0.16);
+    z-index: 50;
+    text-align: right;
+    pointer-events: none;
+">
+    <span>DAWSCAPE SYSTEM // DAW</span>
+    <span style="margin-inline: 4px;">·</span>
+    <a href="{{ route('legal') }}" style="color: inherit; text-decoration: none; pointer-events: auto;">
+        AVISO LEGAL Y RGPD
+    </a>
 </div>
 </body>
 </html>
