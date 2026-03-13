@@ -382,6 +382,9 @@
       height: 52px;
       font-size: 1.6rem;
     }
+  }
+</style>
+
 <script>
   (function() {
     const musicPlayer = document.getElementById('music-player');
@@ -545,5 +548,6 @@
       initPlayerUI();
     } else {
       document.addEventListener('audioManagerReady', initPlayerUI, { once: true });
+    }
   })();
 </script>
