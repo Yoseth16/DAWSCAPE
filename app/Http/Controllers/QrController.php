@@ -90,12 +90,15 @@ class QrController extends Controller
         // Quitar guiones para facilitar búsquedas tipo "prueba-3-angel" => "prueba3angel"
         $codigoLimpiado = strtoupper(trim(str_replace('-', '', $codigo)));
 
-        // Acepta coincidencia exacta del código viejo, o que el texto escaneado contenga el slug esperado.
-        $esValido = hash_equals($claveEsperada, $codigoLimpiado) || str_contains($codigoLimpiado, $urlAdmitida);
+        $esValido = false;
 
+        // 1. Acepta coincidencia exacta del código viejo
+        if (hash_equals($claveEsperada, $codigoLimpiado)) {
+            $esValido = true;
+        }
+
+        // 2. O busca en base de datos si es una URL generada dinámicamente
         if (!$esValido) {
-            // Buscar en base de datos si es una URL dinámica generada
-            // El código suele ser una URL completa tipo https://dawscape.fun/qr/algo
             $qrEnBD = \App\Models\Qr::where('url', $codigo)->first();
             
             // Si no coincide la URL exacta, intentamos buscar si el slug de la URL coincide en la BD
