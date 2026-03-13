@@ -51,6 +51,13 @@
   </div>
 </div>
 
+<!-- Indicador global de pista en reproducción -->
+<div class="now-playing-banner" id="nowPlayingBanner" aria-live="polite">
+  <span class="now-playing-label">♪ Sonando ahora mismo:</span>
+  <span class="now-playing-title" id="nowPlayingTitle">—</span>
+  <span class="now-playing-label">♪</span>
+</div>
+
 <style>
   :root {
     --music-player-primary: #00ff88;
@@ -58,6 +65,49 @@
     --music-player-border: #00ff8840;
     --music-player-text: #c8ffdf;
     --music-player-panel: #041a0e;
+  }
+
+  /* Indicador "Sonando ahora mismo" */
+  .now-playing-banner {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--music-player-primary);
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.7);
+    pointer-events: none;
+    z-index: 850;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+
+  .now-playing-banner.visible {
+    opacity: 0.9;
+    transform: translateY(0);
+  }
+
+  .now-playing-title {
+    font-weight: 700;
+    max-width: 55vw;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    animation: nowPlayingPulse 2.2s ease-in-out infinite;
+  }
+
+  .now-playing-label {
+    opacity: 0.8;
+  }
+
+  @keyframes nowPlayingPulse {
+    0%, 100% { text-shadow: 0 0 10px rgba(0, 255, 136, 0.6); }
+    50% { text-shadow: 0 0 18px rgba(0, 255, 136, 0.95); }
   }
 
   /* Wrapper y botón toggle */
@@ -369,6 +419,15 @@
       height: 44px;
       font-size: 1.2rem;
     }
+
+    .now-playing-banner {
+      font-size: 0.65rem;
+      bottom: 0.3rem;
+    }
+
+    .now-playing-title {
+      max-width: 72vw;
+    }
   }
 
   /* Tablet+ */
@@ -396,6 +455,8 @@
     const trackTitle = document.getElementById('trackTitle');
     const indicatorDot = document.querySelector('.indicator-dot');
     const toggleBtn = document.getElementById('musicToggleBtn');
+    const nowPlayingBanner = document.getElementById('nowPlayingBanner');
+    const nowPlayingTitle = document.getElementById('nowPlayingTitle');
 
     let previousVolume = 0.5; // Para restaurar al desmutear
 
@@ -453,10 +514,17 @@
       // Título
       if (trackInfo && trackInfo.title) {
         trackTitle.textContent = trackInfo.title;
+        nowPlayingTitle.textContent = trackInfo.title;
       }
 
       // Volumen
       syncVolumeUI(volume);
+
+      if (isPlaying && trackInfo && trackInfo.title) {
+        nowPlayingBanner.classList.add('visible');
+      } else {
+        nowPlayingBanner.classList.remove('visible');
+      }
     });
 
     // Play/Pause

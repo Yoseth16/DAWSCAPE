@@ -192,10 +192,10 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Respuesta Correcta</label>
-                        <input type="text" name="respuesta_correcta" class="form-control" required placeholder="Ej: 1989">
+                        <label class="form-label">Respuestas válidas</label>
+                        <input type="text" name="respuesta_correcta" class="form-control" required placeholder="Ej: París, Paris, PARIS">
                         <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 6px; display: block; line-height: 1.4;">
-                            * El sistema validará la respuesta internamente omitiendo tildes, mayúsculas y espacios.
+                            * Puedes indicar <strong>varias respuestas correctas separadas por comas</strong>. El sistema las comparará sin tildes ni mayúsculas.
                         </small>
                     </div>
 

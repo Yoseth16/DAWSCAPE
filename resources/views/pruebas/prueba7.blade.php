@@ -515,9 +515,14 @@ function checkAnswer() {
 
   const q = questions[currentQ];
   const userAns = normalize(val);
-  const correct = normalize(q.answer);
+  const alternatives = String(q.answer || '')
+    .split(',')
+    .map(a => normalize(a))
+    .filter(a => a.length > 0);
 
-  if (userAns === correct) {
+  const isCorrect = alternatives.includes(userAns);
+
+  if (isCorrect) {
     isTransitioning = true;
     input.disabled = true;
     input.onkeydown = null;
