@@ -197,7 +197,12 @@ document.addEventListener("DOMContentLoaded", function () {
         let tiempoInicial = parseInt(configEl.dataset.tiempo || "0", 10);
         const loadTimeMs = Date.now();
 
+        // Exponer al scope global para que el sistema de pistas pueda actualizar el timer
+        window.tiempoInicial = tiempoInicial;
+
         function actualizarTimer() {
+            // Sincronizar con window.tiempoInicial (puede ser modificado por pista-ayuda)
+            tiempoInicial = window.tiempoInicial;
             let tiempo =
                 tiempoInicial + Math.floor((Date.now() - loadTimeMs) / 1000);
             let minutos = parseInt(tiempo / 60, 10);
@@ -210,6 +215,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
         }
+        window.actualizarTimer = actualizarTimer;
         actualizarTimer();
         setInterval(actualizarTimer, 1000);
     }

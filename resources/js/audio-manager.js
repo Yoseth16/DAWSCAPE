@@ -81,6 +81,7 @@ class AudioManager {
       correct: 'Acierto.mp3',
       error: 'Error.mp3',
       hint: 'Boton-Pista.mp3',
+      speaking: 'hablando-pista.mp3',
     };
 
     this.initializeSFX();

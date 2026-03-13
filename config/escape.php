@@ -33,7 +33,7 @@ return [
             'texto' => 'La memoria es frágil cuando trabaja sola. Dividid la carga, compartid el patrón. Cuatro cuadrantes, una mente colectiva. La sincronización es vuestra única salvación.',
         ],
     ],
-    'penalizacion_pista' => 60, // 60 segundos (1 minuto) por pista
+    'penalizacion_pista' => 480, // 480 segundos (8 minutos) por pista
 
     'respuestas' => [
         'prueba1' => [
