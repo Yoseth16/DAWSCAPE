@@ -181,6 +181,7 @@
         .checkbox-label { font-size: 0.85rem; color: #669977; line-height: 1.5; cursor: pointer; }
 
         .btn {
+            display: block;
             font-family: 'Orbitron', sans-serif;
             font-size: 1rem;
             letter-spacing: 0.3em;
@@ -195,6 +196,8 @@
             overflow: hidden;
             width: 100%;
             font-weight: 700;
+            text-align: center;
+            text-decoration: none;
         }
 
         .btn::before {
