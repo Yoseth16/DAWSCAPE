@@ -34,7 +34,7 @@ return [
         ],
         6 => [
             'creador' => 'Migue',
-            'imagen' => 'migue.png',
+            'imagen' => 'miguel.png',
             'imagen_habla' => 'miguel2.png',
             'texto' => 'La memoria es frágil cuando trabaja sola. Dividid la carga, compartid el patrón. Cuatro cuadrantes, una mente colectiva. La sincronización es vuestra única salvación.',
         ],
