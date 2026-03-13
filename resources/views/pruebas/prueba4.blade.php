@@ -153,75 +153,25 @@
   }
 
   /* ===========================
-     QR MODAL (Prueba 4)
-     - Overlay oscuro
-     - Centrado
-     - Z-index > scanlines (body::before)
+     QR NATIVO
   ============================ */
-  #qr-modal {
-    position: fixed;
-    inset: 0;
-    display: none;
+  .btn-qr-native {
+    min-height: 48px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 1rem;
-    background: rgba(0, 0, 0, 0.75);
-    z-index: 3000;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
   }
-  #qr-modal[aria-hidden="false"] { display: flex; }
-  .qr-panel {
-    width: 100%;
-    max-width: 520px;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    box-shadow: 0 0 35px rgba(0,255,136,0.15);
-    padding: 1rem;
-  }
-  .qr-panel-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 0.75rem;
-  }
-  .qr-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.95rem;
-    letter-spacing: 0.12em;
-    color: var(--green);
-  }
-  .btn {
-    cursor: pointer;
-    border: 1px solid var(--border);
-    background: rgba(0,255,136,0.08);
-    color: var(--text);
-    padding: 0.65rem 0.85rem;
-    font-family: inherit;
-    font-size: 0.95rem;
-    transition: transform .08s ease, background .15s ease, border-color .15s ease;
-  }
-  .btn:hover { background: rgba(0,255,136,0.14); border-color: rgba(0,255,136,0.6); }
-  .btn:active { transform: translateY(1px); }
-  .btn-danger { background: rgba(255,34,68,0.10); border-color: rgba(255,34,68,0.40); }
-  .btn-danger:hover { background: rgba(255,34,68,0.18); border-color: rgba(255,34,68,0.65); }
-  #qr-reader {
-    width: 100%;
-    border: 1px dashed var(--border);
-    background: rgba(2, 12, 6, 0.35);
-    padding: 0.5rem;
-  }
-  #qr-result {
-    margin-top: 0.75rem;
+  #qr-processing {
+    margin-top: 1rem;
     font-size: 0.9rem;
-    color: #b0e0bf;
-    line-height: 1.5;
-    min-height: 1.4rem;
-  }
-  .qr-hint {
-    margin-top: 0.5rem;
-    font-size: 0.75rem;
-    color: #7aa88c;
-    opacity: 0.9;
+    color: var(--green);
+    display: none;
+    text-align: center;
+    text-shadow: 0 0 5px var(--green);
   }
 </style>
 </head>
@@ -242,24 +192,17 @@
     <p>El cortafuegos ha caído y el sistema está expuesto. El código fuente de la supervivencia se ha filtrado en el <strong>Oasis</strong>.</p>
     <br>
     <p><strong>Busca la terminal negra donde los paquetes de datos se convierten en snacks. Escanea el acceso para completar la brecha.</strong></p>
-    <div style="margin-top: 1.25rem; display:flex; justify-content:center;">
-      <button id="btn-scan" type="button" class="btn">📷 Escanear QR</button>
+    <div style="margin-top: 1.25rem; display:flex; flex-direction:column; align-items:center; gap: 1rem;">
+      <input type="file" accept="image/*" capture="environment" id="qr-input" style="display:none">
+      <button id="btn-scan" type="button" class="btn btn-qr-native" onclick="document.getElementById('qr-input').click()">
+        📷 ESCANEAR
+      </button>
+      <div id="qr-processing"></div>
     </div>
   </div>
 </div>
 
-<!-- Modal / Overlay QR -->
-<div id="qr-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Escáner QR">
-  <div class="qr-panel">
-    <div class="qr-panel-header">
-      <div class="qr-title">ESCÁNER QR // PRUEBA 4</div>
-      <button id="btn-close-modal" class="btn btn-danger" type="button">✕ Cerrar</button>
-    </div>
-    <div id="qr-reader"></div>
-    <p id="qr-result">Pulsa "📷 Escanear QR" para iniciar la cámara.</p>
-    <div class="qr-hint">// Si no aparece la cámara, revisa permisos del navegador.</div>
-  </div>
-</div>
+<div id="dummy-reader" style="visibility:hidden; width:1px; height:1px; position:absolute;"></div>
 
 <!-- Librería html5-qrcode (CDN) -->
 <script src="https://unpkg.com/html5-qrcode"></script>
@@ -291,55 +234,19 @@ setInterval(actualizarTimer, 1000);
 </script>
 
 <script>
-// Escaneo QR (html5-qrcode) — Prueba 4
+// Escaneo QR Nativo (Prueba 4)
 (function () {
   const PRUEBA_NUMERO = 4;
 
-  const btnScan  = document.getElementById('btn-scan');
-  const modal    = document.getElementById('qr-modal');
-  const btnClose = document.getElementById('btn-close-modal');
-  const resultEl = document.getElementById('qr-result');
-  const readerEl = document.getElementById('qr-reader');
-
-  const csrfToken =
-    document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-
-  let scanner = null;
-  let isStopping = false;
+  const qrInput = document.getElementById('qr-input');
+  const processingEl = document.getElementById('qr-processing');
+  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
   function setResult(msg, isError = false) {
-    if (!resultEl) return;
-    resultEl.textContent = msg;
-    resultEl.style.color = isError ? '#ff8aa0' : '#b0e0bf';
-  }
-
-  async function stopScanner() {
-    if (!scanner || isStopping) return;
-    isStopping = true;
-    try {
-      await scanner.clear();
-    } catch (e) {
-    } finally {
-      scanner = null;
-      isStopping = false;
-      if (readerEl) readerEl.innerHTML = '';
-    }
-  }
-
-  function openModal() {
-    if (!modal) return;
-    modal.setAttribute('aria-hidden', 'false');
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-  }
-
-  async function closeModal() {
-    await stopScanner();
-    if (!modal) return;
-    modal.setAttribute('aria-hidden', 'true');
-    modal.style.display = 'none';
-    document.body.style.overflow = '';
-    setResult('Escáner cerrado. Puedes volver a intentarlo cuando quieras.');
+    if (!processingEl) return;
+    processingEl.textContent = msg;
+    processingEl.style.color = isError ? '#ff8aa0' : 'var(--green)';
+    processingEl.style.display = 'block';
   }
 
   async function validarCodigo(decodedText) {
@@ -381,44 +288,28 @@ setInterval(actualizarTimer, 1000);
     }
   }
 
-  async function startScanner() {
-    if (typeof Html5QrcodeScanner === 'undefined') {
-      setResult('No se pudo cargar la librería del escáner. Recarga la página.', true);
-      return;
-    }
-
-    await stopScanner();
-    if (readerEl) readerEl.innerHTML = '';
-    setResult('Inicializando cámara...');
-
-    const qrSize = Math.min(250, window.innerWidth - 80);
-    const config = { fps: 10, qrbox: { width: qrSize, height: qrSize }, rememberLastUsedCamera: true };
-    scanner = new Html5QrcodeScanner('qr-reader', config, false);
-    scanner.render(
-      async (decodedText) => {
-        await stopScanner();
-        await validarCodigo(decodedText);
-      },
-      () => {}
-    );
-
-    setTimeout(() => {
-      const hasVideo = readerEl?.querySelector('video');
-      if (!hasVideo && modal && modal.getAttribute('aria-hidden') === 'false') {
-        setResult('No se pudo acceder a la cámara. Revisa permisos o usa otro dispositivo.', true);
+  qrInput?.addEventListener('change', async (e) => {
+      if (e.target.files && e.target.files.length > 0) {
+          const file = e.target.files[0];
+          setResult('Procesando imagen...');
+          
+          try {
+              if (typeof Html5Qrcode === 'undefined') {
+                  setResult('Error al cargar escáner. Recarga la página.', true);
+                  return;
+              }
+              const html5QrCode = new Html5Qrcode("dummy-reader");
+              const decodedText = await html5QrCode.scanFile(file, true);
+              await validarCodigo(decodedText);
+          } catch (err) {
+              setResult('No se encontró un código QR válido en la imagen. Inténtalo de nuevo.', true);
+              if (window.audioManager) window.audioManager.playSFX('error');
+          }
+          
+          e.target.value = ''; // Limpiar para permitir volver a subir la misma
       }
-    }, 1200);
-  }
+  });
 
-  btnScan?.addEventListener('click', async () => {
-    openModal();
-    await startScanner();
-  });
-  btnClose?.addEventListener('click', closeModal);
-  modal?.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal && modal.getAttribute('aria-hidden') === 'false') closeModal();
-  });
 })();
 </script>
 </body>
