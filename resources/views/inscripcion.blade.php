@@ -347,7 +347,7 @@
 
       <button type="submit" class="btn">Registrar Equipo</button>
 
-      <a href="{{ route('inicio') }}" class="btn btn-secondary" style="margin-top: 1rem;">Volver</a>
+      <a href="{{ route('inicio') }}" class="btn btn-secondary" style="margin-top: 2rem;">Volver</a>
     </form>
   </div>
 </div>
