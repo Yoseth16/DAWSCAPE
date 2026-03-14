@@ -126,10 +126,26 @@ class AudioManager {
    * Setup listeners para eventos globales
    */
   setupEventListeners() {
-    // Pausa audio cuando se cambia de pestaña
+    // Pausa audio cuando se cambia de pestaña y reanuda suavemente al volver,
+    // siempre que el usuario no haya dejado el volumen en 0 (mute manual).
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         this.pauseMusic();
+      } else if (document.visibilityState === 'visible') {
+        // Equivalente a:
+        // if (audio && audio.paused && !silenciado) { audio.play().catch(() => {}); }
+        const isMuted = (this.currentVolume <= 0.001) || (this.targetVolume <= 0.001);
+        if (this.bgMusic && this.bgMusic.paused && !isMuted && this.currentTrach) {
+          this.bgMusic
+            .play()
+            .then(() => {
+              this.isPlaying = true;
+              this._updateUI();
+            })
+            .catch(() => {
+              // Ignorar silenciosamente errores de autoplay o políticas del navegador
+            });
+        }
       }
     });
   }
