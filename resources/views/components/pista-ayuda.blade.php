@@ -290,7 +290,7 @@
 /* --- Aviso penalización --- */
 .pista-penalty-banner {
     position: fixed;
-    top: 4.5rem; left: 50%;
+    top: 1.2rem; left: 50%;
     transform: translateX(-50%) translateY(-20px);
     background: linear-gradient(135deg, rgba(255,170,0,0.95), rgba(255,140,0,0.95));
     color: #1a1a00;
@@ -320,7 +320,11 @@
     .pista-speech-box { padding: 1.2rem 1rem 1rem; min-height: 100px; }
     .pista-speech-text { font-size: 0.82rem; }
     .pista-btn-si, .pista-btn-no { padding: 0.6rem 1.6rem; font-size: 0.8rem; }
-    .pista-penalty-banner { font-size: 0.75rem; padding: 0.5rem 1rem; }
+    .pista-penalty-banner {
+        font-size: 0.75rem;
+        padding: 0.45rem 0.9rem;
+        top: 0.6rem;
+    }
 }
 </style>
 
