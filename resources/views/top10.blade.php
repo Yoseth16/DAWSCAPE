@@ -728,11 +728,39 @@
             if(isConfettiActive) initMatrixCelebration();
         });
 
+        // Utilidad global para medallas/logros (usado en lista y podio)
+        function renderMedals(logros) {
+            if(!logros || logros.length === 0) return '';
+            let html = '<div style="display:inline-flex; gap:5px; margin-left:10px; vertical-align:middle;">';
+            logros.forEach(logro => {
+                if (logro === 'speedrunner_ninja') html += '<i class="ph-fill ph-lightning" title="Speedrunner Ninja" style="color:#eab308; font-size:1.4rem; filter: drop-shadow(0 0 5px #eab308);"></i>';
+                if (logro === 'cerebro_intacto') html += '<i class="ph-fill ph-brain" title="Cerebro Intacto" style="color:#ec4899; font-size:1.4rem; filter: drop-shadow(0 0 5px #ec4899);"></i>';
+                if (logro === 'hackerman') html += '<i class="ph-fill ph-terminal-window" title="Hackerman" style="color:#10b981; font-size:1.4rem; filter: drop-shadow(0 0 5px #10b981);"></i>';
+            });
+            html += '</div>';
+            return html;
+        }
+
         // FETCH DATA
         async function fetchTop10() {
             try {
                 const response = await fetch('/top10/datos');
+                if (!response.ok) {
+                    console.error('Error HTTP en /top10/datos:', response.status, response.statusText);
+                    return;
+                }
                 const data = await response.json();
+                console.log('Top10 datos recibidos:', data);
+
+                if (!data || !Array.isArray(data.top10) || data.top10.length === 0) {
+                    console.warn('Top10: no hay datos o formato incorrecto', data);
+                    // mensaje de espera en el podio
+                    const podiumContainer = document.getElementById('podium-container');
+                    podiumContainer.innerHTML = `<div style="text-align:center; width:100%; color:var(--text-muted); font-size:1.5rem; margin-top:50px;"><i class="ph ph-terminal-window" style="font-size:4rem; opacity:0.3;"></i><br>Esperando conexiones de equipos...</div>`;
+                    document.getElementById('list-container').innerHTML = '';
+                    return;
+                }
+
                 renderDashboard(data);
             } catch (err) {
                 console.error("Error fetching Top 10 data:", err);
