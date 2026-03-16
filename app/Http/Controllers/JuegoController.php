@@ -658,8 +658,10 @@ class JuegoController extends Controller
 
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $this->logAccion($partida, 'Prueba 7 Dinamica', 'Entra a la prueba (Códice Oculto)');
+        $yaUsada = in_array(7, $this->obtenerPistasUsadas($partida));
+        $pistaConfig = config('escape.pistas.7');
 
-        return view('pruebas.prueba7dinamica', compact('tiempo_transcurrido', 'pistas', 'intentos_fallidos'));
+        return view('pruebas.prueba7dinamica', compact('tiempo_transcurrido', 'pistas', 'intentos_fallidos', 'yaUsada', 'pistaConfig'));
     }
 
     public function validarPrueba7(Request $request)

@@ -377,6 +377,7 @@
     var mouthAnimInterval = null;
     var dialogoActivo = false;
     var mouthOpen = false;
+    var volumenAntesDucking = null; // Para restaurar el volumen tras cerrar la pista
 
     // ═══ ELEMENTOS DOM ═══
     var btn = document.getElementById('pistaBtn');
@@ -434,12 +435,8 @@
             if (speakingAudio) { speakingAudio.pause(); }
             speakingAudio = new Audio('/sonido/hablando-pista.mp3');
             speakingAudio.loop = true;
-            // Respetar el volumen global del AudioManager
-            var vol = 0.3;
-            if (window.audioManager) {
-                vol = Math.min(0.4, window.audioManager.currentVolume * 0.6);
-            }
-            speakingAudio.volume = vol;
+            // Volumen alto para que destaque sobre la música reducida
+            speakingAudio.volume = 0.6;
             speakingAudio.play().catch(function() {});
         } catch(e) {}
     }
@@ -486,6 +483,29 @@
         }, VELOCIDAD_TEXTO);
     }
 
+    // ═══ AUDIO DUCKING (bajar música al abrir pista) ═══
+    function aplicarDucking() {
+        if (!window.audioManager) return;
+        try {
+            var current = (typeof window.audioManager.targetVolume === 'number')
+                ? window.audioManager.targetVolume
+                : (typeof window.audioManager.currentVolume === 'number'
+                    ? window.audioManager.currentVolume : 0.5);
+            if (volumenAntesDucking === null) {
+                volumenAntesDucking = current;
+            }
+            window.audioManager.setVolume(Math.max(current * 0.15, 0.03));
+        } catch(e) {}
+    }
+
+    function restaurarDucking() {
+        if (!window.audioManager || volumenAntesDucking === null) return;
+        try {
+            window.audioManager.setVolume(volumenAntesDucking);
+            volumenAntesDucking = null;
+        } catch(e) {}
+    }
+
     // ═══ MOSTRAR / CERRAR DIÁLOGO ═══
     function abrirDialogo() {
         dialogoActivo = true;
@@ -493,6 +513,7 @@
         buttonsDiv.classList.remove('visible');
         closeBtn.classList.remove('visible');
         speechText.innerHTML = '';
+        aplicarDucking();
     }
 
     function cerrarDialogo() {
@@ -503,6 +524,7 @@
         if (typewriterInterval) { clearInterval(typewriterInterval); typewriterInterval = null; }
         detenerSonidoHabla();
         detenerAnimBoca();
+        restaurarDucking();
     }
 
     function mostrarBotones() {
@@ -554,6 +576,17 @@
 
     function manejarSi() {
         ocultarBotones();
+
+        // CASO ESPECIAL: Prueba 6 (Simon Dice) — no penalizar, mensaje gracioso
+        if (PRUEBA_NUMERO === 6) {
+            typewriter('Oye... solo tienes que memorizar o apuntar los colores... no tiene sentido pedirme una pista aquí, anda...', function() {
+                mostrarCerrar();
+                setTimeout(function() {
+                    if (dialogoActivo && !typewriterInterval) cerrarDialogo();
+                }, 4000);
+            });
+            return;
+        }
 
         // Feedback inmediato antes del fetch
         typewriter('Déjame pensar... Un momento...', function() {

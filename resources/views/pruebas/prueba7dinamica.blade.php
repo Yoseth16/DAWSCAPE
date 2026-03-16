@@ -442,7 +442,7 @@
 </style>
 </head>
 <body>
-  @include('components.game-audio-setup', ['trackKey' => 'prueba8'])
+  @include('components.game-audio-setup', ['trackKey' => 'prueba7'])
 <!-- HEADER -->
 <div class="game-header">
   <div class="team-info">
@@ -718,5 +718,7 @@ function setFeedback(msg, cls) {
 </script>
 </body>
 </html>
+
+@include('components.pista-ayuda', ['pruebaNumero' => 7, 'pistaConfig' => $pistaConfig, 'yaUsada' => $yaUsada])
 
 @include('components.live-listener')

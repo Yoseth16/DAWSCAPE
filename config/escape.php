@@ -38,6 +38,12 @@ return [
             'imagen_habla' => 'miguel2.png',
             'texto' => 'La memoria es frágil cuando trabaja sola. Dividid la carga, compartid el patrón. Cuatro cuadrantes, una mente colectiva. La sincronización es vuestra única salvación.',
         ],
+        7 => [
+            'creador' => 'Nacho',
+            'imagen' => 'nacho.png',
+            'imagen_habla' => 'nacho2.png',
+            'texto' => 'Cuatro dígitos escondidos en cuatro rincones del edificio. No los busquéis al azar: cada QR os dará un acertijo. Resolved el acertijo, descubrid el número, y colocadlos en el orden correcto. ¡Drift hacia la victoria!',
+        ],
     ],
     'penalizacion_pista' => 480, // 480 segundos (8 minutos) por pista
 
