@@ -317,7 +317,7 @@
   <div class="logo">TERMINAL OASIS</div>
   <div class="intro-text">
     <p style="color:var(--red)">Acceso al núcleo denegado.</p>
-    <p style="margin-top:0.5rem;">El cortafuegos de la red Oasis requiere una suma de verificación (checksum) basada en el inventario de hardware actual.</p>
+    <p style="margin-top:0.5rem;">El cortafuegos de la red Oasis requiere un código de verificación basado en el inventario de hardware actual.</p>
     <p style="margin-top:0.5rem; color:#668877;">Para generar el código de bypass, combina estos tres factores de la unidad de suministros:</p>
     <ul class="term-list">
         <li>Censo total de ranuras de almacenamiento (número de bandejas o filas horizontales visibles).</li>
@@ -326,7 +326,7 @@
     </ul>
     <p style="text-align: center; margin-top: 1.5rem; font-size: 0.9em;"><strong>Introduce la suma total para purgar el sistema.</strong></p>
     <div class="form-group">
-        <label style="font-size: 0.8rem; color: #445544;">// WAITING_CHECKSUM</label>
+        <label style="font-size: 0.8rem; color: #445544;">// CÓDIGO REQUERIDO</label>
         <input class="answer-input" id="checksum-input" type="number" inputmode="numeric" pattern="[0-9]*" placeholder="___" autocomplete="off">
         <div class="feedback" id="feedback-msg"></div>
         <button class="challenge-btn" id="btn-verificar" type="button">EJECUTAR BYPASS →</button>
@@ -341,8 +341,8 @@
 <div class="screen" id="screen-win">
   <div class="logo">OASIS HACKEADO</div>
   <div id="term-win">
-      <div class="term-line" id="l1">[OK] Validating checksum... 100%</div>
-      <div class="term-line" id="l2">[OK] Inyección de código completada en el sector Oasis.</div>
+      <div class="term-line" id="l1">[OK] Verificando código... 100%</div>
+      <div class="term-line" id="l2">[OK] Acceso autenticado en el sector Oasis.</div>
       <div class="term-line" id="l3">[OK] Acceso concedido al núcleo del sistema DAW.</div>
       <div class="term-line narrative" id="l4">-- NO MESSAGE --</div>
       <div class="term-line" id="l5" style="margin-top: 2rem; text-align: center;">

@@ -321,7 +321,7 @@
 <div class="screen" id="screen-challenge">
   <div class="logo">SISTEMA ESPEJO ACTIVADO</div>
   <div class="intro-text">
-    <p>El abecedario ha sido invertido para proteger la clave. La correspondencia original ha sido corrompida.</p>
+    <p>El abecedario ha sido invertido para proteger la clave. La correspondencia original ha sido reorganizada.</p>
     <p style="margin-top:0.5rem; color:#668877;">Nueva tabla de conversión:</p>
     <p style="color:var(--green); letter-spacing:0.1em; text-align:center; padding: 0.5rem; background: #0a0a0a; border: 1px dashed #00ff8840; margin: 0.5rem 0;">Z = 1 &nbsp; Y = 2 &nbsp; X = 3 &nbsp; ... &nbsp; A = 26</p>
     <p style="margin-top:0.5rem;">El núcleo del sistema está oculto en varias unidades numeradas del 1 al 64. Cada número representa una letra bajo el Protocolo Espejo.</p>
@@ -340,10 +340,10 @@
     <div class="form-group">
         <input class="answer-input" id="checksum-input" type="text" placeholder="_______" autocomplete="off" spellcheck="false" autocapitalize="off" maxlength="7">
         <div class="feedback" id="feedback-msg"></div>
-        <button class="challenge-btn" id="btn-verificar" type="button">DESCIFRAR NÚCLEO →</button>
+        <button class="challenge-btn" id="btn-verificar" type="button">VERIFICAR PALABRA CLAVE →</button>
     </div>
     <div class="hint-box" id="hint-box">
-        <strong>[PISTA DEL SISTEMA]</strong><br>La palabra que buscas ya está escrita en la pantalla. Solo necesitas encontrarla en las taquillas correctas. Revisa la tabla de descifrado detalladamente.
+        <strong>[PISTA DEL SISTEMA]</strong><br>La palabra que buscas ya está escrita en la pantalla. Solo necesitas encontrarla en las taquillas correctas. Revisa la tabla de conversión detalladamente.
     </div>
   </div>
 </div>
@@ -352,7 +352,7 @@
 <div class="screen" id="screen-win">
   <div class="logo">NÚCLEO RESTAURADO</div>
   <div id="term-win">
-      <div class="term-line" id="l1">[OK] Descifrando alfabeto espejo… 100%</div>
+      <div class="term-line" id="l1">[OK] Reorganizando alfabeto espejo… 100%</div>
       <div class="term-line" id="l2">[OK] Fragmentos recuperados correctamente.</div>
       <div class="term-line" id="l3">[OK] Palabra clave validada.</div>
       <div class="term-line narrative" id="l4">-- NO MESSAGE --</div>
@@ -544,7 +544,7 @@ setInterval(actualizarTimer, 1000);
     .then(data => {
       if (data.success) {
         if (window.audioManager) window.audioManager.playSFX('correct');
-        challengeFeedback.textContent = '[OK] PROTOCOLO ESPEJO DESCIFRADO.';
+        challengeFeedback.textContent = '[OK] PROTOCOLO ESPEJO RESTAURADO.';
         challengeFeedback.className = 'feedback ok';
         challengeInput.classList.add('correct');
         setTimeout(() => triggerWinSequence(data.mensaje), 800);

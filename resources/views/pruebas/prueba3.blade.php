@@ -306,7 +306,7 @@
     </ul>
     <p style="text-align: center; margin-top: 2rem;"><strong>Introduce la suma total para purgar el sistema... si te atreves.</strong></p>
     <div class="form-group">
-        <label style="font-size: 0.8rem; color: #445544;">// CHECKSUM_REQUIRED</label>
+        <label style="font-size: 0.8rem; color: #445544;">// CÓDIGO NECESARIO</label>
         <input class="answer-input" id="checksum-input" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="___" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         <div class="feedback" id="feedback-msg"></div>
         <button class="challenge-btn" id="btn-verificar" type="button">VERIFICAR →</button>
@@ -321,8 +321,8 @@
 <div class="screen" id="screen-win">
   <div class="logo">SISTEMA COMPROMETIDO</div>
   <div id="term-win">
-      <div class="term-line" id="l1">[OK] Validating checksum... 100%</div>
-      <div class="term-line" id="l2">[OK] Overflow de memoria corregido.</div>
+      <div class="term-line" id="l1">[OK] Verificando código... 100%</div>
+      <div class="term-line" id="l2">[OK] Datos recargados correctamente.</div>
       <div class="term-line" id="l3">[OK] Acceso concedido al núcleo del sistema.</div>
       <div class="term-line narrative" id="l4">-- NO MESSAGE --</div>
       <div class="term-line" id="l5" style="margin-top: 2rem; text-align: center;">
