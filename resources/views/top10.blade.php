@@ -162,6 +162,7 @@
             align-items: center;
             justify-content: flex-start;
             overflow: hidden;
+            padding-top: 0.75rem; /* baja ligeramente el podio para que se lea bien CABEZA DE CARRERA */
         }
 
         /* Zona inferior: lista 4-10 — 55% del espacio */
@@ -272,8 +273,9 @@
             text-shadow: 0 0 6px currentColor;
             padding: 0.3rem 0;
         }
-        .podium-rank::before { content: '['; opacity: 0.5; }
-        .podium-rank::after { content: ']'; opacity: 0.5; }
+        /* Sin corchetes alrededor del número de podio */
+        .podium-rank::before,
+        .podium-rank::after { content: ''; }
 
         .podium-name {
             font-size: 1.1rem;
@@ -296,13 +298,9 @@
             letter-spacing: 1px;
         }
 
+        /* Ocultar la línea técnica [PID:X] en las tarjetas del podio */
         .podium-phase {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: 3px;
-            font-weight: normal;
-            border-top: 1px dashed var(--text-muted);
-            padding-top: 3px;
+            display: none;
         }
 
         .p1-badge {
@@ -377,8 +375,9 @@
             text-align: left;
             flex-shrink: 0;
         }
-        .list-pos::before { content: '[#'; }
-        .list-pos::after { content: ']'; }
+        /* Quitar corchetes / decoraciones en número de posición en la lista */
+        .list-pos::before,
+        .list-pos::after { content: ''; }
 
         .list-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 
