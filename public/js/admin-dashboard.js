@@ -97,7 +97,9 @@ function updateKPIs(metrics) {
 
 function updateTable(partidas) {
     const tbody = document.querySelector('#mainTable tbody');
-    const searchVal = document.getElementById("searchInput").value.toLowerCase();
+    if (!tbody) return;
+    const searchInput = document.getElementById("searchInput");
+    const searchVal = searchInput ? searchInput.value.toLowerCase() : '';
 
     // Reconstruimos filas (más seguro para mantener el orden dinámico)
     let newHtml = '';
@@ -137,8 +139,8 @@ function updateTable(partidas) {
             }
 
             const avatarBg = p.color_hex ? p.color_hex : 'linear-gradient(135deg, #60a5fa, #3b82f6)';
-            const avatarInner = p.icono 
-                ? `<i class="ph-fill ${p.icono}"></i>` 
+            const avatarInner = p.icono
+                ? `<i class="ph-fill ${p.icono}"></i>`
                 : `<span style="font-weight: bold; font-size: 1.2rem;">${p.avatar}</span>`;
             const avatarHtml = `<div class="avatar" style="background: ${avatarBg}; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; color: white;">${avatarInner}</div>`;
 
@@ -176,8 +178,11 @@ function updateTable(partidas) {
 }
 
 function updateChart(chartData) {
+    const chartCanvas = document.getElementById('fasesChart');
+    if (!chartCanvas) return;
+
     if (!myChart) {
-        const ctx = document.getElementById('fasesChart').getContext('2d');
+        const ctx = chartCanvas.getContext('2d');
         myChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
