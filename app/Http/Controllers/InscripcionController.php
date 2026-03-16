@@ -102,7 +102,7 @@ class InscripcionController extends Controller
         // 3. ENVÍO DE EMAIL CON CÓDIGO DE ACCESO VÍA RESEND
         try {
             Mail::send(new CodigoAccesoInscripcion($inscripcion));
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::error('Error enviando email de inscripción: ' . $e->getMessage());
             // No fallar si hay error en email, pero loguear
         }
