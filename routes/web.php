@@ -55,6 +55,12 @@ Route::middleware(['check.fase'])->group(function () {
     Route::get('/prueba7', [JuegoController::class, 'mostrarPrueba7'])->name('prueba7');
     Route::post('/prueba7', [JuegoController::class, 'validarPrueba7']);
 
+    Route::get('/prueba8', [JuegoController::class, 'mostrarPrueba8'])->name('prueba8');
+    Route::post('/prueba8', [JuegoController::class, 'validarPrueba8']);
+
+    Route::get('/prueba9', [JuegoController::class, 'mostrarPrueba9'])->name('prueba9');
+    Route::post('/prueba9', [JuegoController::class, 'validarPrueba9'])->middleware('throttle:20,1');
+
     Route::get('/final', [JuegoController::class, 'mostrarFinal'])->name('final');
 
     // Sistema de Pistas/Ayuda
@@ -187,27 +193,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('admin.prueba.prueba5');
     Route::get('/prueba/prueba6', [JuegoController::class, 'mostrarPrueba6'])->name('admin.prueba.prueba6');
     Route::get('/prueba/prueba7', [JuegoController::class, 'mostrarPrueba7'])->name('admin.prueba.prueba7');
-
-    Route::get('/prueba/prueba8', function () {
-        // Admin bypass: crear sesión temporal y generar combinación de prueba fija para demostración
-        session([
-            'email'        => 'admin-test@prueba8.test',
-            'nombre_equipo' => 'ADMIN TEST',
-            'clase'        => 'Pruebas'
-        ]);
-        // Forzamos combinación de test visible para el admin: [3, 7, 1, 9]
-        return view('pruebas.prueba7dinamica', [
-            'tiempo_transcurrido' => 0,
-            'combinacion'         => [3, 7, 1, 9],
-            'pistas'              => [
-                'Cristal de la biblioteca',
-                'Mesa de ping pong del patio',
-                'Puerta de dirección',
-                'Mostrador de conserjería'
-            ],
-            'intentos_fallidos'   => 0
-        ]);
-    })->name('admin.prueba.prueba8');
+    Route::get('/prueba/prueba8', [JuegoController::class, 'mostrarPrueba8'])->name('admin.prueba.prueba8');
+    Route::get('/prueba/prueba9', [JuegoController::class, 'mostrarPrueba9'])->name('admin.prueba.prueba9');
 
     // Gestión de Perfil de Profesor (Breeze)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

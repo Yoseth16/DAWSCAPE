@@ -23,7 +23,9 @@ class Partida extends Model
         'tiempo_pausado_segundos',
         'ultima_pausa_at',
         'combinacion_codice',
-        'intentos_codice'
+        'intentos_codice',
+        'intentos_prueba9',
+        'hints_used'
     ];
 
     protected $casts = [

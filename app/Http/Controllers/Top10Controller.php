@@ -12,17 +12,21 @@ use App\Events\Top10Updated;
 class Top10Controller extends Controller
 {
     // Define the sequence of phases and their friendly names for the progress bar
-    private $fases_orden = [
-        'INICIO' => ['nombre' => 'En el Inicio', 'peso' => 0],
-        'Prueba 1 Mario' => ['nombre' => 'Prueba 1 — Criptografía', 'peso' => 1],
-        'Prueba 2 Yoseth' => ['nombre' => 'Prueba 2 — Servidor Seguro', 'peso' => 2],
-        'Prueba 3 Angel' => ['nombre' => 'Prueba 3 — Máquina de Café', 'peso' => 3],
-        'Prueba 4 Arturo' => ['nombre' => 'Prueba 4 — Oasis Snacks', 'peso' => 4],
-        'Prueba 5 Eloy' => ['nombre' => 'Prueba 5 — Protocolo Espejo', 'peso' => 5],
-        'Prueba 6 Migue' => ['nombre' => 'Prueba 6 — Descifrado Final', 'peso' => 6],
-        'FINALIZADO' => ['nombre' => '¡Completado!', 'peso' => 7],
-        'FINALIZADO_TIMEOUT' => ['nombre' => '¡Tiempo Agotado!', 'peso' => 7],
-    ];
+    private array $fases_orden;
+
+    public function __construct()
+    {
+        $this->fases_orden = collect(config('fases.fases', []))
+            ->mapWithKeys(function ($f) {
+                return [
+                    $f['db'] => [
+                        'nombre' => $f['nombre'],
+                        'peso' => $f['peso'],
+                    ]
+                ];
+            })
+            ->all();
+    }
 
     public function index()
     {
@@ -37,7 +41,11 @@ class Top10Controller extends Controller
             // Get ticker message from cache
             $ticker = Cache::get('top10_ticker', '¡Bienvenidos al Escape Room DAWSCAPE! Que gane el mejor equipo.');
 
-            $terminadasFases = ['FINALIZADO', 'FINALIZADO_TIMEOUT'];
+            $terminadasFases = [
+                config('fases.fases.finalizado.db'),
+                config('fases.fases.timeout.db'),
+            ];
+            $maxPesoEnJuego = (int) config('fases.max_peso_en_juego', 9);
 
             // Solo equipos que empezaron juego y ya tienen fase
             $partidas = Partida::whereNotNull('fase_actual')
@@ -120,12 +128,12 @@ class Top10Controller extends Controller
             $peso = $this->fases_orden[$partida->fase_actual]['peso'] ?? 0;
             $nombre_prueba = $this->fases_orden[$partida->fase_actual]['nombre'] ?? $partida->fase_actual;
 
-            // Calculate progress percentage (max weight is 6 before finish)
-            $progreso = min(100, round(($peso / 6) * 100));
+            // Calculate progress percentage (max weight is $maxPesoEnJuego before finish)
+            $progreso = $maxPesoEnJuego > 0 ? min(100, round(($peso / $maxPesoEnJuego) * 100)) : 0;
 
             $estado = match ($partida->fase_actual) {
-                'FINALIZADO' => 'finalizado',
-                'FINALIZADO_TIMEOUT' => 'timeout',
+                config('fases.fases.finalizado.db') => 'finalizado',
+                config('fases.fases.timeout.db') => 'timeout',
                 default => 'jugando',
             };
 
@@ -134,7 +142,7 @@ class Top10Controller extends Controller
                 'nombre_equipo' => $partida->nombre_equipo,
                 'fase_actual' => $partida->fase_actual,
                 'nombre_prueba' => $nombre_prueba,
-                'fase_numero' => min(6, max(0, (int)$peso)),
+                'fase_numero' => min($maxPesoEnJuego, max(0, (int)$peso)),
                 'progreso_porcentaje' => $progreso,
                 'tiempo_segundos' => $segsLive,
                 'tiempo_formateado' => floor($segsLive / 60) . 'm ' . str_pad($segsLive % 60, 2, '0', STR_PAD_LEFT) . 's',

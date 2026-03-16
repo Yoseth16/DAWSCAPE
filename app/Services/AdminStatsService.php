@@ -14,10 +14,13 @@ class AdminStatsService
      */
     public function getPartidasOrdered()
     {
+        $FINALIZADO = config('fases.fases.finalizado.db');
+        $TIMEOUT = config('fases.fases.timeout.db');
+
         return Partida::orderByRaw("
             CASE
-                WHEN fase_actual = 'FINALIZADO' THEN 0
-                WHEN fase_actual = 'FINALIZADO_TIMEOUT' THEN 1
+                WHEN fase_actual = '{$FINALIZADO}' THEN 0
+                WHEN fase_actual = '{$TIMEOUT}' THEN 1
                 ELSE 2
             END")
             ->orderBy('tiempo_segundos', 'asc')
@@ -31,7 +34,7 @@ class AdminStatsService
      */
     public function getTop5()
     {
-        return Partida::where('fase_actual', 'FINALIZADO')
+        return Partida::where('fase_actual', config('fases.fases.finalizado.db'))
             ->orderByRaw('(tiempo_segundos + COALESCE(penalizacion_segundos, 0)) ASC')
             ->limit(5)
             ->get();
@@ -43,13 +46,16 @@ class AdminStatsService
      */
     public function getMetrics()
     {
+        $FINALIZADO = config('fases.fases.finalizado.db');
+        $TIMEOUT = config('fases.fases.timeout.db');
+
         // En lugar de traer todos los registros a memoria para contarlos (O(n)),
         // delegamos el conteo al motor de base de datos (O(1) o indexado).
         $metrics = Partida::select(
             DB::raw('COUNT(*) as total'),
-            DB::raw('SUM(CASE WHEN fase_actual = "FINALIZADO" THEN 1 ELSE 0 END) as finalizados'),
-            DB::raw('SUM(CASE WHEN fase_actual = "FINALIZADO_TIMEOUT" THEN 1 ELSE 0 END) as timeout'),
-            DB::raw('AVG(CASE WHEN fase_actual = "FINALIZADO" THEN tiempo_segundos ELSE NULL END) as tiempo_medio')
+            DB::raw("SUM(CASE WHEN fase_actual = '{$FINALIZADO}' THEN 1 ELSE 0 END) as finalizados"),
+            DB::raw("SUM(CASE WHEN fase_actual = '{$TIMEOUT}' THEN 1 ELSE 0 END) as timeout"),
+            DB::raw("AVG(CASE WHEN fase_actual = '{$FINALIZADO}' THEN tiempo_segundos ELSE NULL END) as tiempo_medio")
         )->first();
 
         $totalEquipos = (int) $metrics->total;

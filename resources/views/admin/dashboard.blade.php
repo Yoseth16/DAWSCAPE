@@ -372,19 +372,24 @@
                         <td>
                             @php
                                 $badges = [
-                                    'Prueba 1 Mario' => ['bg' => '#dbeafe', 'color' => '#1d4ed8', 'icon' => 'ph-spinner-gap'],
-                                    'Prueba 2 Yoseth' => ['bg' => '#f3e8ff', 'color' => '#6d28d9', 'icon' => 'ph-spinner-gap'],
-                                    'Prueba 3 Angel' => ['bg' => '#ffedd5', 'color' => '#c2410c', 'icon' => 'ph-spinner-gap'],
-                                    'Prueba 4 Arturo' => ['bg' => '#fee2e2', 'color' => '#b91c1c', 'icon' => 'ph-spinner-gap'],
-                                    'Prueba 5 Eloy' => ['bg' => '#cffafe', 'color' => '#0e7490', 'icon' => 'ph-spinner-gap'],
-                                    'Prueba 6 Migue' => ['bg' => '#fef08a', 'color' => '#a16207', 'icon' => 'ph-spinner-gap'],
-                                    'Prueba 7 Dinamica' => ['bg' => '#dcfce7', 'color' => '#15803d', 'icon' => 'ph-spinner-gap'],
-                                    'Prueba 8' => ['bg' => '#fce7f3', 'color' => '#be185d', 'icon' => 'ph-spinner-gap'],
-                                    'FINALIZADO' => ['bg' => '#d1fae5', 'color' => '#047857', 'icon' => 'ph-check-circle'],
-                                    'FINALIZADO_TIMEOUT' => ['bg' => '#f3f4f6', 'color' => '#374151', 'icon' => 'ph-clock']
+                                    config('fases.fases.prueba1.db') => ['bg' => '#dbeafe', 'color' => '#1d4ed8', 'icon' => 'ph-spinner-gap'],
+                                    config('fases.fases.prueba2.db') => ['bg' => '#f3e8ff', 'color' => '#6d28d9', 'icon' => 'ph-spinner-gap'],
+                                    config('fases.fases.prueba3.db') => ['bg' => '#ffedd5', 'color' => '#c2410c', 'icon' => 'ph-spinner-gap'],
+                                    config('fases.fases.prueba4.db') => ['bg' => '#fee2e2', 'color' => '#b91c1c', 'icon' => 'ph-spinner-gap'],
+                                    config('fases.fases.prueba5.db') => ['bg' => '#cffafe', 'color' => '#0e7490', 'icon' => 'ph-spinner-gap'],
+                                    config('fases.fases.prueba6.db') => ['bg' => '#fef08a', 'color' => '#a16207', 'icon' => 'ph-spinner-gap'],
+                                    config('fases.fases.prueba7.db') => ['bg' => '#dcfce7', 'color' => '#15803d', 'icon' => 'ph-spinner-gap'],
+                                    config('fases.fases.prueba8.db') => ['bg' => '#fce7f3', 'color' => '#be185d', 'icon' => 'ph-spinner-gap'],
+                                    config('fases.fases.prueba9.db') => ['bg' => '#e0f2fe', 'color' => '#0369a1', 'icon' => 'ph-spinner-gap'],
+                                    config('fases.fases.finalizado.db') => ['bg' => '#d1fae5', 'color' => '#047857', 'icon' => 'ph-check-circle'],
+                                    config('fases.fases.timeout.db') => ['bg' => '#f3f4f6', 'color' => '#374151', 'icon' => 'ph-clock']
                                 ];
                                 $badge = $badges[$partida->fase_actual] ?? ['bg' => '#f1f5f9', 'color' => '#475569', 'icon' => 'ph-spinner-gap'];
-                                $stageText = match($partida->fase_actual) { 'FINALIZADO' => 'COMPLETADO', 'FINALIZADO_TIMEOUT' => 'TIMEOUT', default => strtoupper($partida->fase_actual) };
+                                $stageText = match($partida->fase_actual) {
+                                    config('fases.fases.finalizado.db') => 'COMPLETADO',
+                                    config('fases.fases.timeout.db') => 'TIMEOUT',
+                                    default => strtoupper($partida->fase_actual)
+                                };
                             @endphp
                             <span class="status-pill" style="background: {{ $badge['bg'] }}; color: {{ $badge['color'] }}; font-weight: 600; padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 4px; box-shadow: none;">
                                 <i class="ph-fill {{ $badge['icon'] }}" @if($badge['icon'] === 'ph-spinner-gap') style="animation: spin 2s linear infinite;" @endif></i> 

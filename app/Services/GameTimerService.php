@@ -66,14 +66,14 @@ class GameTimerService
         }
         
         if (str_starts_with($partida->fase_actual, 'FINALIZADO')) {
-            return $partida->fase_actual === 'FINALIZADO_TIMEOUT';
+            return $partida->fase_actual === config('fases.fases.timeout.db');
         }
 
         $transcurrido = $this->obtenerTiempoTranscurrido();
         if ($transcurrido >= self::MAX_TIEMPO_MINUTOS * 60) {
             $partida->update([
                 'tiempo_segundos' => $transcurrido,
-                'fase_actual' => 'FINALIZADO_TIMEOUT'
+                'fase_actual' => config('fases.fases.timeout.db')
             ]);
             return true;
         }

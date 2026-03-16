@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Partida;
 use App\Models\Inscripcion;
+use App\Models\PreguntaDinamica;
 use Barryvdh\DomPDF\Facade\Pdf;
 use \App\Services\GameTimerService;
 use App\Http\Requests\EmpezarPartidaRequest;
@@ -155,14 +156,16 @@ class JuegoController extends Controller
 
             // Restaurar progreso en la sesión según la fase en BBDD
             $fasesOrdenadas = [
-                'Prueba 1 Mario' => 1,
-                'Prueba 2 Yoseth' => 2,
-                'Prueba 3 Angel' => 3,
-                'Prueba 4 Arturo' => 4,
-                'Prueba 5 Eloy' => 5,
-                'Prueba 6 Migue' => 6,
-                'Prueba 7 Dinamica' => 7,
-                'FINALIZADO' => 8
+                config('fases.fases.prueba1.db') => 1,
+                config('fases.fases.prueba2.db') => 2,
+                config('fases.fases.prueba3.db') => 3,
+                config('fases.fases.prueba4.db') => 4,
+                config('fases.fases.prueba5.db') => 5,
+                config('fases.fases.prueba6.db') => 6,
+                config('fases.fases.prueba7.db') => 7,
+                config('fases.fases.prueba8.db') => 8,
+                config('fases.fases.prueba9.db') => 9,
+                config('fases.fases.finalizado.db') => 10,
             ];
 
             $faseActualDBNormalizada = ucwords(strtolower(trim($partidaExistente->fase_actual ?? '')));
@@ -200,7 +203,9 @@ class JuegoController extends Controller
                     5 => route('prueba5'),
                     6 => route('prueba6'),
                     7 => route('prueba7'),
-                    8 => route('final'),
+                    8 => route('prueba8'),
+                    9 => route('prueba9'),
+                    10 => route('final'),
                 ];
                 $destino = $destinos[$nivelDB] ?? route('prueba1');
             }
@@ -214,7 +219,7 @@ class JuegoController extends Controller
             'email'             => $inscripcion->correo,
             'nombre_equipo'     => $inscripcion->nombre_equipo,
             'clase'             => $inscripcion->clase,
-            'fase_actual'       => 'Prueba 1 Mario',
+            'fase_actual'       => config('fases.fases.prueba1.db'),
             'tiempo_segundos'   => 0,
             'inicio_juego'      => Carbon::now(),
             'icono'             => $request->input('icono', 'ph-first-aid'),
@@ -242,7 +247,7 @@ class JuegoController extends Controller
 
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $partida = $this->timerService->obtenerPartidaActiva();
-        $this->logAccion($partida, 'Prueba 1 Mario', 'Entra a la prueba');
+        $this->logAccion($partida, config('fases.fases.prueba1.db'), 'Entra a la prueba');
         $yaUsada = in_array(1, $this->obtenerPistasUsadas($partida));
         $pistaConfig = config('escape.pistas.1');
         return view('pruebas.prueba1', compact('tiempo_transcurrido', 'yaUsada', 'pistaConfig'));
@@ -253,7 +258,7 @@ class JuegoController extends Controller
         $partida = $this->timerService->obtenerPartidaActiva();
 
         if (!$request->completed) {
-            $this->logAccion($partida, 'Prueba 1 Mario', 'Intento fallido', ['motivo' => 'Faltan acertijos por resolver']);
+            $this->logAccion($partida, config('fases.fases.prueba1.db'), 'Intento fallido', ['motivo' => 'Faltan acertijos por resolver']);
             return response()->json(['success' => false, 'message' => 'Validación fallida: Faltan acertijos por resolver'], 400);
         }
 
@@ -262,11 +267,11 @@ class JuegoController extends Controller
 
         foreach ($request->answers as $index => $answer) {
             if (!isset($respuestas_correctas[$index])) {
-                $this->logAccion($partida, 'Prueba 1 Mario', 'Intento fallido', ['motivo' => 'Sobran respuestas']);
+                $this->logAccion($partida, config('fases.fases.prueba1.db'), 'Intento fallido', ['motivo' => 'Sobran respuestas']);
                 return response()->json(['success' => false, 'message' => 'Validación fallida: Sobran respuestas.'], 400);
             }
             if (!in_array(strtolower(trim($answer)), $respuestas_correctas[$index])) {
-                $this->logAccion($partida, 'Prueba 1 Mario', 'Intento fallido', ['motivo' => 'Respuesta '.($index + 1).' incorrecta: '.$answer]);
+                $this->logAccion($partida, config('fases.fases.prueba1.db'), 'Intento fallido', ['motivo' => 'Respuesta '.($index + 1).' incorrecta: '.$answer]);
                 return response()->json(['success' => false, 'message' => 'Validación fallida: Respuesta '.($index + 1).' incorrecta.'], 400);
             }
         }
@@ -276,7 +281,7 @@ class JuegoController extends Controller
 
         // SOLO actualizamos la fase_actual, NO paramos el reloj maestro de BBDD.
         if ($partida) {
-            $this->logAccion($partida, 'Prueba 1 Mario', 'Prueba superada');
+            $this->logAccion($partida, config('fases.fases.prueba1.db'), 'Prueba superada');
 
             // LOGRO 1: Speedrunner Ninja (Prueba 1 superada en menos de 2 minutos sin penalizaciones)
             $tiempo = $this->timerService->obtenerTiempoTranscurrido();
@@ -284,7 +289,7 @@ class JuegoController extends Controller
                 $this->desbloquearLogro($partida, 'speedrunner_ninja');
             }
 
-            $this->timerService->avanzarFase($partida, 'Prueba 2 Yoseth', 'Prueba 1 Mario Superada');
+            $this->timerService->avanzarFase($partida, config('fases.fases.prueba2.db'), 'Prueba 1 Mario Superada');
             Top10Updated::dispatch();
             AdminDashboardUpdated::dispatch();
         }
@@ -303,7 +308,7 @@ class JuegoController extends Controller
 
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $partida = $this->timerService->obtenerPartidaActiva();
-        $this->logAccion($partida, 'Prueba 2 Yoseth', 'Entra a la prueba');
+        $this->logAccion($partida, config('fases.fases.prueba2.db'), 'Entra a la prueba');
         $yaUsada = in_array(2, $this->obtenerPistasUsadas($partida));
         $pistaConfig = config('escape.pistas.2');
         return view('pruebas.prueba2', compact('tiempo_transcurrido', 'yaUsada', 'pistaConfig'));
@@ -326,8 +331,8 @@ class JuegoController extends Controller
         $partida = $this->timerService->obtenerPartidaActiva();
 
         if ($partida && $partida->inicio_juego) {
-            $this->logAccion($partida, 'Prueba 2 Yoseth', 'Prueba superada');
-            $this->timerService->avanzarFase($partida, 'Prueba 3 Angel', 'Prueba 2 Yoseth Superada');
+            $this->logAccion($partida, config('fases.fases.prueba2.db'), 'Prueba superada');
+            $this->timerService->avanzarFase($partida, config('fases.fases.prueba3.db'), 'Prueba 2 Yoseth Superada');
             Top10Updated::dispatch();
             AdminDashboardUpdated::dispatch();
         }
@@ -345,7 +350,7 @@ class JuegoController extends Controller
 
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $partida = $this->timerService->obtenerPartidaActiva();
-        $this->logAccion($partida, 'Prueba 3 Angel', 'Entra a la prueba');
+        $this->logAccion($partida, config('fases.fases.prueba3.db'), 'Entra a la prueba');
         $yaUsada = in_array(3, $this->obtenerPistasUsadas($partida));
         $pistaConfig = config('escape.pistas.3');
         return view('pruebas.prueba3', compact('tiempo_transcurrido', 'yaUsada', 'pistaConfig'));
@@ -361,7 +366,7 @@ class JuegoController extends Controller
         $respuesta_usuario = (int)trim($request->checksum);
 
         if ($respuesta_usuario !== $CHECKSUM_CORRECTO) {
-            $this->logAccion($partida, 'Prueba 3 Angel', 'Intento fallido', ['input' => $request->checksum]);
+            $this->logAccion($partida, config('fases.fases.prueba3.db'), 'Intento fallido', ['input' => $request->checksum]);
             return response()->json(['success' => false, 'message' => 'Checksum erróneo']);
         }
 
@@ -370,8 +375,8 @@ class JuegoController extends Controller
         // Ya no es la última, pasamos a Prueba 4
 
         if ($partida && $partida->inicio_juego) {
-            $this->logAccion($partida, 'Prueba 3 Angel', 'Prueba superada');
-            $this->timerService->avanzarFase($partida, 'Prueba 4 Arturo', 'Prueba 3 Angel Superada');
+            $this->logAccion($partida, config('fases.fases.prueba3.db'), 'Prueba superada');
+            $this->timerService->avanzarFase($partida, config('fases.fases.prueba4.db'), 'Prueba 3 Angel Superada');
             Top10Updated::dispatch();
             AdminDashboardUpdated::dispatch();
         }
@@ -395,7 +400,7 @@ class JuegoController extends Controller
 
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $partida = $this->timerService->obtenerPartidaActiva();
-        $this->logAccion($partida, 'Prueba 4 Arturo', 'Entra a la prueba');
+        $this->logAccion($partida, config('fases.fases.prueba4.db'), 'Entra a la prueba');
         $yaUsada = in_array(4, $this->obtenerPistasUsadas($partida));
         $pistaConfig = config('escape.pistas.4');
         return view('pruebas.prueba4', compact('tiempo_transcurrido', 'yaUsada', 'pistaConfig'));
@@ -411,7 +416,7 @@ class JuegoController extends Controller
         $respuesta_usuario = (int)trim($request->checksum);
 
         if ($respuesta_usuario !== $CHECKSUM_OASIS) {
-            $this->logAccion($partida, 'Prueba 4 Arturo', 'Intento fallido', ['input' => $request->checksum]);
+            $this->logAccion($partida, config('fases.fases.prueba4.db'), 'Intento fallido', ['input' => $request->checksum]);
             return response()->json(['success' => false, 'message' => 'Checksum erróneo']);
         }
 
@@ -420,8 +425,8 @@ class JuegoController extends Controller
         // Ya no es la última, pasamos a Prueba 5
 
         if ($partida && $partida->inicio_juego) {
-            $this->logAccion($partida, 'Prueba 4 Arturo', 'Prueba superada');
-            $this->timerService->avanzarFase($partida, 'Prueba 5 Eloy', 'Prueba 4 Arturo Superada');
+            $this->logAccion($partida, config('fases.fases.prueba4.db'), 'Prueba superada');
+            $this->timerService->avanzarFase($partida, config('fases.fases.prueba5.db'), 'Prueba 4 Arturo Superada');
             Top10Updated::dispatch();
             AdminDashboardUpdated::dispatch();
         }
@@ -445,7 +450,7 @@ class JuegoController extends Controller
 
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $partida = $this->timerService->obtenerPartidaActiva();
-        $this->logAccion($partida, 'Prueba 5 Eloy', 'Entra a la prueba');
+        $this->logAccion($partida, config('fases.fases.prueba5.db'), 'Entra a la prueba');
         $yaUsada = in_array(5, $this->obtenerPistasUsadas($partida));
         $pistaConfig = config('escape.pistas.5');
         return view('pruebas.prueba5', compact('tiempo_transcurrido', 'yaUsada', 'pistaConfig'));
@@ -461,12 +466,12 @@ class JuegoController extends Controller
         // LOGRO 3: Hackerman Easter Egg
         if ($input_normalizado === 'sudo rm -rf') {
             $this->desbloquearLogro($partida, 'hackerman');
-            $this->logAccion($partida, 'Prueba 5 Eloy', 'Easter Egg Ejecutado', ['input' => $input_normalizado]);
+            $this->logAccion($partida, config('fases.fases.prueba5.db'), 'Easter Egg Ejecutado', ['input' => $input_normalizado]);
             return response()->json(['success' => false, 'message' => 'Comando peligroso detectado. Permiso denegado. Logro [HACKERMAN] desbloqueado.']);
         }
 
         if ($input_normalizado !== $PALABRA_ESPEJO) {
-            $this->logAccion($partida, 'Prueba 5 Eloy', 'Intento fallido', ['input' => $input_normalizado]);
+            $this->logAccion($partida, config('fases.fases.prueba5.db'), 'Intento fallido', ['input' => $input_normalizado]);
             return response()->json(['success' => false, 'message' => 'Palabra clave errónea']);
         }
 
@@ -475,8 +480,8 @@ class JuegoController extends Controller
         // AHORA SÍ, PASAMOS A LA PRUEBA 6 (MÍGUE)
 
         if ($partida && $partida->inicio_juego) {
-            $this->logAccion($partida, 'Prueba 5 Eloy', 'Prueba superada');
-            $this->timerService->avanzarFase($partida, 'Prueba 6 Migue', 'Prueba 5 Eloy Superada');
+            $this->logAccion($partida, config('fases.fases.prueba5.db'), 'Prueba superada');
+            $this->timerService->avanzarFase($partida, config('fases.fases.prueba6.db'), 'Prueba 5 Eloy Superada');
             Top10Updated::dispatch();
             AdminDashboardUpdated::dispatch();
         }
@@ -510,7 +515,7 @@ class JuegoController extends Controller
 
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $partida = $this->timerService->obtenerPartidaActiva();
-        $this->logAccion($partida, 'Prueba 6 Migue', 'Entra a la prueba');
+        $this->logAccion($partida, config('fases.fases.prueba6.db'), 'Entra a la prueba');
         $yaUsada = in_array(6, $this->obtenerPistasUsadas($partida));
         $pistaConfig = config('escape.pistas.6');
         return view('pruebas.prueba6', compact('tiempo_transcurrido', 'yaUsada', 'pistaConfig'));
@@ -521,14 +526,14 @@ class JuegoController extends Controller
         $partida = $this->timerService->obtenerPartidaActiva();
 
         if (!$request->completed || !is_array($request->expected_sequence)) {
-            $this->logAccion($partida, 'Prueba 6 Migue', 'Intento fallido', ['motivo' => 'Datos incompletos']);
+            $this->logAccion($partida, config('fases.fases.prueba6.db'), 'Intento fallido', ['motivo' => 'Datos incompletos']);
             return response()->json(['success' => false, 'message' => 'Validación fallida: Datos incompletos.'], 400);
         }
 
         $sessionSequence = session('prueba6_sequence', []);
 
         if (empty($sessionSequence) || $request->expected_sequence !== $sessionSequence) {
-            $this->logAccion($partida, 'Prueba 6 Migue', 'Intento fallido', ['motivo' => 'Secuencia incorrecta']);
+            $this->logAccion($partida, config('fases.fases.prueba6.db'), 'Intento fallido', ['motivo' => 'Secuencia incorrecta']);
             return response()->json(['success' => false, 'message' => 'Validación fallida: Secuencia incorrecta o manipulada.'], 400);
         }
 
@@ -536,14 +541,14 @@ class JuegoController extends Controller
 
         // FINALIZA LA PRUEBA 6 -> AVANZAMOS A PRUEBA 7
         if ($partida && $partida->inicio_juego) {
-            $this->logAccion($partida, 'Prueba 6 Migue', 'Prueba superada');
+            $this->logAccion($partida, config('fases.fases.prueba6.db'), 'Prueba superada');
 
             // LOGRO 2: Cerebro Intacto (No usar pistas)
             if (($partida->penalizacion_segundos ?? 0) == 0) {
                 $this->desbloquearLogro($partida, 'cerebro_intacto');
             }
 
-            $this->timerService->avanzarFase($partida, 'Prueba 7 Dinamica', 'Prueba 6 Migue Superada');
+            $this->timerService->avanzarFase($partida, config('fases.fases.prueba7.db'), 'Prueba 6 Migue Superada');
             Top10Updated::dispatch();
             AdminDashboardUpdated::dispatch();
         }
@@ -571,7 +576,7 @@ class JuegoController extends Controller
         $penalizacion = 30;
         $partida->increment('penalizacion_segundos', $penalizacion);
 
-        $this->logAccion($partida, 'Prueba 6 Migue', 'Penalización por fallo en Simón Dice', [
+        $this->logAccion($partida, config('fases.fases.prueba6.db'), 'Penalización por fallo en Simón Dice', [
             'penalizacion' => $penalizacion,
             'mensaje' => '[PENALIZACIÓN] Secuencia incorrecta. +30 segundos añadidos al tiempo.'
         ]);
@@ -657,11 +662,11 @@ class JuegoController extends Controller
         $intentos_fallidos = $partida ? ($partida->intentos_codice ?? 0) : 0;
 
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
-        $this->logAccion($partida, 'Prueba 7 Dinamica', 'Entra a la prueba (Códice Oculto)');
+        $this->logAccion($partida, config('fases.fases.prueba7.db'), 'Entra a la prueba (Códice Oculto)');
         $yaUsada = in_array(7, $this->obtenerPistasUsadas($partida));
         $pistaConfig = config('escape.pistas.7');
 
-        return view('pruebas.prueba7dinamica', compact('tiempo_transcurrido', 'pistas', 'intentos_fallidos', 'yaUsada', 'pistaConfig'));
+        return view('pruebas.prueba7', compact('tiempo_transcurrido', 'pistas', 'intentos_fallidos', 'yaUsada', 'pistaConfig'));
     }
 
     public function validarPrueba7(Request $request)
@@ -675,7 +680,7 @@ class JuegoController extends Controller
         $combinacionCorrecta = $partida->combinacion_codice;
 
         if (!$combinacionCorrecta || count($combinacionCorrecta) !== 4) {
-            $this->logAccion($partida, 'Prueba 7 Dinamica', 'Error: combinación no inicializada');
+            $this->logAccion($partida, config('fases.fases.prueba7.db'), 'Error: combinación no inicializada');
             return response()->json(['success' => false, 'message' => 'Error interno: combinación no inicializada.'], 500);
         }
 
@@ -690,24 +695,12 @@ class JuegoController extends Controller
 
         if ($digitsInput === array_map('intval', $combinacionCorrecta)) {
             // ✅ COMBINACIÓN CORRECTA
-            session(['prueba7dinamica_superada' => true]);
+            session(['prueba7_superada' => true]);
 
             if ($partida->inicio_juego) {
-                $this->logAccion($partida, 'Prueba 7 Dinamica', 'Códice Oculto — COMBINACIÓN CORRECTA');
-                $segundos_totales = $this->timerService->obtenerTiempoTranscurrido();
-
-                $partida->update([
-                    'tiempo_segundos' => $segundos_totales,
-                    'fase_actual'     => 'FINALIZADO',
-                ]);
-
-                \App\Models\HitoFase::create([
-                    'partida_id'            => $partida->id,
-                    'fase'                  => 'JUEGO FINALIZADO',
-                    'segundos_transcurridos' => $segundos_totales,
-                    'alcanzado_at'          => Carbon::now()
-                ]);
-
+                $this->logAccion($partida, config('fases.fases.prueba7.db'), 'Códice Oculto — COMBINACIÓN CORRECTA');
+                // Avanzamos a Prueba 8 (Cultura General)
+                $this->timerService->avanzarFase($partida, config('fases.fases.prueba8.db'), 'Prueba 7 Dinamica Superada');
                 Top10Updated::dispatch();
                 AdminDashboardUpdated::dispatch();
             }
@@ -719,7 +712,7 @@ class JuegoController extends Controller
         $nuevosIntentos = ($partida->intentos_codice ?? 0) + 1;
         $partida->update(['intentos_codice' => $nuevosIntentos]);
 
-        $this->logAccion($partida, 'Prueba 7 Dinamica', 'Intento fallido', [
+        $this->logAccion($partida, config('fases.fases.prueba7.db'), 'Intento fallido', [
             'intento'  => $nuevosIntentos,
             'enviado'  => $digitsInput,
             'correcto' => $combinacionCorrecta
@@ -731,6 +724,218 @@ class JuegoController extends Controller
         ]);
     }
 
+    // =====================================================
+    // PRUEBA 8: CULTURA GENERAL (CORTAFUEGOS)
+    // =====================================================
+    public function mostrarPrueba8()
+    {
+        if ($this->timerService->verificarTimeout()) return redirect()->route('final')->with('timeout', true);
+
+        $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
+        $partida = $this->timerService->obtenerPartidaActiva();
+        $this->logAccion($partida, config('fases.fases.prueba8.db'), 'Entra a la prueba (Cortafuegos)');
+
+        $preguntasAsignadas = PreguntaDinamica::where('activa', true)
+            ->inRandomOrder()
+            ->limit(5)
+            ->get();
+
+        return view('pruebas.prueba8', compact('tiempo_transcurrido', 'preguntasAsignadas'));
+    }
+
+    public function validarPrueba8(Request $request)
+    {
+        $partida = $this->timerService->obtenerPartidaActiva();
+        if (!$partida) {
+            return response()->json(['success' => false, 'message' => 'Sesión no encontrada.'], 401);
+        }
+
+        if (!$request->boolean('completed')) {
+            return response()->json(['success' => false, 'message' => 'Validación fallida.'], 400);
+        }
+
+        session(['prueba8_superada' => true]);
+
+        $this->logAccion($partida, config('fases.fases.prueba8.db'), 'Prueba superada');
+
+        // Avanzamos a Prueba 9 (Juego de Pistas)
+        $this->timerService->avanzarFase($partida, config('fases.fases.prueba9.db'), 'Prueba 8 Cultura General Superada');
+        Top10Updated::dispatch();
+        AdminDashboardUpdated::dispatch();
+
+        return response()->json(['success' => true]);
+    }
+
+    // =====================================================
+    // PRUEBA 9: JUEGO DE PISTAS
+    // =====================================================
+    public function mostrarPrueba9()
+    {
+        if ($this->timerService->verificarTimeout()) return redirect()->route('final')->with('timeout', true);
+
+        $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
+        $partida = $this->timerService->obtenerPartidaActiva();
+        $this->logAccion($partida, config('fases.fases.prueba9.db'), 'Entra a la prueba');
+
+        $index = (int) session('prueba9_index', 0);
+        $letters = (array) session('prueba9_letters', []);
+        $fails = (int) session('prueba9_intentos_fallidos', 0);
+
+        return view('pruebas.prueba9', [
+            'tiempo_transcurrido' => $tiempo_transcurrido,
+            'progress' => [
+                'index' => $index,
+                'letters' => array_values($letters),
+                'fails' => $fails,
+            ],
+        ]);
+    }
+
+    private function normalizarRespuesta(string $str): string
+    {
+        $s = trim(mb_strtolower($str));
+        if (class_exists(\Normalizer::class)) {
+            $s = \Normalizer::normalize($s, \Normalizer::FORM_D);
+            $s = preg_replace('/\pM/u', '', $s);
+        }
+        $s = preg_replace('/\s+/', ' ', $s);
+        return $s;
+    }
+
+    public function validarPrueba9(Request $request)
+    {
+        $partida = $this->timerService->obtenerPartidaActiva();
+        if (!$partida) {
+            return response()->json(['success' => false, 'message' => 'Sesión no encontrada.'], 401);
+        }
+
+        $questions = [
+            ['q' => '¿Cuántas escaleras mecánicas no funcionan casi siempre?', 'a' => '2', 'l' => 'J'],
+            ['q' => '¿Cuántas clases de desarrollo web hay en total?', 'a' => '2', 'l' => 'U'],
+            ['q' => '¿Qué empresa invierte en FPS como Xtart?', 'a' => 'samsung', 'l' => 'M'],
+            ['q' => '¿En qué clase de Xtart no hay un ordenador solo?', 'a' => '2º dam', 'l' => 'P'],
+            ['q' => '¿Qué estabilizante llevan las patatas de Vicente Vidal?', 'a' => 'e-61', 'l' => 'E'],
+            ['q' => '¿Qué hacer si alguien se atraganta con una Oreo?', 'a' => 'maniobra heimlich', 'l' => 'R'],
+            ['q' => '¿Dónde está el extintor de la clase 2ºDAM?', 'a' => 'al lado de la puerta', 'l' => 'S'],
+        ];
+        $finalPassword = 'jumpers';
+
+        $action = (string) $request->input('action', 'answer');
+        $index = (int) session('prueba9_index', 0);
+        $letters = (array) session('prueba9_letters', []);
+        $fails = (int) session('prueba9_intentos_fallidos', 0);
+
+        if ($action === 'answer') {
+            if ($index >= count($questions)) {
+                return response()->json(['success' => true, 'state' => 'password', 'letters' => array_values($letters)]);
+            }
+
+            $user = $this->normalizarRespuesta((string) $request->input('answer', ''));
+            $expected = $this->normalizarRespuesta($questions[$index]['a']);
+
+            if ($user === '' || $user !== $expected) {
+                $fails++;
+                session(['prueba9_intentos_fallidos' => $fails]);
+
+                // Persistir métricas en BBDD
+                $partida->increment('intentos_prueba9', 1);
+                if ($fails >= 5 && !$partida->hints_used) {
+                    $partida->update(['hints_used' => true]);
+                }
+
+                return response()->json([
+                    'success' => false,
+                    'message' => '[ERROR] Respuesta incorrecta. Inténtalo de nuevo.',
+                    'fails' => $fails,
+                    'hint' => $fails >= 5 ? '[PISTA DEL SISTEMA] — Piensa en lo que ves cada día en el instituto.' : null,
+                ]);
+            }
+
+            // Correcta
+            $letters[] = $questions[$index]['l'];
+            $index++;
+            session([
+                'prueba9_letters' => array_values($letters),
+                'prueba9_index' => $index,
+            ]);
+
+            // No registramos hitos por cada acierto (solo al completar la prueba entera)
+
+            if ($index >= count($questions)) {
+                return response()->json([
+                    'success' => true,
+                    'state' => 'password',
+                    'letter' => $questions[$index - 1]['l'],
+                    'letters' => array_values($letters),
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'state' => 'question',
+                'letter' => $questions[$index - 1]['l'],
+                'nextIndex' => $index,
+                'total' => count($questions),
+            ]);
+        }
+
+        if ($action === 'password') {
+            $pass = $this->normalizarRespuesta((string) $request->input('password', ''));
+            if ($pass !== $finalPassword) {
+                $fails++;
+                session(['prueba9_intentos_fallidos' => $fails]);
+
+                // Persistir métricas en BBDD
+                $partida->increment('intentos_prueba9', 1);
+                if ($fails >= 5 && !$partida->hints_used) {
+                    $partida->update(['hints_used' => true]);
+                }
+
+                return response()->json([
+                    'success' => false,
+                    'message' => '[ERROR] Contraseña incorrecta. Inténtalo de nuevo.',
+                    'fails' => $fails,
+                    'hint' => $fails >= 5 ? '[PISTA DEL SISTEMA] — Piensa en lo que ves cada día en el instituto.' : null,
+                ]);
+            }
+
+            session(['prueba9_superada' => true]);
+            $this->logAccion($partida, config('fases.fases.prueba9.db'), 'Prueba completada');
+
+            $segundos_totales = $this->timerService->obtenerTiempoTranscurrido();
+
+            // Registrar hito de superación de la Prueba 9 antes de finalizar
+            \App\Models\HitoFase::create([
+                'partida_id'            => $partida->id,
+                'fase'                  => 'Prueba 9 Juego de Pistas Superada',
+                'segundos_transcurridos' => $segundos_totales,
+                'alcanzado_at'          => Carbon::now()
+            ]);
+
+            // Limpiar estado de sesión de la prueba 9 para evitar arrastre al recargar/rejugar
+            session()->forget(['prueba9_index', 'prueba9_letters', 'prueba9_intentos_fallidos']);
+
+            $partida->update([
+                'tiempo_segundos' => $segundos_totales,
+                'fase_actual'     => config('fases.fases.finalizado.db'),
+            ]);
+
+            \App\Models\HitoFase::create([
+                'partida_id'            => $partida->id,
+                'fase'                  => 'JUEGO FINALIZADO',
+                'segundos_transcurridos' => $segundos_totales,
+                'alcanzado_at'          => Carbon::now()
+            ]);
+
+            Top10Updated::dispatch();
+            AdminDashboardUpdated::dispatch();
+
+            return response()->json(['success' => true, 'state' => 'done']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Acción no válida.'], 400);
+    }
+
     // --- PANTALLA FINAL ---
     public function mostrarFinal()
     {
@@ -738,7 +943,7 @@ class JuegoController extends Controller
         $partida = Partida::where('email', session('email'))->first();
 
         // Top 3 equipos finalizados, ordenados por tiempo
-        $top3 = Partida::where('fase_actual', 'FINALIZADO')
+        $top3 = Partida::where('fase_actual', config('fases.fases.finalizado.db'))
             ->orderBy('tiempo_segundos', 'asc')
             ->limit(3)
             ->get();
@@ -792,7 +997,7 @@ class JuegoController extends Controller
 
                 $partida->update([
                     'tiempo_segundos' => $segundos_totales,
-                    'fase_actual' => 'FINALIZADO'
+                    'fase_actual' => config('fases.fases.finalizado.db')
                 ]);
             }
         }

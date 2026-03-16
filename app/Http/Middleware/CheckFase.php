@@ -19,7 +19,9 @@ class CheckFase
         'prueba5'  => 'prueba4arturo_superada',
         'prueba6'  => 'prueba5eloy_superada',
         'prueba7'  => 'prueba6migue_superada',
-        'final'    => 'prueba7dinamica_superada',
+        'prueba8'  => 'prueba7_superada',
+        'prueba9'  => 'prueba8_superada',
+        'final'    => 'prueba9_superada',
     ];
 
     /**
@@ -67,7 +69,7 @@ class CheckFase
      */
     private function rutaActual(): string
     {
-        $orden = ['prueba1', 'prueba2', 'prueba3', 'prueba4', 'prueba5', 'prueba6', 'prueba7', 'final'];
+        $orden = ['prueba1', 'prueba2', 'prueba3', 'prueba4', 'prueba5', 'prueba6', 'prueba7', 'prueba8', 'prueba9', 'final'];
 
         foreach ($orden as $ruta) {
             if (isset(self::REQUISITOS[$ruta]) && !session(self::REQUISITOS[$ruta])) {

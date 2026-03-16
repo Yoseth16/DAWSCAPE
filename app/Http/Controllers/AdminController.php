@@ -87,7 +87,7 @@ class AdminController extends Controller
 
     public function exportarTop20PDF()
     {
-        $top20 = Partida::where('fase_actual', 'FINALIZADO')
+        $top20 = Partida::where('fase_actual', config('fases.fases.finalizado.db'))
             ->orderBy('tiempo_segundos', 'asc')
             ->limit(20)
             ->get();
@@ -118,7 +118,7 @@ class AdminController extends Controller
             'bottlenecks' => $bottlenecks,
             'partidas' => $partidas->map(function($p) {
                 $segsLive = 0;
-                if ($p->fase_actual !== 'FINALIZADO' && $p->fase_actual !== 'FINALIZADO_TIMEOUT' && $p->inicio_juego) {
+                if ($p->fase_actual !== config('fases.fases.finalizado.db') && $p->fase_actual !== config('fases.fases.timeout.db') && $p->inicio_juego) {
                     $segsLive = abs(now()->diffInSeconds(\Carbon\Carbon::parse($p->inicio_juego)));
                 }
                 $pistasCount = \App\Models\PistaUsada::where('partida_id', $p->id)->count();
