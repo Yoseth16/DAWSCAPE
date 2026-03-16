@@ -47,10 +47,10 @@
             font-family: 'Share Tech Mono', monospace;
             background-color: var(--bg-color);
             color: var(--text-main);
-            overflow-x: hidden;
+            overflow: hidden; /* Sin scroll en TV */
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
+            height: 100vh; /* Vista completa */
         }
 
         /* MATRIX BG SCENE */
@@ -153,17 +153,36 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 3rem;
-            padding: 2rem 1rem 6rem 1rem;
-            max-width: 1200px;
+            gap: 1.5rem;
+            padding: 1.5rem 1.5rem 2rem 1.5rem;
+            max-width: 1400px;
             margin: 0 auto;
             width: 100%;
             box-sizing: border-box;
-            align-items: center;
+            align-items: stretch;
         }
 
-        .left-col { display: flex; flex-direction: column; gap: 2rem; width: 100%; max-width: 1000px; align-items: center; }
-        .right-col { display: flex; flex-direction: column; gap: 1.5rem; width: 100%; max-width: 1000px; }
+        /* Zona superior (podio) ~40% alto */
+        .left-col { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 1rem; 
+            width: 100%; 
+            flex: 0 0 40%; 
+            max-height: 40%;
+            align-items: center; 
+            justify-content: flex-start;
+        }
+
+        /* Zona inferior (lista 4-10) ~60% alto */
+        .right-col { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 0.75rem; 
+            width: 100%; 
+            flex: 1 1 60%; 
+            max-height: 60%;
+        }
 
         /* SECCIÓN TÍTULOS */
         .section-title {
@@ -200,10 +219,11 @@
             display: flex;
             align-items: flex-end;
             justify-content: center;
-            gap: 1.5rem;
-            height: 400px;
+            gap: 1rem;
+            height: 100%;
             position: relative;
             width: 100%;
+            max-height: 100%;
         }
 
         .podium-slot {
@@ -265,11 +285,11 @@
         .podium-card {
             background: var(--surface-color);
             border: 1px solid currentColor;
-            padding: 1.2rem;
+            padding: 0.8rem;
             border-radius: 4px;
             width: 100%;
             text-align: center;
-            margin-bottom: -15px; 
+            margin-bottom: -10px; 
             z-index: 5;
             box-shadow: 0 0 20px rgba(0,0,0,0.8);
             position: relative;
@@ -340,16 +360,18 @@
         .list-container {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.4rem;
+            flex: 1;
+            max-height: calc(100% - 2.5rem); /* deja espacio para el título */
         }
 
         .list-item {
             background: transparent;
             border: 1px solid var(--border-color);
-            padding: 1rem;
+            padding: 0.75rem 1rem;
             display: flex;
             align-items: center;
-            gap: 1.5rem;
+            gap: 1rem;
             transition: all 0.3s;
             position: relative;
             overflow: hidden;
@@ -371,7 +393,7 @@
         @keyframes flash-red-hack { 0% { background-color: rgba(255, 34, 68, 0.2); } 100% { background-color: transparent; } }
 
         .list-pos {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: bold;
             color: var(--text-muted);
             width: 60px;
@@ -395,7 +417,7 @@
 
         .list-info h4 { 
             margin: 0; 
-            font-size: 1.4rem; 
+            font-size: 1.3rem; 
             font-weight: bold; 
             white-space: nowrap; 
             overflow: hidden; 
@@ -474,6 +496,11 @@
         .finisher-time { font-size: 1.2rem; font-weight: bold; color: var(--warning-color); text-shadow: 0 0 5px var(--warning-color); }
         .finisher-hour { font-size: 0.85rem; color: var(--text-muted); text-align: right; margin-top: 4px; }
 
+        /* Ocultar completamente sección de finalizados en TV */
+        #finishers-section {
+            display: none !important;
+        }
+
 
         /* FULLSCREEN CELEBRATION OVERLAY (MATRIX) */
         #celebration-overlay {
@@ -535,38 +562,31 @@
 
         /* ===== TV / LARGE SCREEN OPTIMIZATION (40-55") ===== */
         @media (min-width: 1400px) {
-            .header h1 { font-size: 4rem; letter-spacing: 6px; }
-            .main-container { max-width: 1600px; gap: 3.5rem; padding: 2.5rem 2rem 7rem 2rem; }
-            .section-title { font-size: 2.2rem; margin-bottom: 1.5rem; }
+            .header h1 { font-size: 3.4rem; letter-spacing: 5px; }
+            .main-container { max-width: 1600px; gap: 1.5rem; padding: 1.5rem 2rem 2rem 2rem; }
+            .section-title { font-size: 2rem; margin-bottom: 0.75rem; }
 
-            /* Podio escalado */
-            .podium-container { height: 550px; gap: 2.5rem; }
-            .p1 { height: 420px; } .p2 { height: 300px; } .p3 { height: 220px; }
-            .podium-rank { font-size: 5rem; }
-            .podium-name { font-size: 2.2rem; }
-            .p1-card .podium-name { font-size: 2.8rem; }
-            .podium-time { font-size: 2.2rem; }
-            .podium-phase { font-size: 1.2rem; }
+            /* Podio escalado pero compacto */
+            .podium-container { height: 100%; gap: 1.5rem; }
+            .p1 { height: 65%; } .p2 { height: 55%; } .p3 { height: 45%; }
+            .podium-rank { font-size: 4rem; }
+            .podium-name { font-size: 2rem; }
+            .p1-card .podium-name { font-size: 2.4rem; }
+            .podium-time { font-size: 2rem; }
+            .podium-phase { font-size: 1.1rem; }
             .p1-badge { font-size: 1.1rem; padding: 4px 15px; }
             .podium-card { padding: 1.8rem; }
 
-            /* Lista 4-10 */
-            .list-item { padding: 1.5rem; gap: 2rem; }
-            .list-pos { font-size: 2.2rem; width: 80px; }
-            .list-terminal-prefix { font-size: 1.2rem; }
-            .list-info h4 { font-size: 2rem; }
-            .list-phase { font-size: 1.2rem; }
-            .list-time { font-size: 2rem; }
-            .progress-wrapper { height: 16px; margin-top: 10px; }
+            /* Lista 4-10 compacta pero legible */
+            .list-item { padding: 1rem 1.4rem; gap: 1.4rem; }
+            .list-pos { font-size: 1.8rem; width: 80px; }
+            .list-terminal-prefix { font-size: 1.1rem; }
+            .list-info h4 { font-size: 1.8rem; }
+            .list-phase { font-size: 1.1rem; }
+            .list-time { font-size: 1.8rem; }
+            .progress-wrapper { height: 14px; margin-top: 8px; }
 
-            /* Finalizados */
-            .finisher-name { font-size: 1.8rem; }
-            .finisher-time { font-size: 1.8rem; }
-            .finisher-pos { font-size: 1.5rem; width: 100px; }
-            .finishers-panel { padding: 2rem; }
-            .finisher-item { padding: 1.2rem 0; }
-
-            /* Celebration overlay */
+            /* Celebration overlay (sin cambios de tamaño excesivos) */
             .celeb-title { font-size: 4rem; }
             .celeb-team { font-size: 7rem; }
             .celeb-time { font-size: 4rem; }
