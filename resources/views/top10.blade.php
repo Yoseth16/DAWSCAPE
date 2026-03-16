@@ -731,7 +731,7 @@
         // FETCH DATA
         async function fetchTop10() {
             try {
-                const response = await fetch('/api/top10');
+                const response = await fetch('/top10/datos');
                 const data = await response.json();
                 renderDashboard(data);
             } catch (err) {
@@ -779,26 +779,32 @@
 
             let listHTML = '';
             remaining.forEach((team, index) => {
-                const rank = index + 4;
+                const rank = team.rank ?? (index + 4);
                 const oldRank = previousTeamsState[team.id] ? previousTeamsState[team.id].rank : rank;
                 let animClass = '';
                 if(rank < oldRank) animClass = 'move-up';
                 else if(rank > oldRank) animClass = 'move-down';
                 
                 // For hacker theme we override the dynamic color if they are abandoned to gray
-                const colorCode = team.color_hex; 
+                const isTimeout = team.estado === 'timeout';
+                const isFinalizado = team.estado === 'finalizado';
+                const colorCode = isTimeout ? '#64748b' : team.color_hex; 
+
+                const badge = isFinalizado
+                    ? `<span style="margin-left:10px; color: var(--success-color); text-shadow: 0 0 6px var(--success-color);">✓ FINALIZADO</span>`
+                    : (isTimeout ? `<span style="margin-left:10px; color: var(--text-muted);">TIEMPO AGOTADO</span>` : '');
 
                 listHTML += `
-                <div class="list-item ${animClass}" ${team.abandonado ? 'style="opacity:0.4;"' : ''}>
+                <div class="list-item ${animClass}" ${isTimeout ? 'style="opacity:0.4;"' : ''}>
                     <div class="list-pos">${rank < 10 ? '0'+rank : rank}</div>
                     <div class="list-info">
                         <div class="list-heading">
                             <span class="list-terminal-prefix">user@dawscape:~$</span>
-                            <h4 style="color: ${colorCode};"><i class="ph-fill ${team.icono || 'ph-users'}" style="margin-right:8px; font-size:1.1em; vertical-align:middle;"></i>${team.nombre_equipo} ${renderMedals(team.logros)} ${team.abandonado ? '(TIMEOUT)' : ''}</h4>
+                            <h4 style="color: ${colorCode};"><i class="ph-fill ${team.icono || 'ph-users'}" style="margin-right:8px; font-size:1.1em; vertical-align:middle;"></i>${team.nombre_equipo} ${renderMedals(team.logros)} ${badge}</h4>
                         </div>
                         <div class="list-phase">
-                            <i class="ph ${team.abandonado ? 'ph-x-circle' : 'ph-spinner-gap ph-spin'}"></i>
-                            [EJECUTANDO]: ${team.nombre_prueba}
+                            <i class="ph ${isFinalizado ? 'ph-check-circle' : (isTimeout ? 'ph-x-circle' : 'ph-spinner-gap ph-spin')}"></i>
+                            ${isFinalizado ? '[COMPLETADO]' : (isTimeout ? '[DETENIDO]' : '[EJECUTANDO]')}: ${team.nombre_prueba}
                         </div>
                         <div class="progress-wrapper">
                             <div class="progress-fill" style="width: ${team.progreso_porcentaje}%;"></div>
@@ -842,7 +848,7 @@
             }
 
             let newState = {};
-            data.top10.forEach((t, i) => { newState[t.id] = { rank: i+1 }; });
+            data.top10.forEach((t, i) => { newState[t.id] = { rank: (t.rank ?? (i+1)) }; });
             previousTeamsState = newState;
 
             if(knownFinishers.size === 0) {
@@ -852,15 +858,18 @@
 
         function createPodiumSlot(team, rank, boxClass) {
             const badge = rank === 1 ? `<div class="p1-badge"><i class="ph-fill ph-warning-circle"></i> ROOT_ACCESS</div>` : '';
-            const gap = rank > 1 && team.gap && !team.abandonado ? `<div class="gap-info">-${team.gap}</div>` : '';
-            const opacity = team.abandonado ? 'opacity: 0.4;' : '';
-            const titleStatus = team.abandonado ? '(ERR_TIMEOUT)' : '';
+            const isTimeout = team.estado === 'timeout';
+            const isFinalizado = team.estado === 'finalizado';
+            const gap = rank > 1 && team.gap && !isTimeout ? `<div class="gap-info">${team.gap}</div>` : '';
+            const opacity = isTimeout ? 'opacity: 0.4;' : '';
+            const titleStatus = isFinalizado ? '(✓ FINALIZADO)' : (isTimeout ? '(ERR_TIMEOUT)' : '');
+            const victoryGlow = isFinalizado ? `box-shadow: 0 0 25px rgba(0,255,65,0.25), inset 0 0 25px rgba(0,255,65,0.15);` : '';
 
             // Assign base color for the text of the box to inherit from CSS Custom props
             // but the name color will be their team.color_hex
             return `
             <div class="podium-slot" style="${opacity}">
-                <div class="podium-card ${rank===1 ? 'p1-card' : ''}" style="border-color: ${team.color_hex}80;">
+                <div class="podium-card ${rank===1 ? 'p1-card' : ''}" style="border-color: ${team.color_hex}80; ${victoryGlow}">
                     ${badge}
                     <div style="font-size: 3rem; margin-bottom: 5px; color: ${team.color_hex}; text-shadow: 0 0 15px ${team.color_hex}80;"><i class="ph ${team.icono}"></i></div>
                     <div class="podium-name" style="color: ${team.color_hex};"><i class="ph-fill ${team.icono || 'ph-users'}" style="margin-right:5px;"></i>${team.nombre_equipo}</div>
@@ -881,17 +890,13 @@
         // Init Polling
         fetchTop10();
         setInterval(fetchTop10, 5000);
-
-        // Echo listener
+        // Echo listener (opcional, refuerza el refresco en tiempo real)
         document.addEventListener('DOMContentLoaded', () => {
             if (window.Echo) {
                 window.Echo.channel('top10')
-                    .listen('Top10Updated', (e) => {
+                    .listen('Top10Updated', () => {
                         fetchTop10();
                     });
-            } else {
-                console.error("Laravel Echo is not loaded. Fallback to polling.");
-                setInterval(fetchTop10, 5000);
             }
         });
 

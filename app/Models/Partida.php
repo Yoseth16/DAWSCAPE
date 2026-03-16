@@ -19,6 +19,7 @@ class Partida extends Model
         'icono',
         'logros',
         'estado',
+        'ranking_posicion_bloqueada',
         'tiempo_pausado_segundos',
         'ultima_pausa_at',
         'combinacion_codice',

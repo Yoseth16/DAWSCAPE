@@ -228,6 +228,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // ==========================================
 Route::get('/top10', [Top10Controller::class, 'index'])->name('top10');
 Route::get('/api/top10', [Top10Controller::class, 'apiData']);
+Route::get('/top10/datos', [Top10Controller::class, 'apiData'])->name('top10.datos');
 
 // Rutas de Laravel Auth
 require __DIR__.'/auth.php';
