@@ -24,6 +24,10 @@ class AudioManager {
     this.sfx = {};
     this.sfxRatio = 0.85;
 
+    // Audio ducking (para bajar el volumen cuando hay diálogos/pistas)
+    this._isDucking = false;
+    this._volumeBeforeDuck = null;
+
     // Base URL resuelta por Laravel asset() desde el layout.
     // Fallback a '/sonido' si la variable no fue inyectada.
     this.baseUrl = (window.AUDIO_BASE_URL || '/sonido').replace(/\/$/, '');
@@ -315,13 +319,68 @@ class AudioManager {
     const vol = Math.max(0, Math.min(1, value));
     this.targetVolume = vol;
     this.currentVolume = vol;
-    // Solo actualizar bgMusic.volume si no estamos en fade
-    if (!this.isFading) {
+    // Solo actualizar bgMusic.volume si no estamos en fade ni en ducking
+    if (!this.isFading && !this._isDucking) {
       this.bgMusic.volume = vol;
     }
     this._syncSFXVolume();
     localStorage.setItem('audioVolume', vol.toFixed(3));
     this._updateUI();
+  }
+
+  /**
+   * Audio Ducking: reduce temporalmente el volumen de la música de fondo
+   * para que otros sonidos (como las pistas habladas) destaquen.
+   * @param {number} duckLevel - Nivel al que reducir (0-1), ej: 0.1 = 10%
+   * @param {number} fadeDuration - Duración del fade en ms
+   */
+  duckMusic(duckLevel = 0.08, fadeDuration = 300) {
+    if (this._isDucking) return; // Ya está en ducking
+
+    this._isDucking = true;
+    this._volumeBeforeDuck = this.bgMusic.volume;
+
+    const targetDuckVol = Math.max(duckLevel, 0.02);
+    const startVol = this.bgMusic.volume;
+    const startTime = Date.now();
+
+    const fadeInterval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / fadeDuration, 1);
+
+      this.bgMusic.volume = startVol - (startVol - targetDuckVol) * progress;
+
+      if (progress >= 1) {
+        clearInterval(fadeInterval);
+        this.bgMusic.volume = targetDuckVol;
+      }
+    }, 20);
+  }
+
+  /**
+   * Restaurar el volumen después del ducking
+   * @param {number} fadeDuration - Duración del fade de restauración en ms
+   */
+  unduckMusic(fadeDuration = 400) {
+    if (!this._isDucking) return;
+
+    const targetVol = this._volumeBeforeDuck || this.targetVolume;
+    const startVol = this.bgMusic.volume;
+    const startTime = Date.now();
+
+    const fadeInterval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / fadeDuration, 1);
+
+      this.bgMusic.volume = startVol + (targetVol - startVol) * progress;
+
+      if (progress >= 1) {
+        clearInterval(fadeInterval);
+        this.bgMusic.volume = targetVol;
+        this._isDucking = false;
+        this._volumeBeforeDuck = null;
+      }
+    }, 20);
   }
 
   /**

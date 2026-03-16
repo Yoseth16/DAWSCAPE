@@ -377,7 +377,6 @@
     var mouthAnimInterval = null;
     var dialogoActivo = false;
     var mouthOpen = false;
-    var volumenAntesDucking = null; // Para restaurar el volumen tras cerrar la pista
 
     // ═══ ELEMENTOS DOM ═══
     var btn = document.getElementById('pistaBtn');
@@ -435,8 +434,8 @@
             if (speakingAudio) { speakingAudio.pause(); }
             speakingAudio = new Audio('/sonido/hablando-pista.mp3');
             speakingAudio.loop = true;
-            // Volumen alto para que destaque sobre la música reducida
-            speakingAudio.volume = 0.6;
+            // Volumen alto para que destaque claramente sobre la música reducida
+            speakingAudio.volume = 0.85;
             speakingAudio.play().catch(function() {});
         } catch(e) {}
     }
@@ -487,23 +486,22 @@
     function aplicarDucking() {
         if (!window.audioManager) return;
         try {
-            var current = (typeof window.audioManager.targetVolume === 'number')
-                ? window.audioManager.targetVolume
-                : (typeof window.audioManager.currentVolume === 'number'
-                    ? window.audioManager.currentVolume : 0.5);
-            if (volumenAntesDucking === null) {
-                volumenAntesDucking = current;
-            }
-            window.audioManager.setVolume(Math.max(current * 0.15, 0.03));
-        } catch(e) {}
+            // Usar el nuevo método de ducking del audioManager
+            // Reduce la música al 8% con un fade de 300ms
+            window.audioManager.duckMusic(0.08, 300);
+        } catch(e) {
+            console.warn('Error aplicando ducking:', e);
+        }
     }
 
     function restaurarDucking() {
-        if (!window.audioManager || volumenAntesDucking === null) return;
+        if (!window.audioManager) return;
         try {
-            window.audioManager.setVolume(volumenAntesDucking);
-            volumenAntesDucking = null;
-        } catch(e) {}
+            // Restaurar el volumen original con un fade de 400ms
+            window.audioManager.unduckMusic(400);
+        } catch(e) {
+            console.warn('Error restaurando ducking:', e);
+        }
     }
 
     // ═══ MOSTRAR / CERRAR DIÁLOGO ═══
