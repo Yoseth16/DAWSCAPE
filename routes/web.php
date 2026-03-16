@@ -143,6 +143,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // System Health
     Route::get('/admin/system', [AdminController::class, 'systemHealth'])->name('admin.system');
 
+    // Visor de datos de tablas (solo lectura)
+    Route::get('/admin/database/{table}', [AdminController::class, 'showTable'])->name('admin.database.show');
+
     // Live Feed & Control (Sala de control en tiempo real)
     Route::get('/admin/live', [AdminController::class, 'liveFeed'])->name('admin.live');
     Route::post('/admin/live/ajustar-tiempo', [AdminController::class, 'ajustarTiempo'])->name('admin.live.ajustar');

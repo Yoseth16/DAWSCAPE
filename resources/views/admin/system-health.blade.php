@@ -284,9 +284,19 @@
             </div>
         </div>
         @php
-            $memLimitBytes = (int) $memoryLimit * 1024 * 1024;
+            $memLimitVal = (int) $memoryLimit;
+            $memLimitSuffix = strtoupper(substr(trim($memoryLimit), -1));
+            if ($memLimitSuffix === 'G') {
+                $memLimitBytes = $memLimitVal * 1024 * 1024 * 1024;
+            } elseif ($memLimitSuffix === 'M') {
+                $memLimitBytes = $memLimitVal * 1024 * 1024;
+            } elseif ($memLimitSuffix === 'K') {
+                $memLimitBytes = $memLimitVal * 1024;
+            } else {
+                $memLimitBytes = $memLimitVal;
+            }
             $memPercent = $memLimitBytes > 0 ? round(($memoryUsage / $memLimitBytes) * 100, 1) : 0;
-            $memColor = $memPercent < 50 ? 'var(--success-color)' : ($memPercent < 80 ? 'var(--warning-color)' : 'var(--danger-color)');
+            $memColor = $memPercent < 70 ? 'var(--success-color)' : ($memPercent < 90 ? 'var(--warning-color)' : 'var(--danger-color)');
         @endphp
         <div class="big-value">{{ number_format($memoryUsage / 1024 / 1024, 1) }} MB</div>
         <div class="sub-value">Pico: {{ number_format($memoryPeak / 1024 / 1024, 1) }} MB &middot; Límite: {{ $memoryLimit }}</div>
@@ -386,7 +396,9 @@
         <ul class="table-list">
             @foreach($tableCounts as $table => $count)
                 <li>
-                    <span class="tbl-name"><i class="ph ph-table" style="margin-right: 6px; color: var(--text-muted);"></i>{{ $table }}</span>
+                    <a href="{{ route('admin.database.show', $tableMap[$table]) }}" class="tbl-name" style="text-decoration: none; color: inherit; display: flex; align-items: center; transition: color 0.2s;" onmouseover="this.style.color='var(--brand-accent)'" onmouseout="this.style.color='inherit'">
+                        <i class="ph ph-table" style="margin-right: 6px; color: var(--text-muted);"></i>{{ $table }}
+                    </a>
                     <span class="tbl-count">{{ number_format($count) }}</span>
                 </li>
             @endforeach

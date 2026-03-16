@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use App\Models\Partida;
 use App\Models\Inscripcion;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -292,6 +294,18 @@ class AdminController extends Controller
         $phpVersion = phpversion();
 
         // Registros en tablas principales
+        // Mapa: nombre visible => nombre real de la tabla en BD
+        $tableMap = [
+            'Partidas' => 'partidas',
+            'Inscripciones' => 'inscripcions',
+            'Logs de Juego' => 'log_juegos',
+            'Pistas Usadas' => 'pistas_usadas',
+            'Preguntas Dinámicas' => 'pregunta_dinamicas',
+            'QRs' => 'qrs',
+            'Usuarios' => 'users',
+            'Hitos de Fase' => 'hitos_fases',
+        ];
+
         $tableCounts = [
             'Partidas' => Partida::count(),
             'Inscripciones' => Inscripcion::count(),
@@ -355,12 +369,39 @@ class AdminController extends Controller
         return view('admin.system-health', compact(
             'memoryUsage', 'memoryPeak', 'memoryLimit',
             'laravelVersion', 'phpVersion',
-            'tableCounts', 'totalRecords', 'dbSize', 'dbOnline',
+            'tableCounts', 'tableMap', 'totalRecords', 'dbSize', 'dbOnline',
             'serverSoftware', 'extensions', 'criticalExtensions',
             'diskFree', 'diskTotal',
             'cacheDriver', 'sessionDriver', 'queueDriver',
             'rutasPruebas'
         ));
+    }
+
+    /**
+     * Visor de datos de una tabla (solo lectura).
+     */
+    public function showTable(string $table)
+    {
+        $allowedTables = [
+            'partidas', 'inscripcions', 'log_juegos', 'pistas_usadas',
+            'pregunta_dinamicas', 'qrs', 'users', 'hitos_fases',
+        ];
+
+        if (!in_array($table, $allowedTables, true) || !Schema::hasTable($table)) {
+            abort(404);
+        }
+
+        $datos = DB::table($table)->paginate(50);
+
+        $rutasPruebas = collect(\Illuminate\Support\Facades\Route::getRoutes()->getRoutes())
+            ->filter(fn($route) => str_starts_with($route->getName() ?? '', 'admin.prueba.'))
+            ->map(function ($route) {
+                $nombreSlug = str_replace('admin.prueba.', '', $route->getName());
+                $nombreLegible = ucfirst(preg_replace('/([a-zA-Z]+)(\d+)(.*)/', '$1 $2 $3', $nombreSlug));
+                return ['url' => url('/') . '/' . ltrim($route->uri(), '/'), 'nombre' => 'Test: ' . $nombreLegible];
+            })->values();
+
+        return view('admin.database', compact('table', 'datos', 'rutasPruebas'));
     }
 
     /**
