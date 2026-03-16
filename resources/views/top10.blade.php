@@ -151,26 +151,26 @@
             min-height: 0;
         }
 
-        /* Zona superior: podio ~45% */
+        /* Zona superior: podio — 45% del espacio disponible */
         .left-col {
             display: flex;
             flex-direction: column;
             gap: 0.3rem;
             width: 100%;
-            flex: 0 0 auto;
-            max-height: 48vh;
+            flex: 45 1 0;
+            min-height: 0;
             align-items: center;
             justify-content: flex-start;
             overflow: hidden;
         }
 
-        /* Zona inferior: lista 4-10 — llena el resto */
+        /* Zona inferior: lista 4-10 — 55% del espacio */
         .right-col {
             display: flex;
             flex-direction: column;
             gap: 0.3rem;
             width: 100%;
-            flex: 1 1 0;
+            flex: 55 1 0;
             min-height: 0;
             overflow: hidden;
         }
@@ -213,7 +213,7 @@
             justify-content: center;
             gap: 0.6rem;
             width: 100%;
-            flex: 1 1 0;
+            flex: 1 1 auto;
             min-height: 0;
         }
 
@@ -221,9 +221,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: flex-end;
             width: 32%;
             min-width: 0;
-            min-height: 0;
         }
 
         .podium-card {
@@ -541,8 +541,9 @@
                 min-height: 100vh;
             }
             .header h1 { font-size: 1.2rem; letter-spacing: 2px; }
-            .main-container { padding: 0.5rem; gap: 0.5rem; }
-            .left-col { max-height: none; }
+            .main-container { padding: 0.5rem; gap: 0.5rem; overflow: visible; }
+            .left-col { flex: 0 0 auto; overflow: visible; }
+            .right-col { flex: 0 0 auto; overflow: visible; }
             .section-title { font-size: 0.85rem; letter-spacing: 1px; gap: 5px; }
             /* Podio vertical */
             .podium-container { flex-direction: column; align-items: stretch; gap: 0.5rem; }
@@ -569,7 +570,7 @@
             .header h1 { font-size: 2.6rem; letter-spacing: 6px; }
             .main-container { max-width: 1800px; gap: 0.5rem; padding: 0.5rem 2.5rem; }
             .section-title { font-size: 1.4rem; }
-            .left-col { max-height: 50vh; }
+            .left-col { flex: 45 1 0; }
 
             .podium-container { gap: 1rem; }
             .p1 { min-height: 120px; }
@@ -915,7 +916,7 @@
             <div class="podium-slot" style="${opacity}">
                 <div class="podium-card ${rank===1 ? 'p1-card' : ''}" style="${finBorder}">
                     ${badge}
-                    <div style="font-size: 2rem; margin-bottom: 4px; color: ${team.color_hex};"><i class="ph ${team.icono}"></i></div>
+                    <div style="font-size: 1.4rem; margin-bottom: 2px; color: ${team.color_hex};"><i class="ph ${team.icono}"></i></div>
                     <div class="podium-name" style="color: ${team.color_hex};">${team.nombre_equipo}</div>
                     <div style="margin: 4px 0;">${renderMedals(team.logros)}</div>
                     <div class="podium-time">${team.tiempo_formateado}</div>
