@@ -483,12 +483,35 @@
     }
 
     // ═══ AUDIO DUCKING (bajar música al abrir pista) ═══
+    var volumenAntesDucking = null;
+
     function aplicarDucking() {
         if (!window.audioManager) return;
         try {
-            // Usar el nuevo método de ducking del audioManager
-            // Reduce la música al 8% con un fade de 300ms
-            window.audioManager.duckMusic(0.08, 300);
+            // Intentar usar el método dedicado de ducking (nuevo)
+            if (typeof window.audioManager.duckMusic === 'function') {
+                window.audioManager.duckMusic(0.08, 300);
+            } else {
+                // Fallback: usar setVolume directamente (método antiguo)
+                var current = window.audioManager.bgMusic ? window.audioManager.bgMusic.volume : 0.5;
+                if (volumenAntesDucking === null) {
+                    volumenAntesDucking = current;
+                }
+                // Reducir al 8% con transición manual
+                var targetVol = Math.max(current * 0.08, 0.02);
+                var startVol = current;
+                var startTime = Date.now();
+                var fadeInterval = setInterval(function() {
+                    var elapsed = Date.now() - startTime;
+                    var progress = Math.min(elapsed / 300, 1);
+                    if (window.audioManager.bgMusic) {
+                        window.audioManager.bgMusic.volume = startVol - (startVol - targetVol) * progress;
+                    }
+                    if (progress >= 1) {
+                        clearInterval(fadeInterval);
+                    }
+                }, 20);
+            }
         } catch(e) {
             console.warn('Error aplicando ducking:', e);
         }
@@ -497,8 +520,26 @@
     function restaurarDucking() {
         if (!window.audioManager) return;
         try {
-            // Restaurar el volumen original con un fade de 400ms
-            window.audioManager.unduckMusic(400);
+            // Intentar usar el método dedicado (nuevo)
+            if (typeof window.audioManager.unduckMusic === 'function') {
+                window.audioManager.unduckMusic(400);
+            } else if (volumenAntesDucking !== null) {
+                // Fallback: restaurar manualmente
+                var targetVol = volumenAntesDucking;
+                var startVol = window.audioManager.bgMusic ? window.audioManager.bgMusic.volume : 0.02;
+                var startTime = Date.now();
+                var fadeInterval = setInterval(function() {
+                    var elapsed = Date.now() - startTime;
+                    var progress = Math.min(elapsed / 400, 1);
+                    if (window.audioManager.bgMusic) {
+                        window.audioManager.bgMusic.volume = startVol + (targetVol - startVol) * progress;
+                    }
+                    if (progress >= 1) {
+                        clearInterval(fadeInterval);
+                        volumenAntesDucking = null;
+                    }
+                }, 20);
+            }
         } catch(e) {
             console.warn('Error restaurando ducking:', e);
         }
