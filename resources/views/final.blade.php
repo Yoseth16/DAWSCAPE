@@ -193,6 +193,73 @@
         text-shadow: 0 0 5px var(--green);
       }
 
+      /* DIPLOMA FINAL */
+      .diploma-section {
+        margin-top: 1.5rem;
+        border: 1px solid rgba(0, 255, 136, 0.35);
+        background: radial-gradient(circle at top, rgba(0,255,136,0.08), transparent 55%);
+        padding: 1.2rem;
+      }
+      .diploma-header {
+        font-size: 0.8rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--green);
+        margin-bottom: 0.75rem;
+      }
+      .diploma-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: center;
+      }
+      .diploma-award {
+        text-align: center;
+      }
+      .diploma-award-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.1rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .diploma-award-emoji {
+        font-size: 2.2rem;
+        margin-bottom: 0.25rem;
+      }
+      .diploma-preview-frame {
+        width: 100%;
+        border: 1px solid rgba(0, 255, 136, 0.2);
+        background: #000000;
+        padding: 0.5rem;
+      }
+      .diploma-preview-frame img {
+        width: 100%;
+        display: block;
+      }
+      .diploma-actions {
+        margin-top: 0.75rem;
+        display: flex;
+        justify-content: center;
+      }
+      .diploma-download-btn {
+        display: inline-block;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.75rem;
+        letter-spacing: 0.18em;
+        padding: 0.9rem 1.6rem;
+        border: 1px solid var(--green);
+        color: var(--green);
+        background: transparent;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .diploma-download-btn:hover {
+        background: var(--green);
+        color: #00110a;
+        box-shadow: 0 0 14px rgba(0,255,136,0.4);
+      }
+
       .btn {
         display: inline-block;
         font-family: 'Orbitron', sans-serif;
@@ -263,6 +330,8 @@
         .breakdown-list { font-size: 0.85rem; }
         .subtitle-txt { font-size: 0.95rem; }
         .ranking-list { font-size: 0.9rem; }
+        .diploma-layout { gap: 0.5rem; }
+        .diploma-award-title { font-size: 0.9rem; }
       }
     </style>
 </head>
@@ -345,6 +414,26 @@
         @endif
       </div>
 
+      @if($partida->fase_actual === 'FINALIZADO')
+      <div class="diploma-section" id="diploma-section">
+        <div class="diploma-header">// DIPLOMA DIGITAL PERSONALIZADO</div>
+        <div class="diploma-layout">
+          <div class="diploma-award">
+            <div class="diploma-award-emoji" id="diploma-award-emoji">🏆</div>
+            <div class="diploma-award-title" id="diploma-award-title">Cargando premio...</div>
+          </div>
+          <div class="diploma-preview-frame">
+            <img id="diploma-image" alt="Diploma del equipo {{ $partida->nombre_equipo }}">
+          </div>
+          <div class="diploma-actions">
+            <button type="button" class="diploma-download-btn" id="download-diploma">
+              DESCARGAR DIPLOMA PNG
+            </button>
+          </div>
+        </div>
+      </div>
+      @endif
+
       <a href="/" class="btn">FINALIZAR CONEXIÓN →</a>
     </div>
 </div>
@@ -361,6 +450,217 @@
     p.style.animationDelay = (Math.random() * 12) + 's';
     c.appendChild(p);
   }
+})();
+
+// =========================
+// SISTEMA DE DIPLOMA FINAL
+// =========================
+(function() {
+  const section = document.getElementById('diploma-section');
+  if (!section) return; // solo cuando el equipo ha finalizado
+
+  const stats = {
+    teamName: @json($partida->nombre_equipo),
+    totalTime: {{ (int)($partida->tiempo_segundos ?? 0) }},
+    timePerChallenge: @json(isset($hitos) ? collect($hitos)->pluck('segundos_invertidos')->values() : []),
+    hintsUsed: 0,
+    maxHints: 10,
+    firstTrySuccessCount: 0,
+    totalAttempts: 0,
+    position: 0,
+    totalChallenges: {{ isset($hitos) ? count($hitos) : 0 }},
+  };
+
+  // Helpers
+  const minutes = (s) => s / 60;
+  const ratio = (n, d) => (d === 0 ? 0 : n / d);
+  const fastestChallengeTime = (st) =>
+    st.timePerChallenge.length ? Math.min.apply(null, st.timePerChallenge) : Infinity;
+
+  // Definición de premios (subset principal)
+  const AWARDS = [
+    {
+      id: 'first_finish',
+      label: 'Primer equipo en terminar',
+      emoji: '🏆',
+      weight: 1000,
+      score: (s) => (s.position === 1 ? 100 : 0),
+    },
+    {
+      id: 'velocista_digital',
+      label: 'Velocista Digital',
+      emoji: '⚡',
+      weight: 850,
+      score: (s) => {
+        const m = minutes(s.totalTime);
+        if (m > 60) return 0;
+        if (m <= 30) return 90 + (30 - m);
+        return 70 + (60 - m) * 0.5;
+      },
+    },
+    {
+      id: 'sin_pistas',
+      label: 'Sin Pistas',
+      emoji: '🧠',
+      weight: 900,
+      score: (s) => (s.hintsUsed === 0 ? 95 : 0),
+    },
+    {
+      id: 'tortuga_ganadora',
+      label: 'La Tortuga Ganadora',
+      emoji: '🐢',
+      weight: 740,
+      score: (s) => {
+        const m = minutes(s.totalTime);
+        if (m < 60) return 0;
+        return 60 + (m - 60) * 0.3;
+      },
+    },
+    {
+      id: 'eureka',
+      label: 'Eureka',
+      emoji: '💡',
+      weight: 730,
+      score: (s) => {
+        const f = minutes(fastestChallengeTime(s));
+        if (f === Infinity || f > 3) return 0;
+        return 88 + (3 - f) * 4;
+      },
+    },
+    {
+      id: 'sobrevivientes_desafio',
+      label: 'Sobrevivientes del Desafío',
+      emoji: '🏅',
+      weight: 650,
+      score: (s) => 60 + minutes(s.totalTime) * 0.3,
+    },
+  ];
+
+  function pickAward(st) {
+    const candidates = AWARDS
+      .map((cfg) => ({ cfg, value: cfg.score(st) }))
+      .filter((c) => c.value > 0);
+    if (!candidates.length) {
+      const fallback = AWARDS.find((a) => a.id === 'sobrevivientes_desafio');
+      return fallback;
+    }
+    candidates.sort((a, b) =>
+      b.value !== a.value ? b.value - a.value : b.cfg.weight - a.cfg.weight
+    );
+    return candidates[0].cfg;
+  }
+
+  function formatDuration(seconds) {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}m ${String(s).padStart(2, '0')}s`;
+  }
+
+  function generateDiplomaPNG(st, award) {
+    const width = 2000;
+    const height = 1400;
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+
+    // Fondo básico temático según premio
+    ctx.fillStyle = '#020c06';
+    ctx.fillRect(0, 0, width, height);
+    if (award.id === 'velocista_digital') {
+      const grd = ctx.createLinearGradient(0, 0, width, height);
+      grd.addColorStop(0, '#020617');
+      grd.addColorStop(1, '#0f172a');
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, width, height);
+    } else if (award.id === 'sin_pistas') {
+      ctx.fillStyle = '#0b1020';
+      ctx.fillRect(0, 0, width, height);
+    } else if (award.id === 'tortuga_ganadora') {
+      ctx.fillStyle = '#d1fae5';
+      ctx.fillRect(0, 0, width, height);
+    } else if (award.id === 'eureka') {
+      ctx.fillStyle = '#1e1b4b';
+      ctx.fillRect(0, 0, width, height);
+    }
+
+    // Marco
+    ctx.strokeStyle = '#00ff8840';
+    ctx.lineWidth = 18;
+    ctx.strokeRect(80, 80, width - 160, height - 160);
+
+    const centerX = width / 2;
+    ctx.textAlign = 'center';
+
+    ctx.fillStyle = '#c8ffdf';
+    ctx.font = 'bold 80px "Share Tech Mono", monospace';
+    ctx.fillText('CERTIFICADO DE AVENTURA', centerX, 220);
+
+    ctx.font = '36px "Share Tech Mono", monospace';
+    ctx.fillText('Este diploma certifica que el equipo', centerX, 320);
+
+    ctx.font = 'bold 72px "Share Tech Mono", monospace';
+    ctx.fillText(st.teamName, centerX, 400);
+
+    ctx.font = '36px "Share Tech Mono", monospace';
+    ctx.fillText('ha completado con éxito el desafío.', centerX, 470);
+
+    ctx.font = '40px "Share Tech Mono", monospace';
+    ctx.fillText('Premio obtenido:', centerX, 560);
+
+    ctx.fillStyle = '#00ff88';
+    ctx.font = 'bold 64px "Share Tech Mono", monospace';
+    ctx.fillText(`${award.emoji} ${award.label}`, centerX, 630);
+
+    const marginX = 200;
+    let y = 760;
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#c8ffdf';
+    ctx.font = '34px "Share Tech Mono", monospace';
+    ctx.fillText(`Tiempo total: ${formatDuration(st.totalTime)}`, marginX, y);
+    y += 60;
+    ctx.fillText(`Retos resueltos: ${st.totalChallenges}`, marginX, y);
+    y += 60;
+    ctx.fillText(`Posición en el ranking: #${st.position || '-'}`, marginX, y);
+
+    const dateStr = new Date().toLocaleDateString('es-ES');
+    ctx.textAlign = 'right';
+    ctx.fillText(`Fecha del reto: ${dateStr}`, width - marginX, y);
+
+    // Sello simple
+    const sealX = width - marginX - 150;
+    const sealY = 860;
+    ctx.beginPath();
+    ctx.arc(sealX, sealY, 80, 0, Math.PI * 2);
+    ctx.fillStyle = '#00ff8840';
+    ctx.fill();
+    ctx.fillStyle = '#00ff88';
+    ctx.textAlign = 'center';
+    ctx.font = '28px "Share Tech Mono", monospace';
+    ctx.fillText('DAW', sealX, sealY - 5);
+    ctx.fillText('SCAPE', sealX, sealY + 30);
+
+    return canvas.toDataURL('image/png');
+  }
+
+  const award = pickAward(stats);
+  const img = document.getElementById('diploma-image');
+  const emojiEl = document.getElementById('diploma-award-emoji');
+  const titleEl = document.getElementById('diploma-award-title');
+  const btn = document.getElementById('download-diploma');
+
+  emojiEl.textContent = award.emoji;
+  titleEl.textContent = award.label;
+
+  const dataUrl = generateDiplomaPNG(stats, award);
+  img.src = dataUrl;
+
+  btn.addEventListener('click', function() {
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = `diploma-{{ \Illuminate\Support\Str::slug($partida->nombre_equipo, '_') }}.png`;
+    a.click();
+  });
 })();
 </script>
 
