@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Inscripcion;
 use App\Mail\CodigoAccesoInscripcion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
@@ -99,17 +100,26 @@ class InscripcionController extends Controller
             'clase'         => $validated['clase'],
         ]);
 
-        // 3. ENVÍO DE EMAIL CON CÓDIGO DE ACCESO VÍA RESEND
+        // 3. ENVÍO DE EMAIL CON CÓDIGO DE ACCESO
+        $correoEnviado = false;
+
         try {
-            Mail::send(new CodigoAccesoInscripcion($inscripcion));
+            Mail::to($inscripcion->correo)->send(new CodigoAccesoInscripcion($inscripcion));
+            $correoEnviado = true;
+        } catch (\Symfony\Component\Mailer\Exception\TransportException $e) {
+            // Error de transporte SMTP (servidor no disponible, credenciales, etc.)
+            Log::error('[INSCRIPCION] Fallo SMTP al enviar código de acceso a ' . $inscripcion->correo . ' — ' . $e->getMessage());
         } catch (\Exception $e) {
-            \Log::error('Error enviando email de inscripción: ' . $e->getMessage());
-            // No fallar si hay error en email, pero loguear
+            // Cualquier otro error de correo
+            Log::error('[INSCRIPCION] Error enviando email de inscripción a ' . $inscripcion->correo . ' — ' . $e->getMessage());
         }
 
-        // 4. REDIRECCIÓN con mensaje de éxito
+        // 4. REDIRECCIÓN con mensaje de éxito (independientemente del correo)
         return redirect()->route('inscripcion.exito', ['token' => $inscripcion->qr_token])
-            ->with('success', '¡Equipo "' . $validated['nombre_equipo'] . '" registrado con éxito! Revisa tu correo para el código de acceso.');
+            ->with('success', '¡Equipo "' . $validated['nombre_equipo'] . '" registrado con éxito!')
+            ->with('correo_enviado', $correoEnviado)
+            ->with('correo_fallido_codigo', $correoEnviado ? null : $inscripcion->codigo_acceso);
+
     }
 
     /**

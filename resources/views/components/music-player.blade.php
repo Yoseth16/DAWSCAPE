@@ -72,7 +72,7 @@
   /* Botón flotante, pequeño y discreto en esquina inferior izquierda */
   .music-mute-btn {
     position: fixed;
-    bottom: 0.75rem;
+    bottom: 3.5rem;
     left: 0.75rem;
     z-index: 900;
     width: 38px;

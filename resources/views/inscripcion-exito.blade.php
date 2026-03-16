@@ -326,6 +326,20 @@
                     <p>Tu equipo está listo para participar en la actividad</p>
                 </div>
 
+                @if(session('correo_fallido_codigo'))
+                <div style="border-radius:10px; border:1px solid rgba(255,170,0,0.6); background:rgba(255,170,0,0.1); padding:1.1rem 1rem; margin-bottom:1.4rem; text-align:center;">
+                    <div style="font-family:'Orbitron',sans-serif; font-size:0.85rem; color:#ffaa00; margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.12em;">
+                        ⚠️ No se pudo enviar el correo de confirmación
+                    </div>
+                    <p style="font-size:0.85rem; color:#c8ffdf; margin-bottom:0.75rem;">
+                        Tu inscripción está guardada correctamente, pero el correo no llegó por un problema técnico. <strong>Anota ahora tu código de acceso:</strong>
+                    </p>
+                    <div style="font-family:'Share Tech Mono',monospace; font-size:1.8rem; letter-spacing:0.3em; color:#ffaa00; text-shadow:0 0 15px rgba(255,170,0,0.6); font-weight:700;">
+                        {{ session('correo_fallido_codigo') }}
+                    </div>
+                </div>
+                @endif
+
                 <!-- Team Information -->
                 <div class="team-info">
                     <h3>Datos del Equipo</h3>

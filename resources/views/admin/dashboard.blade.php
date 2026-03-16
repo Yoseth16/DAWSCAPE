@@ -342,9 +342,10 @@
                 <thead>
                     <tr>
                         <th style="width: 5%">ID</th>
-                        <th style="width: 35%">Equipo & Contacto</th>
-                        <th style="width: 15%">Clase</th>
+                        <th style="width: 30%">Equipo & Contacto</th>
+                        <th style="width: 10%">Clase</th>
                         <th style="width: 15%">Estado / Progreso</th>
+                        <th style="width: 10%; text-align:center;">Códice (P7)</th>
                         <th style="width: 10%">Tiempo</th>
                         <th style="width: 10%">Pistas</th>
                         <th style="width: 10%; text-align:center;">Borrar</th>
@@ -399,12 +400,14 @@
                                 <i class="ph-fill {{ $badge['icon'] }}" @if($badge['icon'] === 'ph-spinner-gap') style="animation: spin 2s linear infinite;" @endif></i> 
                                 {{ $stageText }}
                             </span>
+                        </td>
+                        <td style="text-align:center;">
                             @if(!empty($partida->combinacion_codice) && is_array($partida->combinacion_codice))
-                                <div style="margin-top: 5px;">
-                                    <span title="Combinación Prueba 7 — El Códice Oculto" style="display:inline-flex; align-items:center; gap:5px; background:#fefce8; border:1px solid #fde68a; color:#92400e; padding:3px 8px; border-radius:6px; font-size:0.78rem; font-family:'Courier New',monospace; font-weight:700; cursor:default;" >
-                                        🔐 {{ implode('-', $partida->combinacion_codice) }}
-                                    </span>
-                                </div>
+                                <span title="Combinación Secreta" style="font-family:'Courier New',monospace; font-weight:700; color:#b45309; background:#fffbeb; border:1px solid #fcd34d; padding:2px 6px; border-radius:6px; font-size:0.85rem;">
+                                    {{ implode('-', $partida->combinacion_codice) }}
+                                </span>
+                            @else
+                                <span style="color:var(--text-muted); font-size:1.2rem; font-weight:bold;">—</span>
                             @endif
                         </td>
                         <td class="time-display">
@@ -446,7 +449,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" style="text-align:center; padding: 4rem 2rem; color:var(--text-muted);">
+                        <td colspan="8" style="text-align:center; padding: 4rem 2rem; color:var(--text-muted);">
                             <i class="ph ph-ghost" style="font-size:3rem; opacity:0.3; margin-bottom:1rem; display:block;"></i>
                             Sistema vacío. Esperando a que los alumnos se registren.
                         </td>

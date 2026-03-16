@@ -210,6 +210,13 @@
     margin-bottom: 1.5rem;
   }
 
+  /* Responsive 2x2 grid for mobile */
+  @media (max-width: 768px) {
+    .digits-row {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
   .digit-slot { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
 
   .digit-label {

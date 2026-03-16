@@ -186,6 +186,15 @@ class JuegoController extends Controller
             if ($request->filled('color_hex')) {
                 $updateData['color_hex'] = $request->color_hex;
             }
+
+            // Asegurar que si una partida antigua se reconecta sin código generado, se le genere uno aquí
+            if (empty($partidaExistente->combinacion_codice)) {
+                $digitos = range(0, 9);
+                shuffle($digitos);
+                $updateData['combinacion_codice'] = array_slice($digitos, 0, 4);
+                $updateData['intentos_codice'] = 0;
+            }
+
             if (!empty($updateData)) {
                 $partidaExistente->update($updateData);
             }
@@ -214,6 +223,10 @@ class JuegoController extends Controller
         }
 
         // ── REGISTRO NUEVO ────────────────────────────────────────────────
+        $digitos = range(0, 9);
+        shuffle($digitos);
+        $combinacion = array_slice($digitos, 0, 4);
+
         Partida::create([
             'uuid'              => (string) \Illuminate\Support\Str::uuid(),
             'email'             => $inscripcion->correo,
@@ -222,6 +235,8 @@ class JuegoController extends Controller
             'fase_actual'       => config('fases.fases.prueba1.db'),
             'tiempo_segundos'   => 0,
             'inicio_juego'      => Carbon::now(),
+            'combinacion_codice' => $combinacion,
+            'intentos_codice'   => 0,
             'icono'             => $request->input('icono', 'ph-first-aid'),
             'color_hex'         => $request->input('color_hex', '#00ff88'),
         ]);
