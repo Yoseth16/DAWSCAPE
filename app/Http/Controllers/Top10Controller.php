@@ -112,7 +112,7 @@ class Top10Controller extends Controller
                 ->whereNotNull('inicio_juego')
                 ->get();
 
-            $todasPartidas = $partidas->map(function ($partida) use ($terminadasFases) {
+            $todasPartidas = $partidas->map(function ($partida) use ($terminadasFases, $maxPesoEnJuego) {
             // Calculate current live time in seconds (including penalties)
             $segsLive = 0;
             $penalizacion = (int)($partida->penalizacion_segundos ?? 0);
