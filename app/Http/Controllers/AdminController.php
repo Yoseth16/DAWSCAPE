@@ -206,6 +206,27 @@ class AdminController extends Controller
         return back()->with('success', 'Pregunta guardada correctamente.');
     }
 
+    public function editarPregunta($id)
+    {
+        $pregunta = \App\Models\PreguntaDinamica::findOrFail($id);
+        return view('admin.editar-pregunta', compact('pregunta'));
+    }
+
+    public function actualizarPregunta(Request $request, $id)
+    {
+        $request->validate([
+            'enunciado' => 'required|string',
+            'respuesta_correcta' => 'required|string|max:255'
+        ]);
+
+        $pregunta = \App\Models\PreguntaDinamica::findOrFail($id);
+        $pregunta->enunciado = $request->enunciado;
+        $pregunta->respuesta_correcta = $request->respuesta_correcta;
+        $pregunta->save();
+
+        return redirect()->route('admin.preguntas')->with('success', 'Pregunta actualizada correctamente.');
+    }
+
     public function togglePregunta($id)
     {
         $pregunta = \App\Models\PreguntaDinamica::findOrFail($id);

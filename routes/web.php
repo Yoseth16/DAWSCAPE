@@ -240,6 +240,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ==========================================
     Route::get('/preguntas', [AdminController::class, 'gestionarPreguntas'])->name('admin.preguntas');
     Route::post('/preguntas', [AdminController::class, 'guardarPregunta']);
+    Route::get('/admin/pregunta/{id}/edit', [AdminController::class, 'editarPregunta'])->name('admin.pregunta.edit');
+    Route::put('/admin/pregunta/{id}', [AdminController::class, 'actualizarPregunta'])->name('admin.pregunta.update');
     Route::post('/preguntas/{id}/toggle', [AdminController::class, 'togglePregunta']);
     Route::delete('/preguntas/{id}', [AdminController::class, 'eliminarPregunta']);
 });

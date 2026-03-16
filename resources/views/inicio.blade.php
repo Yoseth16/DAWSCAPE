@@ -266,7 +266,7 @@
   <!-- BANNER INFORMATIVO -->
   <div style="max-width: 500px; margin-bottom: 2rem; padding: 1.5rem; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 0.5rem; color: #cbd5e1; text-align: center; font-size: 0.95rem; line-height: 1.6;">
     <p style="margin-bottom: 1rem;"><strong style="color: #22c55e;">¿PRIMERA VEZ?</strong></p>
-    <p style="margin-bottom: 1.5rem;">Si aún no te has inscrito, debes hacerlo primero para generar tu código QR. La inscripción te permite registrar tu equipo y obtener el código necesario para acceder al juego.</p>
+    <p style="margin-bottom: 1.5rem;">Si aún no te has inscrito, debes hacerlo primero. La inscripción te permite registrar tu equipo y recibir por email las credenciales necesarias para acceder al juego.</p>
     <a href="/inscripcion" style="display: inline-block; padding: 0.8rem 1.5rem; background: rgba(34, 197, 94, 0.2); border: 1px solid #22c55e; color: #22c55e; text-decoration: none; border-radius: 0.35rem; font-weight: 600; transition: all 0.3s; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.1em;">→ Ir a Inscripción</a>
   </div>
 

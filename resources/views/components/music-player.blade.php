@@ -3,6 +3,11 @@
   <span id="musicToggleIcon">▶️</span>
 </button>
 
+<!-- Indicador de volumen en móvil -->
+<div id="mobileVolumeHint" class="mobile-volume-hint" aria-label="Usa los botones de tu dispositivo para el volumen">
+  🔊 Vol. del dispositivo
+</div>
+
 <!-- Indicador global de estado de música -->
 <div class="now-playing-banner" id="nowPlayingBanner" aria-live="polite">
   <span class="now-playing-label" id="nowPlayingPrefix">♪ Sonando ahora mismo:</span>
@@ -110,6 +115,33 @@
     box-shadow: 0 2px 8px rgba(0, 255, 136, 0.2);
   }
 
+  /* Hint de volumen para móvil */
+  .mobile-volume-hint {
+    display: none;
+    position: fixed;
+    bottom: 0.75rem;
+    left: 3.2rem;
+    z-index: 900;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--music-player-primary);
+    background: var(--music-player-bg);
+    border: 1px solid var(--music-player-border);
+    border-radius: 6px;
+    padding: 0.25rem 0.5rem;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0.85;
+    backdrop-filter: blur(6px);
+  }
+
+  /* Mostrar hint solo en dispositivos móviles / táctiles */
+  @media (pointer: coarse) and (max-width: 1024px) {
+    .mobile-volume-hint {
+      display: block;
+    }
+  }
+
   /* Mobile: ligeramente más pegado al borde y sin molestar al contenido */
   @media (max-width: 600px) {
     .now-playing-banner {
@@ -129,6 +161,12 @@
       font-size: 1rem;
       box-shadow: 0 3px 10px rgba(0, 255, 136, 0.25);
     }
+
+    .mobile-volume-hint {
+      left: 2.9rem;
+      bottom: 0.65rem;
+      font-size: 0.55rem;
+    }
   }
 </style>
 
@@ -140,8 +178,14 @@
     const nowPlayingTitle = document.getElementById('nowPlayingTitle');
     const nowPlayingPrefix = document.getElementById('nowPlayingPrefix');
     const nowPlayingSuffix = document.getElementById('nowPlayingSuffix');
+    const mobileHint = document.getElementById('mobileVolumeHint');
 
     if (!toggleBtn || !toggleIcon || !nowPlayingBanner) return;
+
+    // Fallback JS para mostrar el hint en móviles detectados por UA
+    if (mobileHint && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      mobileHint.style.display = 'block';
+    }
 
     let currentMode = 'hidden'; // 'playing' | 'paused' | 'hidden'
     let pauseHintTimeout = null;

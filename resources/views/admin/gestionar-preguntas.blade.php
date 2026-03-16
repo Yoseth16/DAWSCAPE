@@ -8,7 +8,7 @@
         .page-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2.5rem; }
         .page-title { margin: 0; font-weight: 700; color: var(--text-main); font-size: 1.8rem; }
         .page-subtitle { color: var(--text-muted); margin-top: 5px; font-size: 0.95rem; }
-        
+
         .glass-panel {
             background: var(--surface-color);
             border-radius: 16px;
@@ -30,7 +30,7 @@
             padding-bottom: 1rem;
             border-bottom: 1px solid var(--border-color);
         }
-        
+
         .panel-heading i { color: var(--brand-color); font-size: 1.3rem; }
 
         /* --- FORMULARIO --- */
@@ -94,12 +94,12 @@
         }
 
         /* --- TABLA --- */
-        .table-responsive { 
-            border-radius: 16px; 
-            overflow: hidden; 
-            border: 1px solid var(--border-color); 
-            background: white; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.02); 
+        .table-responsive {
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            background: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
         }
         .table-custom { width: 100%; margin: 0; border-collapse: collapse; }
         .table-custom th {
@@ -109,7 +109,7 @@
         }
         .table-custom td { padding: 1.2rem 1.5rem; vertical-align: middle; border-bottom: 1px solid #f1f5f9; color: var(--text-main); }
         .table-custom tr:hover { background-color: #f8fafc; }
-        
+
         .table-custom tr.inactive td {
             opacity: 0.6;
             background-color: #f8fafc;
@@ -130,12 +130,15 @@
 
         .btn-toggle-on { color: #10b981; }
         .btn-toggle-on:hover { background: #d1fae5; }
-        
+
         .btn-toggle-off { color: #94a3b8; }
         .btn-toggle-off:hover { background: #e2e8f0; color: #64748b; }
 
         .btn-delete { color: #ef4444; }
         .btn-delete:hover { background: #fee2e2; }
+
+        .btn-edit { color: #f59e0b; }
+        .btn-edit:hover { background: #fef3c7; }
 
         .answer-text {
             font-family: 'Courier New', Courier, monospace;
@@ -176,7 +179,7 @@
     @endif
 
     <div class="split-grid">
-        
+
         <!-- Formulario Izquierda -->
         <div>
             <div class="glass-panel">
@@ -236,7 +239,12 @@
                                     <td style="line-height: 1.5;">{{ $p->enunciado }}</td>
                                     <td><span class="answer-text">{{ $p->respuesta_correcta }}</span></td>
                                     <td style="text-align: center; white-space: nowrap;">
-                                        
+
+                                        <!-- Botón Editar -->
+                                        <a href="{{ route('admin.pregunta.edit', $p->id) }}" class="btn-action btn-edit" title="Editar pregunta" style="display:inline-flex; text-decoration:none; margin-right: 4px;">
+                                            <i class="ph ph-pencil-simple" style="font-size:1.2rem;"></i>
+                                        </a>
+
                                         <!-- Botón Toggle Estado -->
                                         <form action="{{ url('/preguntas/' . $p->id . '/toggle') }}" method="POST" style="display:inline-block; margin:0;">
                                             @csrf

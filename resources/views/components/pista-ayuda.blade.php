@@ -290,27 +290,40 @@
 /* --- Aviso penalización --- */
 .pista-penalty-banner {
     position: fixed;
-    bottom: 25%;
-    top: auto;
+    top: 1.5rem;
+    bottom: auto;
     left: 50%;
-    transform: translateX(-50%) translateY(20px);
+    transform: translateX(-50%) translateY(-20px);
     background: linear-gradient(135deg, rgba(255,170,0,0.95), rgba(255,140,0,0.95));
     color: #1a1a00;
     font-family: 'Orbitron', sans-serif;
     font-size: 0.85rem; font-weight: 700;
     padding: 0.7rem 1.5rem;
     border-radius: 8px;
-    z-index: 700;
+    z-index: 9999;
     opacity: 0;
     transition: all 0.4s ease;
     pointer-events: none;
     box-shadow: 0 4px 20px rgba(255,170,0,0.4);
     letter-spacing: 0.05em;
     text-align: center;
+    max-width: 90vw;
+    box-sizing: border-box;
 }
 .pista-penalty-banner.show {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
+}
+
+@media (max-width: 768px) {
+    .pista-penalty-banner {
+        font-size: 0.75rem;
+        padding: 0.5rem 1rem;
+        max-width: 92vw;
+        width: auto;
+        white-space: normal;
+        word-break: break-word;
+    }
 }
 
 @media (max-width: 600px) {
@@ -323,8 +336,8 @@
     .pista-speech-text { font-size: 0.82rem; }
     .pista-btn-si, .pista-btn-no { padding: 0.6rem 1.6rem; font-size: 0.8rem; }
     .pista-penalty-banner {
-        font-size: 0.75rem;
-        padding: 0.45rem 0.9rem;
+        font-size: 0.7rem;
+        padding: 0.45rem 0.8rem;
     }
 }
 </style>
