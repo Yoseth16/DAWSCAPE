@@ -72,24 +72,23 @@
             z-index: 999;
         }
 
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg-color); }
-        ::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 4px; }
+        /* OCULTAR SCROLLBAR — modo kiosko */
+        ::-webkit-scrollbar { display: none; }
+        * { scrollbar-width: none; -ms-overflow-style: none; }
 
-        /* HEADER */
+        /* HEADER — compacto para TV */
         .header {
             text-align: center;
-            padding: 1rem 0;
+            padding: 0.4rem 0;
             border-bottom: 1px solid var(--border-color);
             background: rgba(2, 12, 6, 0.95);
-            position: sticky;
-            top: 0;
             z-index: 100;
+            flex-shrink: 0;
         }
 
         .header h1 {
             margin: 0;
-            font-size: 2.8rem;
+            font-size: 2rem;
             font-weight: 900;
             letter-spacing: 4px;
             color: var(--text-main);
@@ -136,56 +135,61 @@
             100% { clip-path: inset(50% 0 30% 0); }
         }
 
-        /* MAIN LAYOUT */
+        /* MAIN LAYOUT — dashboard 100vh sin scroll */
         .main-container {
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
-            padding: 1.5rem 1.5rem 2rem 1.5rem;
-            max-width: 1400px;
+            gap: 0.4rem;
+            padding: 0.4rem 1.5rem 0.4rem 1.5rem;
+            max-width: 1600px;
             margin: 0 auto;
             width: 100%;
             box-sizing: border-box;
             align-items: stretch;
+            overflow: hidden;
+            min-height: 0;
         }
 
-        /* Zona superior (podio) */
+        /* Zona superior: podio ~45% */
         .left-col {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.3rem;
             width: 100%;
             flex: 0 0 auto;
+            max-height: 48vh;
             align-items: center;
             justify-content: flex-start;
+            overflow: hidden;
         }
 
-        /* Zona inferior (lista 4-10) */
+        /* Zona inferior: lista 4-10 — llena el resto */
         .right-col {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.3rem;
             width: 100%;
-            flex: 1 1 auto;
+            flex: 1 1 0;
             min-height: 0;
-            overflow-y: auto;
+            overflow: hidden;
         }
 
-        /* SECCIÓN TÍTULOS */
+        /* SECCIÓN TÍTULOS — compacto */
         .section-title {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: bold;
-            margin: 0 0 0.5rem 0;
+            margin: 0 0 0.3rem 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             text-transform: uppercase;
             letter-spacing: 2px;
             color: var(--text-main);
             text-align: center;
             text-shadow: 0 0 6px rgba(0,255,65,0.4);
+            flex-shrink: 0;
         }
         .section-title::before { content: '>_ '; color: var(--text-main); }
         .blinking-cursor {
@@ -202,13 +206,15 @@
             50% { opacity: 0; }
         }
 
-        /* PODIUM (TOP 3) */
+        /* PODIUM (TOP 3) — compacto para 1080p */
         .podium-container {
             display: flex;
             align-items: flex-end;
             justify-content: center;
-            gap: 0.8rem;
+            gap: 0.6rem;
             width: 100%;
+            flex: 1 1 0;
+            min-height: 0;
         }
 
         .podium-slot {
@@ -217,13 +223,13 @@
             align-items: center;
             width: 32%;
             min-width: 0;
+            min-height: 0;
         }
 
-        /* Card (info del equipo) — flujo normal, encima del pedestal */
         .podium-card {
             background: var(--surface-color);
             border: 1px solid;
-            padding: 0.8rem 0.6rem;
+            padding: 0.5rem 0.5rem;
             border-radius: 4px;
             width: 100%;
             text-align: center;
@@ -231,7 +237,6 @@
             box-sizing: border-box;
         }
 
-        /* Pedestal (número de ranking) — debajo de la card, sin overlap */
         .podium-box {
             width: 100%;
             border-top: 2px solid;
@@ -244,47 +249,47 @@
         }
 
         .p2 {
-            min-height: 100px;
+            min-height: 60px;
             border-color: var(--podium-2-border);
             color: var(--podium-2-text);
         }
         .p1 {
-            min-height: 140px;
+            min-height: 90px;
             border-color: var(--podium-1-border);
             border-top-width: 3px;
             color: var(--podium-1-text);
         }
         .p3 {
-            min-height: 70px;
+            min-height: 40px;
             border-color: var(--podium-3-border);
             color: var(--podium-3-text);
         }
 
         .podium-rank {
-            font-size: 3rem;
+            font-size: 2.2rem;
             font-weight: bold;
             line-height: 1;
             text-shadow: 0 0 6px currentColor;
-            padding: 0.5rem 0;
+            padding: 0.3rem 0;
         }
         .podium-rank::before { content: '['; opacity: 0.5; }
         .podium-rank::after { content: ']'; opacity: 0.5; }
 
         .podium-name {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: bold;
             color: currentColor;
-            margin: 0 0 4px 0;
+            margin: 0 0 2px 0;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            line-height: 1.3;
+            line-height: 1.2;
         }
-        .p1-card .podium-name { font-size: 1.5rem; color: var(--podium-1-text); }
+        .p1-card .podium-name { font-size: 1.3rem; color: var(--podium-1-text); }
 
         .podium-time {
             font-family: 'Share Tech Mono', monospace;
-            font-size: 1.3rem;
+            font-size: 1.15rem;
             font-weight: bold;
             color: var(--text-main);
             text-shadow: 0 0 4px rgba(0,255,65,0.4);
@@ -292,57 +297,71 @@
         }
 
         .podium-phase {
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
-            margin-top: 5px;
+            margin-top: 3px;
             font-weight: normal;
             border-top: 1px dashed var(--text-muted);
-            padding-top: 5px;
+            padding-top: 3px;
         }
 
         .p1-badge {
             display: inline-block;
             background: var(--bg-color);
             color: var(--danger-color);
-            padding: 2px 8px;
+            padding: 1px 6px;
             border: 1px solid var(--danger-color);
             font-weight: bold;
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             letter-spacing: 2px;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             white-space: nowrap;
         }
 
         .gap-info {
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             color: var(--danger-color);
             font-weight: bold;
+            margin-top: 2px;
+        }
+
+        /* Ocultar barra de progreso en podio para ahorrar espacio */
+        .podium-card .progress-wrapper {
+            height: 6px;
             margin-top: 4px;
         }
 
-        /* LISTA (4-10) TERMINAL STYLE */
+        /* LISTA (4-10) — GRID 2 COLUMNAS para TV */
         .list-container {
-            display: flex;
-            flex-direction: column;
-            gap: 0.35rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.25rem;
             flex: 1;
-            max-height: calc(100% - 2.5rem);
+            min-height: 0;
+            overflow: hidden;
+            align-content: start;
         }
 
         .list-item {
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid var(--border-color);
             border-left: 3px solid var(--text-main);
-            padding: 0.6rem 1rem;
+            padding: 0.3rem 0.6rem;
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.5rem;
             font-family: 'Share Tech Mono', monospace;
             border-radius: 2px;
+            min-height: 0;
         }
         .list-item:nth-child(even) {
             background: rgba(0, 255, 65, 0.03);
         }
+
+        /* En la lista grid: ocultar detalles que sobran para caber */
+        .list-item .list-phase { display: none; }
+        .list-item .progress-wrapper { display: none; }
+        .list-item .list-terminal-prefix { display: none; }
 
         .move-up { animation: flash-green-hack 2s; }
         .move-down { animation: flash-red-hack 2s; }
@@ -351,55 +370,57 @@
         @keyframes flash-red-hack { 0% { background-color: rgba(255, 34, 68, 0.2); } 100% { background-color: transparent; } }
 
         .list-pos {
-            font-size: 1.3rem;
+            font-size: 1rem;
             font-weight: bold;
             color: var(--text-muted);
-            width: 60px;
+            width: 40px;
             text-align: left;
+            flex-shrink: 0;
         }
         .list-pos::before { content: '[#'; }
         .list-pos::after { content: ']'; }
 
-        .list-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+        .list-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 
         .list-heading {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 6px;
         }
 
         .list-terminal-prefix {
             color: var(--text-muted);
-            font-size: 1rem;
+            font-size: 0.85rem;
         }
 
         .list-info h4 {
             margin: 0;
-            font-size: 1.15rem;
+            font-size: 1rem;
             font-weight: bold;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             color: var(--text-main);
-            line-height: 1.4;
+            line-height: 1.3;
         }
 
         .list-phase {
-            font-size: 0.95rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-top: 4px;
+            gap: 6px;
+            margin-top: 2px;
         }
 
         .list-time {
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: bold;
             color: var(--warning-color);
             text-align: right;
             letter-spacing: 1px;
             white-space: nowrap;
+            flex-shrink: 0;
         }
 
         /* PROGRESS BAR HACKER STYLE */
@@ -511,7 +532,7 @@
         /* MATRIX CANVAS */
         #confetti { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
 
-        /* ===== MOBILE (<768px) ===== */
+        /* ===== MOBILE (<768px) : scroll vertical ===== */
         @media (max-width: 767px) {
             body {
                 overflow-y: auto;
@@ -519,93 +540,54 @@
                 height: auto;
                 min-height: 100vh;
             }
-            .header h1 {
-                font-size: 1.3rem;
-                letter-spacing: 2px;
-            }
-            .main-container {
-                padding: 0.75rem;
-                gap: 0.75rem;
-            }
-            .section-title {
-                font-size: 0.95rem;
-                letter-spacing: 1px;
-                gap: 6px;
-                margin-bottom: 0.4rem;
-            }
-            /* Podio: vertical stack en móvil */
-            .podium-container {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 0.6rem;
-            }
-            .podium-slot {
-                width: 100%;
-                flex-direction: row;
-                align-items: stretch;
-            }
-            .podium-card {
-                flex: 1;
-                min-width: 0;
-                padding: 0.6rem;
-                border-radius: 4px 0 0 4px;
-                text-align: left;
-            }
-            .podium-box {
-                width: 60px;
-                min-width: 60px;
-                border-top: none;
-                border-left: 2px solid;
-                border-right: none;
-                border-bottom: none;
-                border-radius: 0 4px 4px 0;
-            }
-            .p1, .p2, .p3 {
-                min-height: auto;
-            }
-            .podium-rank { font-size: 2rem; }
-            .podium-name { font-size: 1rem; }
-            .p1-card .podium-name { font-size: 1.15rem; }
-            .podium-time { font-size: 1.1rem; }
-            .podium-phase { font-size: 0.7rem; }
-            .p1-badge { font-size: 0.65rem; padding: 1px 5px; }
-            .gap-info { font-size: 0.7rem; }
-            /* Lista compacta */
-            .list-item {
-                padding: 0.4rem 0.6rem;
-                gap: 0.5rem;
-            }
-            .list-pos { font-size: 0.95rem; width: 42px; }
-            .list-info h4 { font-size: 0.95rem; }
-            .list-terminal-prefix { display: none; }
-            .list-time { font-size: 1rem; }
-            .list-phase { font-size: 0.75rem; }
-            .progress-wrapper { height: 6px; }
+            .header h1 { font-size: 1.2rem; letter-spacing: 2px; }
+            .main-container { padding: 0.5rem; gap: 0.5rem; }
+            .left-col { max-height: none; }
+            .section-title { font-size: 0.85rem; letter-spacing: 1px; gap: 5px; }
+            /* Podio vertical */
+            .podium-container { flex-direction: column; align-items: stretch; gap: 0.5rem; }
+            .podium-slot { width: 100%; flex-direction: row; align-items: stretch; }
+            .podium-card { flex: 1; min-width: 0; padding: 0.5rem; border-radius: 4px 0 0 4px; text-align: left; }
+            .podium-box { width: 55px; min-width: 55px; border-top: none; border-left: 2px solid; border-right: none; border-bottom: none; border-radius: 0 4px 4px 0; }
+            .p1, .p2, .p3 { min-height: auto; }
+            .podium-rank { font-size: 1.8rem; }
+            .podium-name { font-size: 0.9rem; }
+            .p1-card .podium-name { font-size: 1rem; }
+            .podium-time { font-size: 1rem; }
+            /* Lista 1 columna en móvil */
+            .list-container { grid-template-columns: 1fr; }
+            .list-item .list-phase { display: flex; }
+            .list-item .progress-wrapper { display: flex; }
+            .list-pos { font-size: 0.85rem; width: 36px; }
+            .list-info h4 { font-size: 0.85rem; }
+            .list-time { font-size: 0.9rem; }
         }
 
-        /* ===== TV / LARGE SCREEN (40-55") ===== */
+        /* ===== TV FULL HD (1920x1080) ===== */
         @media (min-width: 1400px) {
-            .header h1 { font-size: 3.2rem; letter-spacing: 5px; }
-            .main-container { max-width: 1600px; gap: 1.2rem; padding: 1.2rem 2rem; }
-            .section-title { font-size: 1.8rem; margin-bottom: 0.6rem; }
+            .header { padding: 0.5rem 0; }
+            .header h1 { font-size: 2.6rem; letter-spacing: 6px; }
+            .main-container { max-width: 1800px; gap: 0.5rem; padding: 0.5rem 2.5rem; }
+            .section-title { font-size: 1.4rem; }
+            .left-col { max-height: 50vh; }
 
-            .podium-container { gap: 1.2rem; }
-            .p1 { min-height: 200px; }
-            .p2 { min-height: 150px; }
-            .p3 { min-height: 110px; }
-            .podium-rank { font-size: 3.8rem; }
-            .podium-name { font-size: 1.8rem; }
-            .p1-card .podium-name { font-size: 2.2rem; }
-            .podium-time { font-size: 1.8rem; }
-            .podium-phase { font-size: 1rem; }
-            .podium-card { padding: 1.2rem; }
+            .podium-container { gap: 1rem; }
+            .p1 { min-height: 120px; }
+            .p2 { min-height: 90px; }
+            .p3 { min-height: 65px; }
+            .podium-rank { font-size: 3rem; }
+            .podium-name { font-size: 1.5rem; }
+            .p1-card .podium-name { font-size: 1.8rem; }
+            .podium-time { font-size: 1.5rem; }
+            .podium-phase { font-size: 0.9rem; }
+            .podium-card { padding: 0.8rem; }
+            .podium-card .progress-wrapper { height: 8px; }
 
-            .list-item { padding: 0.8rem 1.2rem; gap: 1.2rem; }
-            .list-pos { font-size: 1.6rem; width: 75px; }
-            .list-info h4 { font-size: 1.6rem; }
-            .list-phase { font-size: 1rem; }
-            .list-time { font-size: 1.6rem; }
-            .progress-wrapper { height: 12px; }
+            .list-container { gap: 0.3rem; }
+            .list-item { padding: 0.5rem 0.8rem; gap: 0.8rem; }
+            .list-pos { font-size: 1.3rem; width: 55px; }
+            .list-info h4 { font-size: 1.3rem; }
+            .list-time { font-size: 1.3rem; }
         }
 
     </style>
