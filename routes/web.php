@@ -196,6 +196,40 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/prueba/prueba8', [JuegoController::class, 'mostrarPrueba8'])->name('admin.prueba.prueba8');
     Route::get('/prueba/prueba9', [JuegoController::class, 'mostrarPrueba9'])->name('admin.prueba.prueba9');
 
+    // Bypass para ver el diploma final de prueba (sin necesidad de haber jugado)
+    Route::get('/prueba/final', function () {
+        // Crear una partida falsa en memoria (no persistida) para previsualizar el diploma
+        $partida = new \App\Models\Partida([
+            'email'                => 'admin-test@dawscape.test',
+            'nombre_equipo'        => 'EQUIPO TEST',
+            'clase'                => '2º DAW',
+            'fase_actual'          => config('fases.fases.finalizado.db'),
+            'tiempo_segundos'      => 2754, // 45m 54s de ejemplo
+            'penalizacion_segundos'=> 60,
+        ]);
+
+        // Top 3 real de la BD (puede estar vacío, no importa)
+        $top3 = \App\Models\Partida::where('fase_actual', config('fases.fases.finalizado.db'))
+            ->orderBy('tiempo_segundos', 'asc')
+            ->limit(3)
+            ->get();
+
+        // Hitos de ejemplo para mostrar el breakdown de rendimiento
+        $hitos = [
+            ['fase' => 'Prueba 1 — Mario',        'segundos_invertidos' => 480,  'total_acumulado' => 480],
+            ['fase' => 'Prueba 2 — Clúster',       'segundos_invertidos' => 360,  'total_acumulado' => 840],
+            ['fase' => 'Prueba 3 — Cafeína',       'segundos_invertidos' => 300,  'total_acumulado' => 1140],
+            ['fase' => 'Prueba 4 — Oasis',         'segundos_invertidos' => 270,  'total_acumulado' => 1410],
+            ['fase' => 'Prueba 5 — Protocolo Espejo','segundos_invertidos'=> 240, 'total_acumulado' => 1650],
+            ['fase' => 'Prueba 6 — Sobrecarga',    'segundos_invertidos' => 320,  'total_acumulado' => 1970],
+            ['fase' => 'Prueba 7 — Códice Oculto', 'segundos_invertidos' => 280,  'total_acumulado' => 2250],
+            ['fase' => 'Prueba 8 — Cortafuegos',   'segundos_invertidos' => 245,  'total_acumulado' => 2495],
+            ['fase' => 'Prueba 9 — Juego de Pistas','segundos_invertidos' => 259, 'total_acumulado' => 2754],
+        ];
+
+        return view('final', compact('partida', 'top3', 'hitos'));
+    })->name('admin.prueba.final');
+
     // Gestión de Perfil de Profesor (Breeze)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

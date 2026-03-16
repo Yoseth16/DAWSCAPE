@@ -174,6 +174,10 @@
                     <i class="ph ph-monitor-play"></i> Ver Top 10
                 </a>
 
+                <a href="{{ route('admin.prueba.final') }}" target="_blank" class="export-btn" style="background:#0ea5e9;">
+                    <i class="ph ph-certificate"></i> Ver Diploma de Prueba
+                </a>
+
                 <a href="/admin/exportar-top20" target="_blank" class="export-btn">
                     <i class="ph ph-file-pdf"></i> Exportar Top 20
                 </a>
@@ -395,6 +399,13 @@
                                 <i class="ph-fill {{ $badge['icon'] }}" @if($badge['icon'] === 'ph-spinner-gap') style="animation: spin 2s linear infinite;" @endif></i> 
                                 {{ $stageText }}
                             </span>
+                            @if(!empty($partida->combinacion_codice) && is_array($partida->combinacion_codice))
+                                <div style="margin-top: 5px;">
+                                    <span title="Combinación Prueba 7 — El Códice Oculto" style="display:inline-flex; align-items:center; gap:5px; background:#fefce8; border:1px solid #fde68a; color:#92400e; padding:3px 8px; border-radius:6px; font-size:0.78rem; font-family:'Courier New',monospace; font-weight:700; cursor:default;" >
+                                        🔐 {{ implode('-', $partida->combinacion_codice) }}
+                                    </span>
+                                </div>
+                            @endif
                         </td>
                         <td class="time-display">
                             @if($partida->fase_actual === 'FINALIZADO' || $partida->fase_actual === 'FINALIZADO_TIMEOUT')
