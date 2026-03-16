@@ -289,11 +289,11 @@
 <div class="screen">
   <div class="logo">DAWSCAPE</div>
   <div class="subtitle">// INSCRIPCIÓN DE EQUIPOS</div>
-  <div class="glitch-text">COMPLETA LOS DATOS Y GANA TU CÓDIGO QR</div>
+  <div class="glitch-text">COMPLETA LOS DATOS Y REGISTRA TU EQUIPO</div>
 
   <div style="max-width: 500px; margin-bottom: 2rem; padding: 1.5rem; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 0.5rem; color: #cbd5e1; text-align: center; font-size: 0.95rem; line-height: 1.6;">
     <p style="margin-bottom: 1rem;"><strong style="color: #22c55e;">IMPORTANTE:</strong> Utiliza un correo del dominio <code>@estudiante.xtart.com</code> para poder acceder después.</p>
-    <p>Una vez inscrito recibirás tu código QR y podrás iniciar la experiencia desde cualquier dispositivo.</p>
+    <p>Una vez inscrito recibirás tus credenciales por email y podrás iniciar la experiencia desde cualquier dispositivo.</p>
   </div>
 
   <div class="login-card">

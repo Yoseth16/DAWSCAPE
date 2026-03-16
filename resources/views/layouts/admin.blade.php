@@ -117,7 +117,7 @@
         .page-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2.5rem; }
         .page-title { margin: 0; font-weight: 700; color: var(--text-main); font-size: 1.8rem; }
         .page-subtitle { color: var(--text-muted); margin-top: 5px; font-size: 0.95rem; }
-        
+
         .glass-panel {
             background: var(--surface-color);
             border-radius: 16px;
@@ -141,7 +141,7 @@
             <h2>DAWSCAPE</h2>
             <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 5px;">Admin Control Center</div>
         </div>
-        
+
         <div class="sidebar-menu">
             <div class="menu-label">Principal</div>
             <ul style="padding:0; margin:0;">
@@ -158,6 +158,21 @@
                 <li class="nav-item">
                     <a href="{{ route('admin.preguntas') }}" class="nav-link {{ request()->routeIs('admin.preguntas') ? 'active' : '' }}">
                         <i class="ph ph-exam"></i> B. Preguntas
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('admin.analitica') }}" class="nav-link {{ request()->routeIs('admin.analitica') ? 'active' : '' }}">
+                        <i class="ph ph-chart-bar"></i> Analítica de Pruebas
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('admin.system') }}" class="nav-link {{ request()->routeIs('admin.system') ? 'active' : '' }}">
+                        <i class="ph ph-heartbeat"></i> System Health
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('admin.live') }}" class="nav-link {{ request()->routeIs('admin.live') ? 'active' : '' }}">
+                        <i class="ph ph-monitor-play"></i> Live Feed & Control
                     </a>
                 </li>
             </ul>
@@ -186,7 +201,7 @@
                     <div class="text-truncate" style="font-size: 0.7rem; color: #94a3b8;">{{ Auth::user()->email }}</div>
                 </div>
             </div>
-            
+
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="btn-logout border-0" style="background: rgba(239, 68, 68, 0.1);">

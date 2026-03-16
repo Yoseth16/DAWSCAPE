@@ -104,14 +104,10 @@ class InscripcionController extends Controller
         $correoEnviado = false;
 
         try {
-            Mail::to($inscripcion->correo)->send(new CodigoAccesoInscripcion($inscripcion));
-            $correoEnviado = true;
-        } catch (\Symfony\Component\Mailer\Exception\TransportException $e) {
-            // Error de transporte SMTP (servidor no disponible, credenciales, etc.)
-            Log::error('[INSCRIPCION] Fallo SMTP al enviar código de acceso a ' . $inscripcion->correo . ' — ' . $e->getMessage());
-        } catch (\Exception $e) {
-            // Cualquier otro error de correo
-            Log::error('[INSCRIPCION] Error enviando email de inscripción a ' . $inscripcion->correo . ' — ' . $e->getMessage());
+            Mail::send(new CodigoAccesoInscripcion($inscripcion));
+        } catch (\Throwable $e) {
+            \Log::error('Error enviando email de inscripción: ' . $e->getMessage());
+            // No fallar si hay error en email, pero loguear
         }
 
         // 4. REDIRECCIÓN con mensaje de éxito (independientemente del correo)

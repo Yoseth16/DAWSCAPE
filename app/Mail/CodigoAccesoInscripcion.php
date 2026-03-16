@@ -13,6 +13,7 @@ class CodigoAccesoInscripcion extends Mailable
 {
     use Queueable, SerializesModels;
 
+<<<<<<< HEAD
     public Inscripcion $inscripcion;
     public string $nombreEquipo;
     public string $codigoAcceso;
@@ -40,17 +41,37 @@ class CodigoAccesoInscripcion extends Mailable
     /**
      * Vista y datos del correo.
      */
+=======
+    public function __construct(
+        public Inscripcion $inscripcion
+    ) {}
+
+    public function envelope(): Envelope
+    {
+        return new Envelope(
+            to: [$this->inscripcion->correo],
+            subject: 'DAWSCAPE - Tu Código de Acceso al Escape Room',
+        );
+    }
+
+>>>>>>> b47905c9862b4b51080cbd80099d8f009c996617
     public function content(): Content
     {
         return new Content(
             markdown: 'emails.codigo-acceso',
             with: [
+<<<<<<< HEAD
                 'nombreEquipo' => $this->nombreEquipo,
                 'codigoAcceso' => $this->codigoAcceso,
+=======
+                'nombreEquipo' => $this->inscripcion->nombre_equipo,
+                'codigoAcceso' => $this->inscripcion->codigo_acceso,
+>>>>>>> b47905c9862b4b51080cbd80099d8f009c996617
                 'inscripcion'  => $this->inscripcion,
             ],
         );
     }
+<<<<<<< HEAD
 
     /**
      * Sin adjuntos.
@@ -59,4 +80,6 @@ class CodigoAccesoInscripcion extends Mailable
     {
         return [];
     }
+=======
+>>>>>>> b47905c9862b4b51080cbd80099d8f009c996617
 }

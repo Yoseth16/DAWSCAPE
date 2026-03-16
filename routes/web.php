@@ -129,6 +129,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'adminPanel'])->name('dashboard');
     Route::get('/admin', function() { return redirect('/dashboard'); }); // Alias por costumbre
 
+    // Analítica de Pruebas
+    Route::get('/admin/analitica', [AdminController::class, 'analitica'])->name('admin.analitica');
+
     // Gestión de Partidas y Ticker Live
     Route::get('/admin/api/stats', [AdminController::class, 'apiStats']);
     Route::get('/admin/api/inscripciones', [AdminController::class, 'apiInscripciones']);
@@ -136,6 +139,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/admin/equipo/{uuid}', [AdminController::class, 'eliminarEquipo']);
     Route::get('/admin/equipo/{uuid}/logs', [AdminController::class, 'mostrarLogs'])->name('admin.equipo.logs');
     Route::get('/admin/exportar-top20', [AdminController::class, 'exportarTop20PDF']);
+
+    // System Health
+    Route::get('/admin/system', [AdminController::class, 'systemHealth'])->name('admin.system');
+
+    // Visor de datos de tablas (solo lectura)
+    Route::get('/admin/database/{table}', [AdminController::class, 'showTable'])->name('admin.database.show');
+
+    // Live Feed & Control (Sala de control en tiempo real)
+    Route::get('/admin/live', [AdminController::class, 'liveFeed'])->name('admin.live');
+    Route::post('/admin/live/ajustar-tiempo', [AdminController::class, 'ajustarTiempo'])->name('admin.live.ajustar');
+    Route::get('/admin/api/equipos-activos', [AdminController::class, 'apiEquiposActivos'])->name('admin.api.equipos-activos');
 
     // Gestión de QRs Dinámicos
     Route::get('/admin/qrs', [QrController::class, 'mostrarGestor'])->name('admin.qrs');
@@ -240,6 +254,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ==========================================
     Route::get('/preguntas', [AdminController::class, 'gestionarPreguntas'])->name('admin.preguntas');
     Route::post('/preguntas', [AdminController::class, 'guardarPregunta']);
+    Route::get('/admin/pregunta/{id}/edit', [AdminController::class, 'editarPregunta'])->name('admin.pregunta.edit');
+    Route::put('/admin/pregunta/{id}', [AdminController::class, 'actualizarPregunta'])->name('admin.pregunta.update');
     Route::post('/preguntas/{id}/toggle', [AdminController::class, 'togglePregunta']);
     Route::delete('/preguntas/{id}', [AdminController::class, 'eliminarPregunta']);
 });

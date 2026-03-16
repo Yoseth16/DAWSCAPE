@@ -198,29 +198,35 @@
         margin-top: 1.5rem;
         border: 1px solid rgba(0, 255, 136, 0.35);
         background: radial-gradient(circle at top, rgba(0,255,136,0.08), transparent 55%);
-        padding: 1.2rem;
+        padding: clamp(0.8rem, 3vw, 1.5rem);
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
       }
       .diploma-header {
-        font-size: 0.8rem;
+        font-size: clamp(0.65rem, 2vw, 0.8rem);
         letter-spacing: 0.18em;
         text-transform: uppercase;
         color: var(--green);
         margin-bottom: 0.75rem;
+        text-align: center;
       }
       .diploma-layout {
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
         align-items: center;
+        width: 100%;
       }
       .diploma-award {
         text-align: center;
       }
       .diploma-award-title {
         font-family: 'Orbitron', sans-serif;
-        font-size: 1.1rem;
+        font-size: clamp(0.85rem, 2.5vw, 1.1rem);
         letter-spacing: 0.12em;
         text-transform: uppercase;
+        word-break: break-word;
       }
       .diploma-award-emoji {
         font-size: 2.2rem;
@@ -228,23 +234,28 @@
       }
       .diploma-preview-frame {
         width: 100%;
+        max-width: 100%;
         border: 1px solid rgba(0, 255, 136, 0.2);
         background: #000000;
-        padding: 0.5rem;
+        padding: clamp(0.25rem, 1vw, 0.5rem);
+        overflow: hidden;
       }
       .diploma-preview-frame img {
         width: 100%;
+        height: auto;
         display: block;
+        object-fit: contain;
       }
       .diploma-actions {
         margin-top: 0.75rem;
         display: flex;
         justify-content: center;
+        width: 100%;
       }
       .diploma-download-btn {
         display: inline-block;
         font-family: 'Orbitron', sans-serif;
-        font-size: 0.75rem;
+        font-size: clamp(0.6rem, 2vw, 0.75rem);
         letter-spacing: 0.18em;
         padding: 0.9rem 1.6rem;
         border: 1px solid var(--green);
@@ -253,6 +264,10 @@
         text-transform: uppercase;
         cursor: pointer;
         transition: all 0.2s;
+        max-width: 100%;
+        text-align: center;
+        -webkit-tap-highlight-color: transparent;
+        min-height: 48px;
       }
       .diploma-download-btn:hover {
         background: var(--green);
@@ -325,13 +340,31 @@
       /* MOBILE */
       .btn { min-height: 52px; -webkit-tap-highlight-color: transparent; }
       @media (max-width: 600px) {
-        .screen { padding: 1rem; }
-        .victory-box { padding: 1.2rem 1rem; }
+        .screen { padding: 0.75rem; }
+        .victory-box { padding: 1rem 0.75rem; }
+        .victory-box::before { font-size: 0.6rem; left: 0.5rem; }
+        .title { font-size: clamp(1.5rem, 7vw, 2.5rem); margin-bottom: 1rem; }
         .breakdown-list { font-size: 0.85rem; }
-        .subtitle-txt { font-size: 0.95rem; }
-        .ranking-list { font-size: 0.9rem; }
-        .diploma-layout { gap: 0.5rem; }
-        .diploma-award-title { font-size: 0.9rem; }
+        .breakdown-panel { padding: 1rem; }
+        .subtitle-txt { font-size: 0.95rem; line-height: 1.6; }
+        .ranking-list { font-size: 0.85rem; padding-left: 1.2rem; }
+        .ranking-list li { flex-wrap: wrap; gap: 0.2rem; }
+        .time-display { font-size: clamp(1.5rem, 8vw, 2.5rem); }
+        .diploma-section { padding: 0.6rem; }
+        .diploma-layout { gap: 0.4rem; }
+        .diploma-award-title { font-size: 0.8rem; }
+        .diploma-award-emoji { font-size: 1.8rem; }
+        .diploma-preview-frame { padding: 0.2rem; }
+        .diploma-download-btn { padding: 0.75rem 1rem; width: 100%; }
+        .btn { padding: 1rem 1.5rem; font-size: 0.8rem; }
+      }
+
+      @media (max-width: 380px) {
+        .screen { padding: 0.5rem; }
+        .victory-box { padding: 0.75rem 0.5rem; }
+        .title { font-size: 1.4rem; }
+        .subtitle-txt { font-size: 0.85rem; }
+        .ranking-list { font-size: 0.8rem; }
       }
     </style>
 </head>

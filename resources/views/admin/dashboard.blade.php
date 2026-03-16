@@ -469,5 +469,5 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <!-- JavaScript externalizado del dashboard -->
-<script src="{{ asset('js/admin-dashboard.js') }}"></script>
+<script src="{{ asset('js/admin-dashboard.js') }}?v={{ time() }}"></script>
 @endpush

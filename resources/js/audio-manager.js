@@ -7,6 +7,11 @@
  */
 class AudioManager {
   constructor() {
+    // Detección de dispositivo móvil (iOS/Android ignoran audio.volume por JS)
+    this.isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+      || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches
+          && window.matchMedia('(max-width: 1024px)').matches);
+
     // Música de fondo
     this.bgMusic = new Audio();
     this.bgMusic.crossOrigin = 'anonymous';
@@ -17,8 +22,9 @@ class AudioManager {
     // Restaurar volumen guardado o usar 0.5 por defecto
     const savedVol = parseFloat(localStorage.getItem('audioVolume'));
     const initialVol = (!isNaN(savedVol) && savedVol >= 0 && savedVol <= 1) ? savedVol : 0.5;
-    this.currentVolume = initialVol;
-    this.targetVolume = initialVol;
+    // En móvil, forzar volumen a 1 (el SO controla el volumen real)
+    this.currentVolume = this.isMobile ? 1 : initialVol;
+    this.targetVolume = this.isMobile ? 1 : initialVol;
 
     // Efectos de sonido (proporción respecto al master)
     this.sfx = {};
@@ -316,6 +322,9 @@ class AudioManager {
    * @param {number} value
    */
   setVolume(value) {
+    // En móvil, el SO controla el volumen; ignorar cambios por JS
+    if (this.isMobile) return;
+
     const vol = Math.max(0, Math.min(1, value));
     this.targetVolume = vol;
     this.currentVolume = vol;
