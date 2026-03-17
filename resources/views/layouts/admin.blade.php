@@ -166,6 +166,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="{{ route('admin.valoraciones') }}" class="nav-link {{ request()->routeIs('admin.valoraciones') ? 'active' : '' }}">
+                        <i class="ph ph-star"></i> Valoraciones
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="{{ route('admin.system') }}" class="nav-link {{ request()->routeIs('admin.system') ? 'active' : '' }}">
                         <i class="ph ph-heartbeat"></i> System Health
                     </a>

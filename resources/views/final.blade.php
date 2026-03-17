@@ -702,5 +702,152 @@
     DAWSCAPE SYSTEM // DAW <br>
     <a href="{{ route('legal') }}" style="color: rgba(255, 255, 255, 0.3); text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='#00ff88'" onmouseout="this.style.color='rgba(255, 255, 255, 0.3)'">AVISO LEGAL Y RGPD</a>
 </div>
+
+<!-- MODAL VALORACION -->
+<style>
+.val-modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+    z-index: 10000; display: flex; justify-content: center; align-items: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
+}
+.val-modal-overlay.active { opacity: 1; pointer-events: auto; }
+.val-modal {
+    background: #111; border: 2px solid #facc15; border-radius: 12px;
+    padding: 2rem; width: 90%; max-width: 400px;
+    box-shadow: 0 0 20px rgba(250, 204, 21, 0.2);
+    text-align: center; color: white; font-family: 'Share Tech Mono', monospace;
+    transform: translateY(20px); transition: transform 0.5s ease;
+}
+.val-modal-overlay.active .val-modal { transform: translateY(0); }
+.val-title { color: #facc15; font-size: 1.5rem; margin-bottom: 1rem; text-shadow: 0 0 10px rgba(250, 204, 21, 0.5); }
+.val-stars { display: flex; justify-content: center; gap: 10px; margin-bottom: 1.5rem; flex-direction: row-reverse; }
+.val-stars input { display: none; }
+.val-stars label { font-size: 2.5rem; color: #444; cursor: pointer; transition: color 0.2s, text-shadow 0.2s; }
+.val-stars label:hover, .val-stars label:hover ~ label, .val-stars input:checked ~ label { color: #facc15; text-shadow: 0 0 15px rgba(250, 204, 21, 0.8); }
+.val-textarea { width: 100%; background: #222; border: 1px solid #444; border-radius: 8px; color: white; padding: 0.75rem; font-family: inherit; resize: none; margin-bottom: 1.5rem; margin-top: 1rem; }
+.val-textarea:focus { outline: none; border-color: #facc15; }
+.val-buttons { display: flex; gap: 1rem; }
+.val-btn { flex: 1; padding: 0.75rem; border-radius: 8px; font-weight: bold; font-family: inherit; cursor: pointer; text-transform: uppercase; border: none; transition: all 0.2s; }
+.val-btn-submit { background: #facc15; color: #000; }
+.val-btn-submit.disabled { opacity: 0.5; cursor: not-allowed; }
+.val-btn-submit:not(.disabled):hover { box-shadow: 0 0 15px rgba(250, 204, 21, 0.6); }
+.val-btn-skip { background: transparent; border: 1px solid #666; color: #aaa; }
+.val-btn-skip:hover { background: #333; color: white; }
+.val-msg { display: none; margin-top: 1rem; color: #00ff88; font-weight: bold; }
+</style>
+
+<div class="val-modal-overlay" id="valModalOverlay">
+    <div class="val-modal">
+        <div class="val-title">¿Qué te ha parecido la actividad?</div>
+        
+        <div class="val-stars">
+            <input type="radio" name="estrellas" id="star5" value="5"><label for="star5">★</label>
+            <input type="radio" name="estrellas" id="star4" value="4"><label for="star4">★</label>
+            <input type="radio" name="estrellas" id="star3" value="3"><label for="star3">★</label>
+            <input type="radio" name="estrellas" id="star2" value="2"><label for="star2">★</label>
+            <input type="radio" name="estrellas" id="star1" value="1"><label for="star1">★</label>
+        </div>
+        
+        <textarea id="valComentario" class="val-textarea" rows="3" placeholder="Déjanos un comentario (opcional)..."></textarea>
+        
+        <div class="val-buttons" id="valButtons">
+            <button class="val-btn val-btn-skip" id="btnSkipVal">Omitir</button>
+            <button class="val-btn val-btn-submit disabled" id="btnSubmitVal" disabled>Enviar valoración</button>
+        </div>
+        
+        <div class="val-msg" id="valMsg">[OK] Valoración registrada.<br>¡Gracias por tu feedback!</div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Verificar si ya se mostro para esta partida
+    if (localStorage.getItem('dawscape_valorado_{{ $partida->id ?? '' }}')) return;
+
+    const overlay = document.getElementById('valModalOverlay');
+    const btnSubmit = document.getElementById('btnSubmitVal');
+    const btnSkip = document.getElementById('btnSkipVal');
+    const msg = document.getElementById('valMsg');
+    const buttonsContainer = document.getElementById('valButtons');
+    const stars = document.querySelectorAll('input[name="estrellas"]');
+    
+    // Habilitar boton cuando se selecciona una estrella
+    stars.forEach(star => {
+        star.addEventListener('change', () => {
+            btnSubmit.disabled = false;
+            btnSubmit.classList.remove('disabled');
+        });
+    });
+
+    // Mostrar modal despues de 5s
+    setTimeout(() => {
+        overlay.classList.add('active');
+    }, 5000);
+
+    // Omitir
+    btnSkip.addEventListener('click', () => {
+        localStorage.setItem('dawscape_valorado_{{ $partida->id ?? '' }}', 'true');
+        overlay.classList.remove('active');
+    });
+
+    // Enviar
+    btnSubmit.addEventListener('click', () => {
+        if(btnSubmit.disabled) return;
+        
+        const checkedStar = document.querySelector('input[name="estrellas"]:checked');
+        if(!checkedStar) return;
+        
+        const starsVal = checkedStar.value;
+        const comment = document.getElementById('valComentario').value;
+        const partidaId = '{{ $partida->id ?? '' }}';
+        
+        let csrfToken = '';
+        const metaCsrf = document.querySelector('meta[name="csrf-token"]');
+        if(metaCsrf) {
+            csrfToken = metaCsrf.getAttribute('content');
+        } else {
+            // Si la vista no tiene meta csrf, lo buscamos en campos hidden o añadimos un tag global en algun lado. Pero laravel permite headers o inputs.
+            csrfToken = '{{ csrf_token() }}';
+        }
+
+        // Deshabilitar boton
+        btnSubmit.disabled = true;
+        btnSubmit.textContent = 'Enviando...';
+
+        fetch('/valoraciones', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                partida_id: partidaId,
+                estrellas: starsVal,
+                comentario: comment
+            })
+        }).then(res => res.json())
+          .then(data => {
+              if(data.success || data.message === 'Ya valorado') {
+                  localStorage.setItem('dawscape_valorado_{{ $partida->id ?? '' }}', 'true');
+                  buttonsContainer.style.display = 'none';
+                  msg.style.display = 'block';
+                  setTimeout(() => {
+                      overlay.classList.remove('active');
+                  }, 2000);
+              } else {
+                  console.error(data);
+                  btnSubmit.disabled = false;
+                  btnSubmit.textContent = 'Enviar valoración';
+              }
+          }).catch(err => {
+              console.error('Error', err);
+              btnSubmit.disabled = false;
+              btnSubmit.textContent = 'Enviar valoración';
+          });
+    });
+});
+</script>
 </body>
 </html>
