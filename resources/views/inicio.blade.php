@@ -279,6 +279,75 @@
     padding: 1rem; margin-bottom: 2rem; border-radius: 0.3rem;
     color: #cbd5e1; font-size: 0.9rem;
   }
+
+  /* ====== CINEMATIC OVERLAY ====== */
+  .cinematic-overlay {
+    position: fixed; inset: 0; z-index: 9999;
+    background: #000; display: none; flex-direction: column;
+    align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.6s;
+  }
+  .cinematic-overlay.active { display: flex; opacity: 1; }
+
+  .cine-scanlines {
+    position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.015) 2px, rgba(255,255,255,0.015) 4px);
+  }
+
+  .cine-logo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 900; color: var(--green);
+    text-shadow: 0 0 40px var(--green), 0 0 120px rgba(var(--green-rgb), 0.5);
+    letter-spacing: 0.25em; opacity: 0;
+    transform: scale(0.5);
+    animation: cine-logo-in 1.2s ease-out 0.5s forwards;
+  }
+
+  .cine-line {
+    width: 0; height: 2px;
+    background: var(--green);
+    box-shadow: 0 0 20px var(--green);
+    margin: 1.5rem 0;
+    animation: cine-line-expand 0.8s ease-out 1.4s forwards;
+  }
+
+  .cine-text {
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--green); font-size: clamp(0.85rem, 2.5vw, 1.2rem);
+    letter-spacing: 0.15em; text-align: center;
+    opacity: 0; max-width: 600px; padding: 0 1rem;
+    line-height: 1.8;
+  }
+  .cine-text-1 { animation: cine-fade-in 0.8s ease-out 2s forwards; }
+  .cine-text-2 { animation: cine-fade-in 0.8s ease-out 3.2s forwards; font-size: clamp(0.75rem, 2vw, 0.95rem); color: rgba(var(--green-rgb), 0.6); margin-top: 0.5rem; }
+
+  .cine-status {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem; color: rgba(var(--green-rgb), 0.4);
+    letter-spacing: 0.3em; text-transform: uppercase;
+    position: absolute; bottom: 2rem;
+    opacity: 0; animation: cine-fade-in 0.5s ease-out 4.2s forwards;
+  }
+  .cine-status::after {
+    content: ''; display: inline-block;
+    width: 6px; height: 6px; background: var(--green);
+    border-radius: 50%; margin-left: 8px;
+    animation: cine-blink 1s infinite 4.2s;
+  }
+
+  @keyframes cine-logo-in {
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes cine-line-expand {
+    to { width: min(350px, 70vw); }
+  }
+  @keyframes cine-fade-in {
+    to { opacity: 1; }
+  }
+  @keyframes cine-blink {
+    0%, 100% { opacity: 1; } 50% { opacity: 0.2; }
+  }
 </style>
 </head>
 <body>
@@ -319,7 +388,7 @@
       </div>
 
       <input type="hidden" name="icono" id="icono_input" value="ph-first-aid">
-      <input type="hidden" name="color_hex" id="color_input" value="#ff69b4">
+      <input type="hidden" name="color_hex" id="color_input" value="#00cc44">
 
       <!-- SELECCIÓN DE AVATAR -->
       <div class="form-group" style="margin-top: 1.5rem;">
@@ -340,11 +409,11 @@
       <div class="form-group" style="margin-top: 1rem; margin-bottom: 2.5rem;">
         <label class="form-label">IDENTIFICADOR DE COLOR</label>
         <div class="grid-selector" id="color-selector">
-          <div class="color-btn active" data-val="#ff69b4" style="background:#ff69b4;" title="Rosa"></div>
+          <div class="color-btn active" data-val="#00cc44" style="background:#00cc44;" title="Verde"></div>
+          <div class="color-btn" data-val="#ff69b4" style="background:#ff69b4;" title="Rosa"></div>
           <div class="color-btn" data-val="#8b00ff" style="background:#8b00ff;" title="Morado"></div>
           <div class="color-btn" data-val="#ff6600" style="background:#ff6600;" title="Naranja"></div>
           <div class="color-btn" data-val="#0066ff" style="background:#0066ff;" title="Azul"></div>
-          <div class="color-btn" data-val="#00cc44" style="background:#00cc44;" title="Verde"></div>
           <div class="color-btn" data-val="#ffdd00" style="background:#ffdd00;" title="Amarillo"></div>
           <div class="color-btn" data-val="#ff1a1a" style="background:#ff1a1a;" title="Rojo"></div>
           <div class="color-btn" data-val="#ffffff" style="background:#ffffff;" title="Blanco"></div>
@@ -364,7 +433,7 @@
         </label>
       </div>
 
-      <button type="submit" class="btn">INICIAR CONEXIÓN →</button>
+      <button type="button" class="btn" id="btnIniciar">INICIAR CONEXIÓN →</button>
     </form>
   </div>
 </div>
@@ -439,7 +508,37 @@ setThemeColor(colorInput.value);
 document.querySelectorAll('.btn, .menu-click, .checkbox-label').forEach(el => {
   el.addEventListener('click', playClick);
 });
+
+// ====== CINEMATIC on form submit ======
+const form = document.querySelector('form');
+const btnIniciar = document.getElementById('btnIniciar');
+const cinematic = document.getElementById('cinematic');
+
+btnIniciar.addEventListener('click', function() {
+  playClick();
+  // Validate the form natively
+  if (!form.reportValidity()) return;
+
+  // Show cinematic
+  cinematic.style.display = 'flex';
+  requestAnimationFrame(() => cinematic.classList.add('active'));
+
+  // Submit after cinematic plays (5s)
+  setTimeout(() => {
+    form.submit();
+  }, 5000);
+});
 </script>
+<!-- CINEMATIC OVERLAY -->
+<div class="cinematic-overlay" id="cinematic">
+  <div class="cine-scanlines"></div>
+  <div class="cine-logo">DAWSCAPE</div>
+  <div class="cine-line"></div>
+  <div class="cine-text cine-text-1">BIENVENIDO, AGENTE.</div>
+  <div class="cine-text cine-text-2">Estás a punto de entrar en el mejor escape room de XTART.<br>Resuelve los enigmas. Demuestra tu ingenio. Escapa.</div>
+  <div class="cine-status">ESTABLECIENDO CONEXIÓN SEGURA</div>
+</div>
+
 <!-- Firma discreta -->
 <div style="
     position: fixed;
