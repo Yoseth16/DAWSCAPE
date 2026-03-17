@@ -13,10 +13,11 @@
 
   :root {
     --green: #00ff88;
+    --green-rgb: 0, 255, 136;
     --red: #ff2244;
     --bg: #020c06;
     --panel: #041a0e;
-    --border: #00ff8840;
+    --border: rgba(0, 255, 136, 0.25);
     --text: #c8ffdf;
   }
 
@@ -34,7 +35,7 @@
     content: '';
     position: fixed;
     inset: 0;
-    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,136,0.013) 2px, rgba(0,255,136,0.013) 4px);
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(var(--green-rgb),0.013) 2px, rgba(var(--green-rgb),0.013) 4px);
     pointer-events: none;
     z-index: 1000;
   }
@@ -65,12 +66,12 @@
   /* MEJORADO: Subtitle con mejor contraste - cambio de #007744 a color más claro */
   .subtitle {
     font-size: 0.85rem;
-    color: #00ff88;
+    color: var(--green);
     letter-spacing: 0.3em;
     text-transform: uppercase;
     margin-bottom: 2rem;
     text-align: center;
-    text-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+    text-shadow: 0 0 10px rgba(var(--green-rgb), 0.2);
   }
 
   .glitch-text { animation: blink 2s infinite; color: var(--red); font-size: 0.9rem; text-shadow: 0 0 10px var(--red); letter-spacing: 0.1em; text-align: center; margin-bottom: 2rem; }
@@ -83,7 +84,7 @@
     background: var(--panel);
     padding: clamp(1.5rem, 5vw, 2.5rem) clamp(1rem, 4vw, 2rem);
     position: relative;
-    box-shadow: 0 0 30px rgba(0, 255, 136, 0.1);
+    box-shadow: 0 0 30px rgba(var(--green-rgb), 0.1);
   }
 
   .login-card::before {
@@ -103,18 +104,18 @@
   .form-label {
     display: block;
     font-size: 0.75rem;
-    color: #00ff88;
+    color: var(--green);
     letter-spacing: 0.15em;
     text-transform: uppercase;
     margin-bottom: 0.5rem;
-    text-shadow: 0 0 6px rgba(0, 255, 136, 0.15);
+    text-shadow: 0 0 6px rgba(var(--green-rgb), 0.15);
   }
 
   .form-control {
     width: 100%;
     background: transparent;
     border: none;
-    border-bottom: 2px solid #00ff8840;
+    border-bottom: 2px solid var(--border);
     color: var(--green);
     font-family: 'Share Tech Mono', monospace;
     font-size: max(16px, 1.1rem); /* Prevents iOS zoom on focus */
@@ -182,9 +183,9 @@
   .color-btn.active { border-color: var(--text); box-shadow: 0 0 15px currentColor; transform: scale(1.1); }
 
   .icon-btn {
-    aspect-ratio: 1; border-radius: 8px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; transition: all 0.2s; color: var(--green); background: rgba(0, 255, 136, 0.05);
+    aspect-ratio: 1; border-radius: 8px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; transition: all 0.2s; color: var(--green); background: rgba(var(--green-rgb), 0.05);
   }
-  .icon-btn:hover { background: rgba(0, 255, 136, 0.2); }
+  .icon-btn:hover { background: rgba(var(--green-rgb), 0.2); }
   .icon-btn.active { background: var(--green); color: var(--bg); border-color: var(--green); box-shadow: 0 0 15px var(--green); }
 
   .btn {
@@ -221,8 +222,8 @@
   .error-feedback { color: var(--red); text-align: center; font-size: 0.85rem; margin-bottom: 1.5rem; letter-spacing: 0.08em; border: 1px dashed var(--red); padding: 0.8rem; background: rgba(255, 34, 68, 0.05); }
 
   @keyframes pulse-glow {
-    0%, 100% { text-shadow: 0 0 20px var(--green), 0 0 50px #00ff8860; }
-    50% { text-shadow: 0 0 40px var(--green), 0 0 90px #00ff8840; }
+    0%, 100% { text-shadow: 0 0 20px var(--green), 0 0 50px rgba(var(--green-rgb), 0.38); }
+    50% { text-shadow: 0 0 40px var(--green), 0 0 90px rgba(var(--green-rgb), 0.25); }
   }
 
   /* Particles */
@@ -251,6 +252,33 @@
     .form-control { font-size: max(16px, 1rem); }
     .btn { font-size: 0.85rem; letter-spacing: 0.15em; }
   }
+
+  /* Dynamic theme classes */
+  .info-banner {
+    max-width: 500px; margin-bottom: 2rem; padding: 1.5rem;
+    background: rgba(var(--green-rgb), 0.08);
+    border: 1px solid rgba(var(--green-rgb), 0.3);
+    border-radius: 0.5rem; color: #cbd5e1; text-align: center;
+    font-size: 0.95rem; line-height: 1.6;
+  }
+  .info-banner-link {
+    display: inline-block; padding: 0.8rem 1.5rem;
+    background: rgba(var(--green-rgb), 0.2);
+    border: 1px solid var(--green); color: var(--green);
+    text-decoration: none; border-radius: 0.35rem;
+    font-weight: 600; transition: all 0.3s;
+    text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.1em;
+  }
+  .info-banner-link:hover {
+    background: rgba(var(--green-rgb), 0.35);
+    box-shadow: 0 0 15px rgba(var(--green-rgb), 0.3);
+  }
+  .instructions-box {
+    background: rgba(241, 245, 249, 0.03);
+    border-left: 3px solid var(--green);
+    padding: 1rem; margin-bottom: 2rem; border-radius: 0.3rem;
+    color: #cbd5e1; font-size: 0.9rem;
+  }
 </style>
 </head>
 <body>
@@ -264,10 +292,10 @@
   <div class="glitch-text">ACCESO RESTRINGIDO. IDENTIFÍQUESE.</div>
 
   <!-- BANNER INFORMATIVO -->
-  <div style="max-width: 500px; margin-bottom: 2rem; padding: 1.5rem; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 0.5rem; color: #cbd5e1; text-align: center; font-size: 0.95rem; line-height: 1.6;">
-    <p style="margin-bottom: 1rem;"><strong style="color: #22c55e;">¿PRIMERA VEZ?</strong></p>
+  <div class="info-banner">
+    <p style="margin-bottom: 1rem;"><strong style="color: var(--green);">¿PRIMERA VEZ?</strong></p>
     <p style="margin-bottom: 1.5rem;">Si aún no te has inscrito, debes hacerlo primero. La inscripción te permite registrar tu equipo y recibir por email las credenciales necesarias para acceder al juego.</p>
-    <a href="/inscripcion" style="display: inline-block; padding: 0.8rem 1.5rem; background: rgba(34, 197, 94, 0.2); border: 1px solid #22c55e; color: #22c55e; text-decoration: none; border-radius: 0.35rem; font-weight: 600; transition: all 0.3s; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.1em;">→ Ir a Inscripción</a>
+    <a href="/inscripcion" class="info-banner-link menu-click">→ Ir a Inscripción</a>
   </div>
 
   <div class="login-card">
@@ -280,8 +308,8 @@
         <div class="error-feedback">✖ {{ session('error') }}</div>
       @endif
 
-      <div style="background: rgba(241, 245, 249, 0.03); border-left: 3px solid #22c55e; padding: 1rem; margin-bottom: 2rem; border-radius: 0.3rem; color: #cbd5e1; font-size: 0.9rem;">
-        <strong style="color: #22c55e;">INSTRUCCIONES:</strong> Utiliza los datos que recibiste en tu email de inscripción.
+      <div class="instructions-box">
+        <strong style="color: var(--green);">INSTRUCCIONES:</strong> Utiliza los datos que recibiste en tu email de inscripción.
       </div>
 
       <div class="form-group">
@@ -355,27 +383,61 @@
   }
 })();
 
-// Lógica de Selectores (Icono y Color)
+// Minecraft click sound
+const clickSound = new Audio('/sonido/minecraft_click.mp3');
+clickSound.volume = 0.5;
+function playClick() {
+  clickSound.currentTime = 0;
+  clickSound.play().catch(() => {});
+}
+
+// Hex → RGB
+function hexToRgb(hex) {
+  return [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)];
+}
+
+// Dynamic theme color
+function setThemeColor(hex) {
+  const [r, g, b] = hexToRgb(hex);
+  const s = document.documentElement.style;
+  s.setProperty('--green', hex);
+  s.setProperty('--green-rgb', `${r}, ${g}, ${b}`);
+  s.setProperty('--border', `rgba(${r}, ${g}, ${b}, 0.25)`);
+  document.querySelectorAll('.particle').forEach(p => p.style.background = hex);
+}
+
+// Icon selector
 const iconBtns = document.querySelectorAll('#icon-selector .icon-btn');
 const iconInput = document.getElementById('icono_input');
-
 iconBtns.forEach(btn => {
   btn.addEventListener('click', () => {
+    playClick();
     iconBtns.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     iconInput.value = btn.getAttribute('data-val');
   });
 });
 
+// Color selector
 const colorBtns = document.querySelectorAll('#color-selector .color-btn');
 const colorInput = document.getElementById('color_input');
-
 colorBtns.forEach(btn => {
   btn.addEventListener('click', () => {
+    playClick();
     colorBtns.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    colorInput.value = btn.getAttribute('data-val');
+    const hex = btn.getAttribute('data-val');
+    colorInput.value = hex;
+    setThemeColor(hex);
   });
+});
+
+// Apply initial theme from default selected color
+setThemeColor(colorInput.value);
+
+// Click sound on all menu buttons & links
+document.querySelectorAll('.btn, .menu-click, .checkbox-label').forEach(el => {
+  el.addEventListener('click', playClick);
 });
 </script>
 <!-- Firma discreta -->
