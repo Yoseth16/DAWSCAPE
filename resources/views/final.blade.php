@@ -194,57 +194,169 @@
       }
 
       /* DIPLOMA FINAL */
+      /* =================== DIPLOMA REDESIGN =================== */
       .diploma-section {
         margin-top: 1.5rem;
-        border: 1px solid rgba(0, 255, 136, 0.35);
-        background: radial-gradient(circle at top, rgba(0,255,136,0.08), transparent 55%);
-        padding: clamp(0.8rem, 3vw, 1.5rem);
+        padding: clamp(0.4rem, 2vw, 0.75rem);
         width: 100%;
-        max-width: 100%;
+      }
+      .diploma-card {
+        position: relative;
+        background: #050505;
+        border: 3px solid #00ff88;
+        box-shadow: 0 0 40px rgba(0,255,136,0.25), 0 0 80px rgba(0,255,136,0.08), inset 0 0 50px rgba(0,255,136,0.02);
+        padding: clamp(1.5rem, 4vw, 3rem) clamp(1.5rem, 4vw, 3.5rem);
         overflow: hidden;
+        font-family: 'Share Tech Mono', monospace;
+        color: #c8ffdf;
       }
-      .diploma-header {
-        font-size: clamp(0.65rem, 2vw, 0.8rem);
-        letter-spacing: 0.18em;
+      .diploma-card::before {
+        content: '';
+        position: absolute;
+        top: 14px; left: 14px; right: 14px; bottom: 14px;
+        border: 1px solid rgba(0,255,136,0.25);
+        pointer-events: none;
+        z-index: 0;
+      }
+      .diplo-scanlines {
+        position: absolute;
+        inset: 0;
+        background-image: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.18) 3px, rgba(0,0,0,0.18) 4px);
+        pointer-events: none;
+        z-index: 1;
+      }
+      .diplo-watermark {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        font-size: clamp(2rem, 5vw, 4rem);
+        font-family: 'Share Tech Mono', monospace;
+        color: rgba(0,255,136,0.04);
+        line-height: 1.4;
+        word-break: break-all;
+        pointer-events: none;
+        z-index: 0;
+        padding: 1rem;
+        user-select: none;
+      }
+      .diplo-corner {
+        position: absolute;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: clamp(1.2rem, 3.5vw, 2.2rem);
+        color: #00ff88;
+        text-shadow: 0 0 12px rgba(0,255,136,0.9);
+        z-index: 3;
+        line-height: 1;
+      }
+      .diplo-tl { top: 14px; left: 16px; }
+      .diplo-tr { top: 14px; right: 16px; }
+      .diplo-bl { bottom: 14px; left: 16px; }
+      .diplo-br { bottom: 14px; right: 16px; }
+      .diplo-content { position: relative; z-index: 2; text-align: center; }
+      .diplo-system-tag {
+        font-size: clamp(0.5rem, 1.4vw, 0.75rem);
+        color: rgba(0,255,136,0.65);
+        letter-spacing: 0.1em;
         text-transform: uppercase;
-        color: var(--green);
-        margin-bottom: 0.75rem;
-        text-align: center;
+        margin-bottom: 0.4rem;
       }
-      .diploma-layout {
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-        align-items: center;
-        width: 100%;
+      @keyframes diplomaGlitch {
+        0%,89%,100% { text-shadow: 0 0 20px rgba(0,255,136,0.5); transform: translate(0,0); }
+        90% { transform: translate(-3px,0); text-shadow: -3px 0 0 rgba(255,0,60,0.7), 3px 0 0 rgba(0,240,255,0.7); }
+        92% { transform: translate(3px,0); }
+        94% { transform: translate(-1px,0); }
+        96% { transform: translate(0,0); }
       }
-      .diploma-award {
-        text-align: center;
-      }
-      .diploma-award-title {
-        font-family: 'Orbitron', sans-serif;
-        font-size: clamp(0.85rem, 2.5vw, 1.1rem);
-        letter-spacing: 0.12em;
+      .diplo-title {
+        font-size: clamp(1.3rem, 4.5vw, 2.8rem);
+        font-weight: 900;
+        color: #ffffff;
+        letter-spacing: 0.06em;
         text-transform: uppercase;
+        text-shadow: 0 0 20px rgba(0,255,136,0.5);
+        animation: diplomaGlitch 7s infinite;
+        margin: 0.2rem 0;
+        font-family: 'Share Tech Mono', monospace;
+      }
+      .diplo-sep {
+        color: rgba(0,255,136,0.45);
+        font-size: clamp(0.45rem, 1.2vw, 0.75rem);
+        margin: 0.45rem 0;
+        overflow: hidden;
+        white-space: nowrap;
+        letter-spacing: -0.02em;
+      }
+      .diplo-certify-text { font-size: clamp(0.7rem, 1.8vw, 0.95rem); color: #888; margin: 0.2rem 0; }
+      @keyframes teamNamePulse {
+        0%,100% { text-shadow: 0 0 10px rgba(0,255,136,0.7), 0 0 30px rgba(0,255,136,0.3); }
+        50%      { text-shadow: 0 0 20px #00ff88, 0 0 60px rgba(0,255,136,0.5), 0 0 100px rgba(0,255,136,0.15); }
+      }
+      .diplo-team-name {
+        font-size: clamp(1.4rem, 4.5vw, 2.8rem);
+        font-weight: 700;
+        color: #00ff88;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        animation: teamNamePulse 2.5s ease-in-out infinite;
+        margin: 0.4rem 0 0.2rem;
+        font-family: 'Share Tech Mono', monospace;
         word-break: break-word;
       }
-      .diploma-award-emoji {
-        font-size: 2.2rem;
-        margin-bottom: 0.25rem;
+      .diplo-award-label {
+        font-size: clamp(0.55rem, 1.3vw, 0.78rem);
+        color: rgba(0,255,136,0.55);
+        letter-spacing: 0.18em;
+        margin: 0.25rem 0;
       }
-      .diploma-preview-frame {
-        width: 100%;
-        max-width: 100%;
-        border: 1px solid rgba(0, 255, 136, 0.2);
-        background: #000000;
-        padding: clamp(0.25rem, 1vw, 0.5rem);
-        overflow: hidden;
+      .diploma-award-emoji { font-size: clamp(1.8rem, 5vw, 3.5rem); margin: 0.15rem 0; }
+      .diploma-award-title {
+        font-size: clamp(0.9rem, 2.5vw, 1.4rem);
+        font-weight: 700;
+        color: #ffd700;
+        text-shadow: 0 0 15px rgba(255,215,0,0.6);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin-bottom: 0.2rem;
+        font-family: 'Share Tech Mono', monospace;
       }
-      .diploma-preview-frame img {
-        width: 100%;
-        height: auto;
-        display: block;
-        object-fit: contain;
+      .diplo-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.35rem 1.5rem;
+        margin: 0.4rem auto;
+        max-width: 680px;
+        text-align: left;
+      }
+      .diplo-stat {
+        font-size: clamp(0.6rem, 1.6vw, 0.88rem);
+        color: #c8ffdf;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        white-space: nowrap;
+      }
+      .diplo-stat-label { color: #777; }
+      .diplo-stat-val { color: #00ff88; font-weight: bold; }
+      .diplo-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-top: 0.5rem;
+        gap: 0.75rem;
+      }
+      .diplo-footer-left { text-align: left; flex: 1; min-width: 0; }
+      .diplo-cert-code {
+        font-size: clamp(0.5rem, 1.3vw, 0.72rem);
+        color: rgba(0,255,136,0.45);
+        letter-spacing: 0.12em;
+        margin-bottom: 0.2rem;
+      }
+      .diplo-footer-text { font-size: clamp(0.45rem, 1.1vw, 0.65rem); color: #555; }
+      .diplo-seal {
+        width: clamp(70px, 10vw, 130px);
+        height: clamp(70px, 10vw, 130px);
+        flex-shrink: 0;
+        filter: drop-shadow(0 0 8px rgba(0,255,136,0.5));
       }
       .diploma-actions {
         margin-top: 0.75rem;
@@ -273,6 +385,21 @@
         background: var(--green);
         color: #00110a;
         box-shadow: 0 0 14px rgba(0,255,136,0.4);
+      }
+      @media print {
+        body * { visibility: hidden; }
+        .diploma-card, .diploma-card * { visibility: visible; }
+        .diploma-card {
+          position: fixed; top: 0; left: 0;
+          width: 100%; height: 100%;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+          border: 3px solid #00ff88 !important;
+          box-shadow: none;
+          padding: 1.5cm 2cm;
+        }
+        .diplo-scanlines { display: none; }
+        @page { size: A4 landscape; margin: 0; }
       }
 
       .btn {
@@ -350,11 +477,14 @@
         .ranking-list { font-size: 0.85rem; padding-left: 1.2rem; }
         .ranking-list li { flex-wrap: wrap; gap: 0.2rem; }
         .time-display { font-size: clamp(1.5rem, 8vw, 2.5rem); }
-        .diploma-section { padding: 0.6rem; }
-        .diploma-layout { gap: 0.4rem; }
-        .diploma-award-title { font-size: 0.8rem; }
-        .diploma-award-emoji { font-size: 1.8rem; }
-        .diploma-preview-frame { padding: 0.2rem; }
+        .diploma-section { padding: 0.4rem; }
+        .diplo-stats { grid-template-columns: 1fr; gap: 0.3rem; max-width: 100%; }
+        .diplo-stat { white-space: normal; }
+        .diplo-team-name { font-size: 1.4rem; }
+        .diploma-award-emoji { font-size: 2rem; }
+        .diplo-footer { flex-direction: column; align-items: center; text-align: center; }
+        .diplo-footer-left { text-align: center; }
+        .diplo-seal { width: 90px; height: 90px; }
         .diploma-download-btn { padding: 0.75rem 1rem; width: 100%; }
         .btn { padding: 1rem 1.5rem; font-size: 0.8rem; }
       }
@@ -449,20 +579,81 @@
 
       @if($partida->fase_actual === 'FINALIZADO')
       <div class="diploma-section" id="diploma-section">
-        <div class="diploma-header">// DIPLOMA DIGITAL PERSONALIZADO</div>
-        <div class="diploma-layout">
-          <div class="diploma-award">
+        <div class="diploma-card">
+          <!-- Corner decorations -->
+          <div class="diplo-corner diplo-tl">╔</div>
+          <div class="diplo-corner diplo-tr">╗</div>
+          <div class="diplo-corner diplo-bl">╚</div>
+          <div class="diplo-corner diplo-br">╝</div>
+          <!-- Scanlines overlay -->
+          <div class="diplo-scanlines"></div>
+          <!-- Watermark (populated by JS) -->
+          <div class="diplo-watermark" id="diplo-watermark"></div>
+
+          <div class="diplo-content">
+            <div class="diplo-system-tag">[ DAWSCAPE // SISTEMA DE CERTIFICACIÓN DIGITAL ]</div>
+            <h2 class="diplo-title">CERTIFICADO DE AVENTURA</h2>
+            <div class="diplo-sep">════════════════════════════════════════════════════════════════════</div>
+
+            <p class="diplo-certify-text">Este diploma certifica que el equipo</p>
+            <div class="diplo-team-name">{{ $partida->nombre_equipo }}</div>
+            <p class="diplo-certify-text">ha completado con éxito el desafío DAWSCAPE</p>
+
+            <div class="diplo-sep">════════════════════════════════════════════════════════════════════</div>
+            <div class="diplo-award-label">— ◆ PREMIO OBTENIDO ◆ —</div>
             <div class="diploma-award-emoji" id="diploma-award-emoji">🏆</div>
             <div class="diploma-award-title" id="diploma-award-title">Cargando premio...</div>
+
+            <div class="diplo-sep">════════════════════════════════════════════════════════════════════</div>
+            <div class="diplo-stats">
+              <div class="diplo-stat">
+                <span>⏱</span>
+                <span class="diplo-stat-label">Tiempo total:</span>
+                <span class="diplo-stat-val" id="diplo-time">--</span>
+              </div>
+              <div class="diplo-stat">
+                <span>📅</span>
+                <span class="diplo-stat-label">Fecha del reto:</span>
+                <span class="diplo-stat-val" id="diplo-date">--</span>
+              </div>
+              <div class="diplo-stat">
+                <span>🏆</span>
+                <span class="diplo-stat-label">Posición ranking:</span>
+                <span class="diplo-stat-val" id="diplo-pos">#--</span>
+              </div>
+              <div class="diplo-stat">
+                <span>🔓</span>
+                <span class="diplo-stat-label">Retos resueltos:</span>
+                <span class="diplo-stat-val" id="diplo-retos">-/9</span>
+              </div>
+            </div>
+
+            <div class="diplo-sep">════════════════════════════════════════════════════════════════════</div>
+            <div class="diplo-footer">
+              <div class="diplo-footer-left">
+                <div class="diplo-cert-code" id="diplo-cert">[ CERT-00000000 ]</div>
+                <div class="diplo-footer-text">DAWSCAPE — Escape Room Digital &middot; XTART &middot; 2026</div>
+              </div>
+              <div class="diplo-seal">
+                <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+                  <defs><path id="diplo-circle-path" d="M 100,12 A 88,88 0 1 1 99.9,12"/></defs>
+                  <circle cx="100" cy="100" r="90" fill="none" stroke="#00ff88" stroke-width="3"/>
+                  <circle cx="100" cy="100" r="74" fill="none" stroke="rgba(0,255,136,0.4)" stroke-width="1.5"/>
+                  <circle cx="100" cy="100" r="70" fill="rgba(0,255,136,0.06)"/>
+                  <text fill="#00ff88" font-family="Share Tech Mono,monospace" font-size="12.5">
+                    <textPath href="#diplo-circle-path"> · DAWSCAPE · XTART · 2026 · VERIFIED ·</textPath>
+                  </text>
+                  <text x="100" y="94" text-anchor="middle" fill="#00ff88" font-family="Share Tech Mono,monospace" font-size="19" font-weight="bold">DAWS</text>
+                  <text x="100" y="116" text-anchor="middle" fill="#00ff88" font-family="Share Tech Mono,monospace" font-size="19" font-weight="bold">CAPE</text>
+                </svg>
+              </div>
+            </div>
           </div>
-          <div class="diploma-preview-frame">
-            <img id="diploma-image" alt="Diploma del equipo {{ $partida->nombre_equipo }}">
-          </div>
-          <div class="diploma-actions">
-            <button type="button" class="diploma-download-btn" id="download-diploma">
-              DESCARGAR DIPLOMA PNG
-            </button>
-          </div>
+        </div>
+        <div class="diploma-actions">
+          <button type="button" class="diploma-download-btn" id="download-diploma">
+            IMPRIMIR / DESCARGAR DIPLOMA
+          </button>
         </div>
       </div>
       @endif
@@ -589,111 +780,36 @@
     return `${m}m ${String(s).padStart(2, '0')}s`;
   }
 
-  function generateDiplomaPNG(st, award) {
-    const width = 2000;
-    const height = 1400;
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext('2d');
-
-    // Fondo básico temático según premio
-    ctx.fillStyle = '#020c06';
-    ctx.fillRect(0, 0, width, height);
-    if (award.id === 'velocista_digital') {
-      const grd = ctx.createLinearGradient(0, 0, width, height);
-      grd.addColorStop(0, '#020617');
-      grd.addColorStop(1, '#0f172a');
-      ctx.fillStyle = grd;
-      ctx.fillRect(0, 0, width, height);
-    } else if (award.id === 'sin_pistas') {
-      ctx.fillStyle = '#0b1020';
-      ctx.fillRect(0, 0, width, height);
-    } else if (award.id === 'tortuga_ganadora') {
-      ctx.fillStyle = '#d1fae5';
-      ctx.fillRect(0, 0, width, height);
-    } else if (award.id === 'eureka') {
-      ctx.fillStyle = '#1e1b4b';
-      ctx.fillRect(0, 0, width, height);
-    }
-
-    // Marco
-    ctx.strokeStyle = '#00ff8840';
-    ctx.lineWidth = 18;
-    ctx.strokeRect(80, 80, width - 160, height - 160);
-
-    const centerX = width / 2;
-    ctx.textAlign = 'center';
-
-    ctx.fillStyle = '#c8ffdf';
-    ctx.font = 'bold 80px "Share Tech Mono", monospace';
-    ctx.fillText('CERTIFICADO DE AVENTURA', centerX, 220);
-
-    ctx.font = '36px "Share Tech Mono", monospace';
-    ctx.fillText('Este diploma certifica que el equipo', centerX, 320);
-
-    ctx.font = 'bold 72px "Share Tech Mono", monospace';
-    ctx.fillText(st.teamName, centerX, 400);
-
-    ctx.font = '36px "Share Tech Mono", monospace';
-    ctx.fillText('ha completado con éxito el desafío.', centerX, 470);
-
-    ctx.font = '40px "Share Tech Mono", monospace';
-    ctx.fillText('Premio obtenido:', centerX, 560);
-
-    ctx.fillStyle = '#00ff88';
-    ctx.font = 'bold 64px "Share Tech Mono", monospace';
-    ctx.fillText(`${award.emoji} ${award.label}`, centerX, 630);
-
-    const marginX = 200;
-    let y = 760;
-    ctx.textAlign = 'left';
-    ctx.fillStyle = '#c8ffdf';
-    ctx.font = '34px "Share Tech Mono", monospace';
-    ctx.fillText(`Tiempo total: ${formatDuration(st.totalTime)}`, marginX, y);
-    y += 60;
-    ctx.fillText(`Retos resueltos: ${st.totalChallenges}`, marginX, y);
-    y += 60;
-    ctx.fillText(`Posición en el ranking: #${st.position || '-'}`, marginX, y);
-
-    const dateStr = new Date().toLocaleDateString('es-ES');
-    ctx.textAlign = 'right';
-    ctx.fillText(`Fecha del reto: ${dateStr}`, width - marginX, y);
-
-    // Sello simple
-    const sealX = width - marginX - 150;
-    const sealY = 860;
-    ctx.beginPath();
-    ctx.arc(sealX, sealY, 80, 0, Math.PI * 2);
-    ctx.fillStyle = '#00ff8840';
-    ctx.fill();
-    ctx.fillStyle = '#00ff88';
-    ctx.textAlign = 'center';
-    ctx.font = '28px "Share Tech Mono", monospace';
-    ctx.fillText('DAW', sealX, sealY - 5);
-    ctx.fillText('SCAPE', sealX, sealY + 30);
-
-    return canvas.toDataURL('image/png');
-  }
-
   const award = pickAward(stats);
-  const img = document.getElementById('diploma-image');
   const emojiEl = document.getElementById('diploma-award-emoji');
   const titleEl = document.getElementById('diploma-award-title');
   const btn = document.getElementById('download-diploma');
 
-  emojiEl.textContent = award.emoji;
-  titleEl.textContent = award.label;
+  // Populate award info
+  if (emojiEl) emojiEl.textContent = award.emoji;
+  if (titleEl) titleEl.textContent = award.label;
 
-  const dataUrl = generateDiplomaPNG(stats, award);
-  img.src = dataUrl;
+  // Populate dynamic stats
+  const dipTime = document.getElementById('diplo-time');
+  const dipDate = document.getElementById('diplo-date');
+  const dipPos  = document.getElementById('diplo-pos');
+  const dipRetos = document.getElementById('diplo-retos');
+  const dipCert  = document.getElementById('diplo-cert');
+  if (dipTime)  dipTime.textContent  = formatDuration(stats.totalTime);
+  if (dipDate)  dipDate.textContent  = new Date().toLocaleDateString('es-ES');
+  if (dipPos)   dipPos.textContent   = '#' + (stats.position || '-');
+  if (dipRetos) dipRetos.textContent = stats.totalChallenges + '/9';
+  if (dipCert) {
+    const certCode = 'CERT-' + String({{ $partida->id ?? 0 }}).padStart(8, '0');
+    dipCert.textContent = '[ ' + certCode + ' ]';
+  }
 
-  btn.addEventListener('click', function() {
-    const a = document.createElement('a');
-    a.href = dataUrl;
-    a.download = `diploma-{{ \Illuminate\Support\Str::slug($partida->nombre_equipo, '_') }}.png`;
-    a.click();
-  });
+  // Populate watermark
+  const wm = document.getElementById('diplo-watermark');
+  if (wm) { let t = ''; for (let i = 0; i < 300; i++) t += '{ DAWSCAPE } '; wm.textContent = t; }
+
+  // Print button
+  if (btn) btn.addEventListener('click', function() { window.print(); });
 })();
 </script>
 

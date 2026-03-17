@@ -270,10 +270,8 @@ Route::get('/top10/datos', [Top10Controller::class, 'apiData'])->name('top10.dat
 
 // Rutas de Laravel Auth
 require __DIR__.'/auth.php';
-u s e   A p p \ H t t p \ C o n t r o l l e r s \ V a l o r a c i o n C o n t r o l l e r ; 
- 
- R o u t e : : p o s t ( ' / v a l o r a c i o n e s ' ,   [ V a l o r a c i o n C o n t r o l l e r : : c l a s s ,   ' s t o r e ' ] ) - > n a m e ( ' v a l o r a c i o n e s . s t o r e ' ) ; 
- 
- R o u t e : : m i d d l e w a r e ( [ ' a u t h ' ] ) - > g r o u p ( f u n c t i o n   ( )   {   R o u t e : : g e t ( ' / a d m i n / v a l o r a c i o n e s ' ,   [ V a l o r a c i o n C o n t r o l l e r : : c l a s s ,   ' i n d e x ' ] ) - > n a m e ( ' a d m i n . v a l o r a c i o n e s ' ) ;   } ) ; 
- 
- 
+
+Route::post('/valoraciones', [App\Http\Controllers\ValoracionController::class, 'store'])->name('valoraciones.store');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/valoraciones', [App\Http\Controllers\ValoracionController::class, 'index'])->name('admin.valoraciones');
+});
