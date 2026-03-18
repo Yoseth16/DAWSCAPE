@@ -511,16 +511,18 @@ document.querySelectorAll('.btn, .menu-click, .checkbox-label').forEach(el => {
 // ====== CINEMATIC on form submit ======
 const form = document.querySelector('form');
 const btnIniciar = document.getElementById('btnIniciar');
-const cinematic = document.getElementById('cinematic');
 
 btnIniciar.addEventListener('click', function() {
   playClick();
   // Validate the form natively
   if (!form.reportValidity()) return;
 
-  // Show cinematic
-  cinematic.style.display = 'flex';
-  requestAnimationFrame(() => cinematic.classList.add('active'));
+  // Show cinematic (element is below this script in the DOM, so query it here)
+  const cinematic = document.getElementById('cinematic');
+  if (cinematic) {
+    cinematic.style.display = 'flex';
+    requestAnimationFrame(() => cinematic.classList.add('active'));
+  }
 
   // Submit after cinematic plays (5s)
   setTimeout(() => {
