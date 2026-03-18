@@ -335,14 +335,24 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label" for="clase">Clase / Grupo *</label>
-        <select id="clase" name="clase" class="form-control" required>
-            <option value="">-- Selecciona tu clase --</option>
-            @foreach ($clases as $clase)
-                <option value="{{ $clase }}" @if(old('clase') === $clase) selected @endif>{{ $clase }}</option>
+        <label class="form-label" for="ciclo">Ciclo *</label>
+        <select id="ciclo" name="ciclo" class="form-control" required>
+            <option value="">-- Selecciona tu ciclo --</option>
+            @foreach ($ciclosGrupos as $ciclo => $grupos)
+                <option value="{{ $ciclo }}" @if(old('ciclo') === $ciclo) selected @endif>{{ $ciclo }}</option>
             @endforeach
         </select>
-        @error('clase')
+        @error('ciclo')
+          <div class="error-message">{{ $message }}</div>
+        @enderror
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="grupo">Grupo *</label>
+        <select id="grupo" name="grupo" class="form-control" required disabled>
+            <option value="">Primero selecciona tu ciclo</option>
+        </select>
+        @error('grupo')
           <div class="error-message">{{ $message }}</div>
         @enderror
       </div>
@@ -363,6 +373,47 @@
 </div>
 
 <script>
+// Mapa ciclo → grupos (inyectado desde PHP)
+const ciclosGrupos = @json($ciclosGrupos);
+
+const cicloSelect = document.getElementById('ciclo');
+const grupoSelect = document.getElementById('grupo');
+const oldGrupo = @json(old('grupo', ''));
+
+cicloSelect.addEventListener('change', function() {
+    const ciclo = this.value;
+    grupoSelect.innerHTML = '';
+
+    if (!ciclo) {
+        grupoSelect.disabled = true;
+        const opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = 'Primero selecciona tu ciclo';
+        grupoSelect.appendChild(opt);
+        return;
+    }
+
+    grupoSelect.disabled = false;
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = '-- Selecciona tu grupo --';
+    grupoSelect.appendChild(placeholder);
+
+    const grupos = ciclosGrupos[ciclo] || [];
+    grupos.forEach(function(g) {
+        const opt = document.createElement('option');
+        opt.value = g;
+        opt.textContent = g;
+        if (g === oldGrupo) opt.selected = true;
+        grupoSelect.appendChild(opt);
+    });
+});
+
+// Restaurar estado si hay old() values (tras error de validación)
+if (cicloSelect.value) {
+    cicloSelect.dispatchEvent(new Event('change'));
+}
+
 // Partículas
 (function() {
   const c = document.getElementById('particles');

@@ -18,17 +18,23 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 class InscripcionController extends Controller
 {
     /**
-     * Arreglo de clases disponibles (selector de lista cerrada).
-     * Previene inconsistencias de datos en BD.
+     * Mapeo de ciclos y sus grupos disponibles.
+     * Se usa para validar y poblar los desplegables encadenados.
      */
-    private array $clases = [
-        '1º DAW',
-        '2º DAW',
-        '1º ASIR',
-        '2º ASIR',
-        '1º Marketing Digital',
-        '2º Marketing Digital',
-        'Otros',
+    private array $ciclosGrupos = [
+        'CAE'  => ['1ºA', '1ºB', '2ºA'],
+        'EPC'  => ['1ºA', '1ºB', '2ºA', '2ºB'],
+        'FyP'  => ['1ºA', '2ºA'],
+        'TES'  => ['1ºA', '2ºA'],
+        'APC'  => ['1ºA', '2ºA', '2ºB'],
+        'CEPC' => ['1ºA', '2ºA'],
+        'DAW'  => ['1ºA', '2ºA'],
+        'HB'   => ['1ºA', '2ºA'],
+        'ID'   => ['1ºA', '1ºB', '2ºA', '2ºB'],
+        'LCB'  => ['1ºA', '1ºB', '2ºA', '2ºB'],
+        'MP'   => ['1ºA', '2ºA'],
+        'PD'   => ['1ºA', '2ºA'],
+        'DAM'  => ['2ºA'],
     ];
 
     /**
@@ -37,7 +43,7 @@ class InscripcionController extends Controller
     public function mostrar()
     {
         return view('inscripcion', [
-            'clases' => $this->clases,
+            'ciclosGrupos' => $this->ciclosGrupos,
         ]);
     }
 
@@ -56,6 +62,8 @@ class InscripcionController extends Controller
     public function guardar(Request $request)
     {
         // 1. VALIDACIÓN
+        $ciclosValidos = array_keys($this->ciclosGrupos);
+
         $validated = $request->validate([
             'nombre_equipo' => [
                 'required',
@@ -74,10 +82,14 @@ class InscripcionController extends Controller
                     }
                 },
             ],
-            'clase' => [
+            'ciclo' => [
                 'required',
                 'string',
-                'in:' . implode(',', $this->clases),
+                'in:' . implode(',', $ciclosValidos),
+            ],
+            'grupo' => [
+                'required',
+                'string',
             ],
             'acepta_terminos' => ['required', 'accepted'],
         ], [
@@ -87,17 +99,27 @@ class InscripcionController extends Controller
             'correo.required'        => 'El correo electrónico es obligatorio.',
             'correo.email'           => 'El formato del correo no es válido.',
             'correo.unique'          => 'Ese correo ya está registrado con otro equipo.',
-            'clase.required'         => 'Debes seleccionar una clase / grupo.',
-            'clase.in'               => 'La clase seleccionada no es válida.',
+            'ciclo.required'         => 'Debes seleccionar un ciclo.',
+            'ciclo.in'               => 'El ciclo seleccionado no es válido.',
+            'grupo.required'         => 'Debes seleccionar un grupo.',
             'acepta_terminos.required' => 'Debes aceptar el aviso legal para continuar.',
             'acepta_terminos.accepted' => 'Debes aceptar el aviso legal para continuar.',
         ]);
 
-        // 2. GUARDADO
+        // Validar que el grupo pertenece al ciclo seleccionado
+        $ciclo = $validated['ciclo'];
+        $grupo = $validated['grupo'];
+        $gruposValidos = $this->ciclosGrupos[$ciclo] ?? [];
+
+        if (!in_array($grupo, $gruposValidos, true)) {
+            return back()->withErrors(['grupo' => 'El grupo seleccionado no es válido para el ciclo elegido.'])->withInput();
+        }
+
+        // 2. GUARDADO (se almacena la combinación ciclo + grupo)
         $inscripcion = Inscripcion::create([
             'nombre_equipo' => $validated['nombre_equipo'],
             'correo'        => $validated['correo'],
-            'clase'         => $validated['clase'],
+            'clase'         => $ciclo . ' ' . $grupo,
         ]);
 
         // 3. ENVÍO DE EMAIL CON CÓDIGO DE ACCESO
