@@ -173,6 +173,11 @@ function handleSectorTouch(sectorId, event) {
 }
 
 function winGame() {
+    // Restaurar volumen de la música al 100%
+    if (typeof window.prueba6RestoreVolume === 'function') {
+        window.prueba6RestoreVolume();
+    }
+
     document.getElementById("screen-game").style.display = "none";
     document.getElementById("screen-success").style.display = "flex";
 
@@ -230,6 +235,11 @@ document.addEventListener("DOMContentLoaded", function () {
     if (btnStart) {
         btnStart.addEventListener("click", function () {
             initAudio();
+
+            // Bajar volumen de la música al 50% durante la secuencia
+            if (typeof window.prueba6ReduceVolume === 'function') {
+                window.prueba6ReduceVolume();
+            }
 
             btnStart.style.display = "none";
             const hudContainer = document.getElementById("hud-container");

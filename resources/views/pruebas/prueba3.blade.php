@@ -231,7 +231,7 @@
     text-decoration: none; text-align: center; display: block;
   }
   .challenge-btn:active { transform: scale(0.98); background: var(--green); color: var(--bg); }
-  .challenge-btn:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+  .challenge-btn:disabled { color: #33aa66; border-color: rgba(51,170,102,0.4); background: rgba(0,255,136,0.05); cursor: not-allowed; pointer-events: none; }
   .feedback { text-align: center; font-size: 0.9rem; min-height: 1.5rem; margin-top: 0.2rem; letter-spacing: 0.05em; width: 100%; }
   .feedback.ok { color: var(--green); }
   .feedback.err { color: var(--red); }

@@ -290,10 +290,9 @@
 /* --- Aviso penalización --- */
 .pista-penalty-banner {
     position: fixed;
-    top: 1.5rem;
-    bottom: auto;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%) translateY(-20px);
+    transform: translate(-50%, -50%) scale(0.95);
     background: linear-gradient(135deg, rgba(255,170,0,0.95), rgba(255,140,0,0.95));
     color: #1a1a00;
     font-family: 'Orbitron', sans-serif;
@@ -312,7 +311,7 @@
 }
 .pista-penalty-banner.show {
     opacity: 1;
-    transform: translateX(-50%) translateY(0);
+    transform: translate(-50%, -50%) scale(1);
 }
 
 @media (max-width: 768px) {

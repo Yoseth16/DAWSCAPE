@@ -69,68 +69,42 @@
 <script>
   (function() {
     var ORIGINAL_VOLUME_KEY = 'prueba6_prevVolume';
-    var REDUCED_VOLUME = 0.25; // 25% de volumen para que destaquen los sonidos del juego
+    var REDUCED_VOLUME = 0.5;
 
-    function applyReducedVolume() {
+    // Guarda el volumen actual y lo reduce al 50%
+    window.prueba6ReduceVolume = function() {
       if (!window.audioManager) return;
-
       try {
         var current =
           (typeof window.audioManager.targetVolume === 'number'
             ? window.audioManager.targetVolume
             : (typeof window.audioManager.currentVolume === 'number'
               ? window.audioManager.currentVolume
-              : 0.5));
-
-        // Guardar el volumen solo si es claramente superior al reducido,
-        // para no sobrescribir un ajuste manual previo muy bajo.
+              : 1));
         if (current > REDUCED_VOLUME + 0.02) {
           localStorage.setItem(ORIGINAL_VOLUME_KEY, current.toFixed(3));
         }
-
         window.audioManager.setVolume(REDUCED_VOLUME);
-      } catch (e) {
-        // Silenciar cualquier error para no romper la prueba
-      }
-    }
+      } catch (e) {}
+    };
 
-    function restoreVolume() {
+    // Restaura el volumen original (100%)
+    window.prueba6RestoreVolume = function() {
       if (!window.audioManager) return;
-
       try {
         var saved = parseFloat(localStorage.getItem(ORIGINAL_VOLUME_KEY));
         if (!isNaN(saved) && saved >= 0 && saved <= 1) {
           window.audioManager.setVolume(saved);
+        } else {
+          window.audioManager.setVolume(1);
         }
         localStorage.removeItem(ORIGINAL_VOLUME_KEY);
-      } catch (e) {
-        // Ignorar errores de restauración
-      }
-    }
+      } catch (e) {}
+    };
 
-    // Aplicar volumen reducido cuando la prueba 6 está activa
-    function initPrueba6Volume() {
-      if (window.audioManager) {
-        applyReducedVolume();
-      } else {
-        document.addEventListener('audioManagerReady', applyReducedVolume, { once: true });
-      }
-    }
-
-    if (document.visibilityState === 'visible') {
-      initPrueba6Volume();
-    } else {
-      document.addEventListener('visibilitychange', function onVis() {
-        if (document.visibilityState === 'visible') {
-          document.removeEventListener('visibilitychange', onVis);
-          initPrueba6Volume();
-        }
-      });
-    }
-
-    // Restaurar volumen cuando el usuario abandone la prueba 6
+    // Restaurar volumen si el usuario abandona la prueba 6
     window.addEventListener('beforeunload', function() {
-      restoreVolume();
+      window.prueba6RestoreVolume();
     });
   })();
 </script>

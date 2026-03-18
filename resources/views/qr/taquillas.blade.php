@@ -237,7 +237,7 @@
       color: var(--bg);
   }
 
-  .btn:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none;}
+  .btn:disabled { color: #33aa66; border-color: rgba(51,170,102,0.4); background: rgba(0,255,136,0.05); cursor: not-allowed; pointer-events: none; }
 
   .feedback {
     text-align: center;

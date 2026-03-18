@@ -189,7 +189,8 @@
 
   .btn:hover::before { left: 0; }
   .btn:hover { color: var(--bg); box-shadow: 0 0 18px rgba(0,255,136,0.25); }
-  .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .btn:active { background: var(--green); color: var(--bg); }
+  .btn:disabled { color: #33aa66; border-color: rgba(51,170,102,0.4); cursor: not-allowed; pointer-events: none; }
 
   .feedback {
     text-align: center;

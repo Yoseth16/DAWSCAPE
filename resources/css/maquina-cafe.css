@@ -233,8 +233,14 @@ body::before {
     color: var(--bg);
 }
 
+.btn:active {
+    background: var(--green);
+    color: var(--bg);
+}
+
 .btn:disabled {
-    opacity: 0.5;
+    color: #33aa66;
+    border-color: rgba(51,170,102,0.4);
     cursor: not-allowed;
     pointer-events: none;
 }

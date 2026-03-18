@@ -148,6 +148,8 @@
 
   .btn:hover::before { left: 0; }
   .btn:hover { color: var(--bg); }
+  .btn:active { background: var(--green); color: var(--bg); }
+  .btn:disabled { color: #33aa66; border-color: rgba(51,170,102,0.4); cursor: not-allowed; pointer-events: none; }
 
   /* QUIZ */
   #screen-quiz {
