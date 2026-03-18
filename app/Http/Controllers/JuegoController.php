@@ -248,7 +248,7 @@ class JuegoController extends Controller
             'inscripcion_id'    => $inscripcion->id,
         ]);
 
-        $destino = ($redirDestino && str_starts_with($redirDestino, '/')) ? $redirDestino : route('prueba1');
+        $destino = ($redirDestino && str_starts_with($redirDestino, '/')) ? $redirDestino : route('sergio.intro');
         return redirect($destino);
     }
 

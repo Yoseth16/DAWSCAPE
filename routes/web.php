@@ -32,6 +32,10 @@ Route::get('/inscripcion/validar/{token}', [InscripcionController::class, 'valid
 
 Route::post('/empezar', [JuegoController::class, 'empezarPartida']);
 
+Route::get('/sergio-intro', function () {
+    return view('sergio_intro');
+})->name('sergio.intro')->middleware('check.fase');
+
 // Grupo protegido para las fases del juego (Asegura progreso lineal)
 Route::middleware(['check.fase'])->group(function () {
     Route::get('/prueba1', [JuegoController::class, 'mostrarPrueba1'])->name('prueba1');
