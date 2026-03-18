@@ -205,7 +205,7 @@ class JuegoController extends Controller
             } else {
                 // Autocalcular destino según nivel
                 $destinos = [
-                    1 => route('sergio.intro'),
+                    1 => route('prueba1'),
                     2 => route('prueba2'),
                     3 => route('prueba3'),
                     4 => route('prueba4'),
@@ -216,7 +216,7 @@ class JuegoController extends Controller
                     9 => route('prueba9'),
                     10 => route('final'),
                 ];
-                $destino = $destinos[$nivelDB] ?? route('sergio.intro');
+                $destino = $destinos[$nivelDB] ?? route('prueba1');
             }
 
             return redirect($destino);
@@ -248,7 +248,7 @@ class JuegoController extends Controller
             'inscripcion_id'    => $inscripcion->id,
         ]);
 
-        $destino = ($redirDestino && str_starts_with($redirDestino, '/')) ? $redirDestino : route('sergio.intro');
+        $destino = ($redirDestino && str_starts_with($redirDestino, '/')) ? $redirDestino : route('prueba1');
         return redirect($destino);
     }
 
@@ -259,6 +259,12 @@ class JuegoController extends Controller
     {
 
         if ($this->timerService->verificarTimeout()) return redirect()->route('final')->with('timeout', true);
+
+        // Mostrar briefing de Sergio antes de la primera prueba (solo una vez)
+        if (!session('sergio_intro_visto')) {
+            session(['sergio_intro_visto' => true]);
+            return view('sergio_intro');
+        }
 
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $partida = $this->timerService->obtenerPartidaActiva();
