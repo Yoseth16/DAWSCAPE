@@ -270,6 +270,123 @@
     overflow: hidden;
     white-space: pre-wrap;
   }
+
+  /* ── MOBILE RESPONSIVE ── */
+
+  /* Fix: prevent content clipping when keyboard opens or content overflows */
+  @supports (min-height: 100dvh) {
+    .screen { min-height: 100dvh; }
+  }
+
+  @media (max-width: 600px) {
+    .game-header {
+      padding: 0.5rem 0.8rem;
+    }
+
+    .team-info { font-size: 0.65rem; line-height: 1.4; }
+
+    .header-timer { font-size: 1rem; }
+
+    .screen.active {
+      padding: 1rem 0.8rem;
+      padding-top: 4rem;
+      padding-bottom: 1.5rem;
+      justify-content: flex-start;
+      gap: 0.8rem;
+    }
+
+    .logo {
+      letter-spacing: 0.08em;
+    }
+
+    .subtitle {
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+    }
+
+    .panel {
+      padding: 1rem 0.9rem;
+    }
+
+    .panel::before {
+      font-size: 0.55rem;
+      top: -0.6rem;
+    }
+
+    .question {
+      font-size: 0.92rem;
+      line-height: 1.7;
+    }
+
+    .matrix-intro {
+      padding: 1rem 1rem;
+      font-size: 0.82rem;
+      line-height: 1.8;
+    }
+
+    .btn {
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      padding: 0.85rem 0.8rem;
+      min-height: 48px;
+    }
+
+    .answer-input {
+      font-size: 16px;
+      padding: 0.7rem 0.4rem;
+      margin-top: 0.8rem;
+    }
+
+    .letter-chip {
+      padding: 5px 8px;
+      min-width: 30px;
+      font-size: 0.85rem;
+    }
+
+    .letters-row {
+      gap: 6px;
+    }
+
+    .feedback { font-size: 0.78rem; }
+
+    .system-hint {
+      padding: 0.7rem 0.8rem;
+      font-size: 0.75rem;
+    }
+
+    .terminal-ok {
+      padding: 1rem 1rem;
+      font-size: 0.85rem;
+      line-height: 1.8;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .logo {
+      letter-spacing: 0.04em;
+    }
+
+    .panel {
+      padding: 0.8rem 0.7rem;
+    }
+
+    .matrix-intro {
+      padding: 0.8rem 0.7rem;
+      font-size: 0.78rem;
+    }
+
+    .btn {
+      font-size: 0.65rem;
+      letter-spacing: 0.06em;
+      padding: 0.75rem 0.6rem;
+    }
+
+    .letter-chip {
+      padding: 4px 6px;
+      min-width: 26px;
+      font-size: 0.78rem;
+    }
+  }
 </style>
 </head>
 <body>
