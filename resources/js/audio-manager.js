@@ -15,6 +15,7 @@ class AudioManager {
     // Música de fondo
     this.bgMusic = new Audio();
     this.bgMusic.crossOrigin = 'anonymous';
+    this.bgMusic.loop = true;
     this.currentTrach = null;
     this.isPlaying = false;
     this.isFading = false;

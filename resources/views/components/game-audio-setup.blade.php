@@ -48,6 +48,7 @@
             }
 
             window.audioManager.bgMusic.src = window.audioManager._url(track.file);
+            window.audioManager.bgMusic.loop = true;
             window.audioManager.bgMusic.volume = 0;
             window.audioManager.currentTrach = TRACK_KEY;
 
