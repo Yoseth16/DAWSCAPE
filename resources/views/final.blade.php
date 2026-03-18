@@ -386,111 +386,7 @@
         color: #00110a;
         box-shadow: 0 0 14px rgba(0,255,136,0.4);
       }
-      @media print {
-        @page {
-          size: A4 landscape;
-          margin: 0;
-        }
-
-        /* Disable all animations and transitions */
-        * {
-          animation: none !important;
-          transition: none !important;
-        }
-
-        /* Hide everything first */
-        body * {
-          visibility: hidden;
-        }
-
-        /* Show only the diploma */
-        .diploma-card, .diploma-card * {
-          visibility: visible;
-        }
-
-        .diploma-card {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          margin: 0;
-          padding: 1.5cm 2cm;
-          box-sizing: border-box;
-          overflow: hidden;
-          page-break-inside: avoid;
-          page-break-after: avoid;
-          page-break-before: avoid;
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
-          border: 3px solid #00ff88 !important;
-          box-shadow: none !important;
-        }
-
-        .diploma-card *, .diploma-card *::before, .diploma-card *::after {
-          box-sizing: border-box;
-          box-shadow: none !important;
-          text-shadow: none !important;
-        }
-
-        /* Keep key colors visible without glow effects */
-        .diplo-title {
-          color: #ffffff !important;
-          text-shadow: none !important;
-        }
-        .diplo-team-name {
-          color: #00ff88 !important;
-          text-shadow: none !important;
-        }
-        .diploma-award-title {
-          color: #ffd700 !important;
-          text-shadow: none !important;
-        }
-        .diplo-corner {
-          text-shadow: none !important;
-        }
-
-        /* Hide decorative overlays that cause rendering issues */
-        .diplo-scanlines { display: none !important; }
-        .diplo-watermark { display: none !important; }
-
-        /* Ensure content fits without overflow */
-        .diplo-content {
-          position: relative;
-          z-index: 2;
-        }
-        .diplo-title {
-          font-size: 2.2rem !important;
-        }
-        .diplo-team-name {
-          font-size: 2.2rem !important;
-        }
-        .diploma-award-emoji {
-          font-size: 2.5rem !important;
-        }
-        .diploma-award-title {
-          font-size: 1.2rem !important;
-        }
-        .diplo-stats {
-          gap: 0.3rem 1.5rem !important;
-          margin: 0.3rem auto !important;
-        }
-        .diplo-sep {
-          margin: 0.3rem 0 !important;
-        }
-        .diplo-footer {
-          margin-top: 0.3rem !important;
-        }
-        .diplo-seal {
-          width: 100px !important;
-          height: 100px !important;
-        }
-
-        /* Hide non-diploma UI elements */
-        .diploma-section { padding: 0 !important; margin: 0 !important; }
-        .diploma-actions { display: none !important; }
-        .particles { display: none !important; }
-      }
+      /* Print styles removed — diploma downloads as PNG via html2canvas */
 
       .btn {
         display: inline-block;
@@ -742,7 +638,7 @@
         </div>
         <div class="diploma-actions">
           <button type="button" class="diploma-download-btn" id="download-diploma">
-            IMPRIMIR / DESCARGAR DIPLOMA
+            DESCARGAR DIPLOMA
           </button>
         </div>
       </div>
@@ -752,6 +648,7 @@
     </div>
 </div>
 
+<script src="{{ asset('js/html2canvas.min.js') }}"></script>
 <script>
 // Partículas
 (function() {
@@ -898,8 +795,196 @@
   const wm = document.getElementById('diplo-watermark');
   if (wm) { let t = ''; for (let i = 0; i < 300; i++) t += '{ DAWSCAPE } '; wm.textContent = t; }
 
-  // Print button
-  if (btn) btn.addEventListener('click', function() { window.print(); });
+  // Download diploma as PNG
+  console.log('html2canvas disponible:', typeof html2canvas !== 'undefined');
+
+  if (btn) {
+    btn.addEventListener('click', function() {
+      var diploma = document.querySelector('.diploma-card');
+      if (!diploma) {
+        console.error('Elemento .diploma-card no encontrado en el DOM');
+        btn.textContent = 'ERROR - Elemento no encontrado';
+        return;
+      }
+
+      var originalText = btn.textContent;
+      btn.textContent = 'GENERANDO...';
+      btn.disabled = true;
+
+      function triggerDownload(dataUrl) {
+        var link = document.createElement('a');
+        link.download = 'diploma-dawscape.png';
+        link.href = dataUrl;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }
+
+      // Fallback: dibujar diploma con Canvas nativo
+      function nativeCanvasFallback() {
+        console.log('Usando fallback con Canvas nativo');
+        var rect = diploma.getBoundingClientRect();
+        var scale = 2;
+        var canvas = document.createElement('canvas');
+        canvas.width = rect.width * scale;
+        canvas.height = rect.height * scale;
+        var ctx = canvas.getContext('2d');
+
+        // Fondo
+        ctx.fillStyle = '#050505';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Borde verde
+        ctx.strokeStyle = '#00ff88';
+        ctx.lineWidth = 6;
+        ctx.strokeRect(3, 3, canvas.width - 6, canvas.height - 6);
+
+        // Borde interior
+        ctx.strokeStyle = 'rgba(0,255,136,0.25)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(28, 28, canvas.width - 56, canvas.height - 56);
+
+        var centerX = canvas.width / 2;
+        var yPos = 80 * scale;
+
+        // System tag
+        ctx.fillStyle = 'rgba(0,255,136,0.65)';
+        ctx.font = (12 * scale) + 'px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('[ DAWSCAPE // SISTEMA DE CERTIFICACIÓN DIGITAL ]', centerX, yPos);
+        yPos += 50 * scale;
+
+        // Título
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold ' + (28 * scale) + 'px monospace';
+        ctx.fillText('CERTIFICADO DE AVENTURA', centerX, yPos);
+        yPos += 30 * scale;
+
+        // Separador
+        ctx.fillStyle = 'rgba(0,255,136,0.45)';
+        ctx.font = (10 * scale) + 'px monospace';
+        ctx.fillText('════════════════════════════════════════', centerX, yPos);
+        yPos += 30 * scale;
+
+        // Texto certifica
+        ctx.fillStyle = '#888888';
+        ctx.font = (14 * scale) + 'px monospace';
+        ctx.fillText('Este diploma certifica que el equipo', centerX, yPos);
+        yPos += 40 * scale;
+
+        // Nombre equipo
+        ctx.fillStyle = '#00ff88';
+        ctx.font = 'bold ' + (26 * scale) + 'px monospace';
+        ctx.fillText(stats.teamName.toUpperCase(), centerX, yPos);
+        yPos += 30 * scale;
+
+        // Texto completado
+        ctx.fillStyle = '#888888';
+        ctx.font = (14 * scale) + 'px monospace';
+        ctx.fillText('ha completado con éxito el desafío DAWSCAPE', centerX, yPos);
+        yPos += 30 * scale;
+
+        // Separador
+        ctx.fillStyle = 'rgba(0,255,136,0.45)';
+        ctx.font = (10 * scale) + 'px monospace';
+        ctx.fillText('════════════════════════════════════════', centerX, yPos);
+        yPos += 28 * scale;
+
+        // Premio label
+        ctx.fillStyle = 'rgba(0,255,136,0.55)';
+        ctx.font = (11 * scale) + 'px monospace';
+        ctx.fillText('— ◆ PREMIO OBTENIDO ◆ —', centerX, yPos);
+        yPos += 35 * scale;
+
+        // Premio título
+        ctx.fillStyle = '#ffd700';
+        ctx.font = 'bold ' + (18 * scale) + 'px monospace';
+        ctx.fillText(award.label.toUpperCase(), centerX, yPos);
+        yPos += 30 * scale;
+
+        // Separador
+        ctx.fillStyle = 'rgba(0,255,136,0.45)';
+        ctx.font = (10 * scale) + 'px monospace';
+        ctx.fillText('════════════════════════════════════════', centerX, yPos);
+        yPos += 28 * scale;
+
+        // Stats
+        ctx.font = (13 * scale) + 'px monospace';
+        ctx.textAlign = 'left';
+        var statsX = canvas.width * 0.2;
+        ctx.fillStyle = '#777';
+        ctx.fillText('Tiempo total: ', statsX, yPos);
+        ctx.fillStyle = '#00ff88';
+        ctx.fillText(formatDuration(stats.totalTime), statsX + 200 * scale, yPos);
+
+        ctx.fillStyle = '#777';
+        ctx.fillText('Fecha del reto: ', statsX + canvas.width * 0.35, yPos);
+        ctx.fillStyle = '#00ff88';
+        ctx.fillText(new Date().toLocaleDateString('es-ES'), statsX + canvas.width * 0.35 + 220 * scale, yPos);
+        yPos += 25 * scale;
+
+        ctx.fillStyle = '#777';
+        ctx.fillText('Posición ranking: ', statsX, yPos);
+        ctx.fillStyle = '#00ff88';
+        ctx.fillText('#' + (stats.position || '-'), statsX + 200 * scale, yPos);
+
+        ctx.fillStyle = '#777';
+        ctx.fillText('Retos resueltos: ', statsX + canvas.width * 0.35, yPos);
+        ctx.fillStyle = '#00ff88';
+        ctx.fillText(stats.totalChallenges + '/9', statsX + canvas.width * 0.35 + 220 * scale, yPos);
+        yPos += 30 * scale;
+
+        // Separador final
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'rgba(0,255,136,0.45)';
+        ctx.font = (10 * scale) + 'px monospace';
+        ctx.fillText('════════════════════════════════════════', centerX, yPos);
+        yPos += 30 * scale;
+
+        // Footer
+        ctx.fillStyle = 'rgba(0,255,136,0.45)';
+        ctx.font = (10 * scale) + 'px monospace';
+        ctx.textAlign = 'left';
+        var certCode = 'CERT-' + String({{ $partida->id ?? 0 }}).padStart(8, '0');
+        ctx.fillText('[ ' + certCode + ' ]', 50 * scale, yPos);
+        yPos += 18 * scale;
+        ctx.fillStyle = '#555';
+        ctx.fillText('DAWSCAPE — Escape Room Digital · XTART · 2026', 50 * scale, yPos);
+
+        triggerDownload(canvas.toDataURL('image/png'));
+      }
+
+      // Intentar html2canvas primero, fallback a Canvas nativo
+      if (typeof html2canvas !== 'undefined') {
+        html2canvas(diploma, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#050505',
+          logging: true
+        }).then(function(canvas) {
+          console.log('Canvas generado correctamente', canvas.width, canvas.height);
+          triggerDownload(canvas.toDataURL('image/png'));
+        }).catch(function(err) {
+          console.error('html2canvas falló:', err, '— usando fallback nativo');
+          try { nativeCanvasFallback(); } catch(e) {
+            console.error('Fallback nativo falló:', e);
+            btn.textContent = 'ERROR - Reintentar';
+            btn.disabled = false;
+          }
+        });
+      } else {
+        console.warn('html2canvas no disponible, usando Canvas nativo');
+        try { nativeCanvasFallback(); } catch(e) {
+          console.error('Fallback nativo falló:', e);
+          btn.textContent = 'ERROR - Reintentar';
+          btn.disabled = false;
+        }
+      }
+    });
+  }
 })();
 </script>
 
