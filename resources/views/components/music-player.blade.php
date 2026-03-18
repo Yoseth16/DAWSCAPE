@@ -5,7 +5,6 @@
 
 <!-- Indicador de volumen en móvil -->
 <div id="mobileVolumeHint" class="mobile-volume-hint" aria-label="Usa los botones de tu dispositivo para el volumen">
-  🔊 Vol. del dispositivo
 </div>
 
 <!-- Indicador global de estado de música -->
