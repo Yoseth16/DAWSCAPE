@@ -225,6 +225,51 @@
   .terminal-ok .ok { color: var(--green); }
 
   @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Matrix rain canvas */
+  #matrix-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.12;
+  }
+
+  .screen { z-index: 1; position: relative; }
+  .game-header { z-index: 100; }
+
+  .matrix-intro {
+    border: 1px solid var(--green);
+    background: rgba(0, 0, 0, 0.85);
+    padding: 1.4rem 1.6rem;
+    max-width: 720px;
+    width: 100%;
+    font-size: 0.95rem;
+    line-height: 2;
+    color: var(--green);
+    text-shadow: 0 0 8px var(--green);
+    letter-spacing: 0.04em;
+    box-shadow: 0 0 40px rgba(0, 255, 136, 0.15), inset 0 0 60px rgba(0, 255, 136, 0.03);
+    animation: fadeIn 0.8s ease;
+  }
+
+  .matrix-intro .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 1.1em;
+    background: var(--green);
+    margin-left: 4px;
+    animation: blink 0.8s step-end infinite;
+    vertical-align: text-bottom;
+  }
+
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+  .typewriter {
+    overflow: hidden;
+    white-space: pre-wrap;
+  }
 </style>
 </head>
 <body>
@@ -239,23 +284,22 @@
   <div class="header-timer" id="cronometro">--:--</div>
 </div>
 
+<!-- MATRIX RAIN -->
+<canvas id="matrix-canvas"></canvas>
+
 <!-- INTRO -->
 <div class="screen active" id="screen-intro">
   <div class="logo">JUEGO DE PISTAS</div>
-  <div class="subtitle">// 7 preguntas → 7 letras → contraseña final</div>
-  <div class="panel" data-label="// INSTRUCCIONES">
-    <div class="question">
-      Responde correctamente para revelar una letra pista.
-      <br><br>
-      Cuando consigas las 7 letras, únelas en orden para formar la contraseña final.
-    </div>
+  <div class="subtitle">// 5 preguntas → 5 letras → contraseña final</div>
+  <div class="matrix-intro">
+    <div class="typewriter" id="matrix-text"></div><span class="cursor"></span>
   </div>
-  <button class="btn" id="btn-start" type="button">▶ INICIAR PRUEBA</button>
+  <button class="btn" id="btn-start" type="button" style="display:none;">▶ INICIAR PRUEBA</button>
 </div>
 
 <!-- QUESTION -->
 <div class="screen" id="screen-question">
-  <div class="subtitle" id="q-counter">PREGUNTA 01 / 07</div>
+  <div class="subtitle" id="q-counter">PREGUNTA 01 / 05</div>
   <div class="panel" id="q-panel" data-label="// PREGUNTA">
     <div class="question" id="q-text">—</div>
 
@@ -273,12 +317,12 @@
 <!-- PASSWORD -->
 <div class="screen" id="screen-password">
   <div class="subtitle">// CONTRASEÑA FINAL</div>
-  <div class="panel" data-label="// LETRAS PISTA">
+  <div class="panel" data-label="// LETRAS OBTENIDAS">
     <div class="letters-row" id="letters-row-final"></div>
   </div>
-  <div class="panel" data-label="// INTRODUCE LA CONTRASEÑA">
-    <div class="question" style="text-align:center; color:#b0e0bf;">
-      Une las letras en orden y escribe la contraseña.
+  <div class="panel" data-label="// DESBLOQUEO DEL SISTEMA">
+    <div class="question" style="text-align:center; color:var(--green); text-shadow: 0 0 8px var(--green);">
+      Has conseguido todas las letras. La contraseña del sistema es: <strong>NACHO</strong>.<br>Introdúcela para desbloquear la salida.
     </div>
     <input class="answer-input" id="password-input" type="text" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="CONTRASEÑA">
     <button class="btn" id="btn-password" type="button">VERIFICAR CONTRASEÑA →</button>
@@ -292,23 +336,21 @@
   <div class="subtitle">// SISTEMA CENTRAL</div>
   <div class="terminal-ok" id="terminal-ok">
     <span class="ok">[OK]</span> Verificando contraseña... 100%<br>
-    <span class="ok">[OK]</span> Acceso concedido al sistema central.<br>
-    <span class="ok">[OK]</span> Prueba completada exitosamente.<br><br>
-    "Has descifrado el código del instituto. El DAWSCAPE ha sido<br>
-    completamente restaurado. ¡Enhorabuena!"
+    <span class="ok">[OK]</span> Acceso concedido. Sistema desbloqueado.<br>
+    <span class="ok">[OK]</span> ¡Has escapado de la clase de DAW!<br><br>
+    "Contraseña NACHO aceptada. La puerta se ha desbloqueado.<br>
+    ¡Enhorabuena, habéis completado el DAWSCAPE!"
   </div>
   <button class="btn" id="btn-final" type="button">VER RESULTADOS FINALES →</button>
 </div>
 
 <script>
   const QUESTIONS = [
-    { q: "¿Cuántas escaleras mecánicas no funcionan casi siempre?", letter: "J" },
-    { q: "¿Cuántas clases de desarrollo web hay en total?", letter: "U" },
-    { q: "¿Qué empresa invierte en FPS como Xtart?", letter: "M" },
-    { q: "¿En qué clase de Xtart no hay un ordenador solo?", letter: "P" },
-    { q: "¿Qué estabilizante llevan las patatas de Vicente Vidal?", letter: "E" },
-    { q: "¿Qué hacer si alguien se atraganta con una Oreo?", letter: "R" },
-    { q: "¿Dónde está el extintor de la clase 2ºDAM?", letter: "S" },
+    { q: "Nombre del director del centro", letter: "N" },
+    { q: "¿Cuántas clases de desarrollo web hay en total en el centro?", letter: "H" },
+    { q: "¿Qué empresa coreana invierte en FP como XTART para promocionar sus productos?", letter: "O" },
+    { q: "¿Cuántas ventanas hay en la clase de DAW?", letter: "A" },
+    { q: "¿Cuántas plantas tiene el centro?", letter: "C" },
   ];
 
   const SERVER_PROGRESS = @json($progress ?? ['index' => 0, 'letters' => [], 'fails' => 0]);
@@ -334,10 +376,12 @@
     document.getElementById(id).classList.add('active');
   }
 
+  const TOTAL_Q = QUESTIONS.length;
+
   function renderLetters(elId, letters) {
     const row = document.getElementById(elId);
     row.innerHTML = '';
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < TOTAL_Q; i++) {
       const chip = document.createElement('div');
       chip.className = 'letter-chip';
       chip.textContent = letters[i] ? letters[i] : '_';
@@ -353,7 +397,7 @@
     const counter = document.getElementById('q-counter');
     const qText = document.getElementById('q-text');
     const n = Math.min(index, QUESTIONS.length - 1);
-    counter.textContent = `PREGUNTA ${String(n+1).padStart(2,'0')} / 07`;
+    counter.textContent = `PREGUNTA ${String(n+1).padStart(2,'0')} / ${String(TOTAL_Q).padStart(2,'0')}`;
     qText.textContent = QUESTIONS[n].q;
     renderLetters('letters-row', letters);
     document.getElementById('feedback').textContent = '';
@@ -448,7 +492,7 @@
   }
 
   document.getElementById('btn-start').addEventListener('click', () => {
-    if (index >= 7) {
+    if (index >= TOTAL_Q) {
       renderLetters('letters-row-final', letters);
       showScreen('screen-password');
       document.getElementById('password-input').focus();
@@ -461,9 +505,56 @@
   document.getElementById('btn-password').addEventListener('click', sendPassword);
   document.getElementById('btn-final').addEventListener('click', () => window.location.href = '/final');
 
+  // Enter key support for inputs
+  document.getElementById('answer-input').addEventListener('keydown', e => { if (e.key === 'Enter') sendAnswer(); });
+  document.getElementById('password-input').addEventListener('keydown', e => { if (e.key === 'Enter') sendPassword(); });
+
+  // Matrix rain effect
+  (function matrixRain() {
+    const canvas = document.getElementById('matrix-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const cols = Math.floor(canvas.width / 18);
+    const drops = Array(cols).fill(1);
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*';
+    function draw() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#00ff88';
+      ctx.font = '15px Share Tech Mono';
+      for (let i = 0; i < drops.length; i++) {
+        const ch = chars[Math.floor(Math.random() * chars.length)];
+        ctx.fillText(ch, i * 18, drops[i] * 18);
+        if (drops[i] * 18 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+      }
+    }
+    setInterval(draw, 50);
+    window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+  })();
+
+  // Typewriter effect for intro
+  (function typewriter() {
+    const text = 'Atenci\u00f3n, te has quedado atrapado en la clase de los alumnos de DAW. Tienes que resolver el acertijo para salir o nunca podr\u00e1s escapar. Cada respuesta correcta te dar\u00e1 una letra para la contrase\u00f1a final.';
+    const el = document.getElementById('matrix-text');
+    const btn = document.getElementById('btn-start');
+    let i = 0;
+    function type() {
+      if (i < text.length) {
+        el.textContent += text.charAt(i);
+        i++;
+        setTimeout(type, 28);
+      } else {
+        btn.style.display = '';
+      }
+    }
+    type();
+  })();
+
   // Si ya hay progreso en sesión, entrar directo a la pantalla correcta
   (function bootstrap() {
-    if (index >= 7) {
+    if (index >= TOTAL_Q) {
       renderLetters('letters-row-final', letters);
       showScreen('screen-password');
     }

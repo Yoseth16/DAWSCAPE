@@ -825,15 +825,13 @@ class JuegoController extends Controller
         }
 
         $questions = [
-            ['q' => '¿Cuántas escaleras mecánicas no funcionan casi siempre?', 'a' => '2', 'l' => 'J'],
-            ['q' => '¿Cuántas clases de desarrollo web hay en total?', 'a' => '2', 'l' => 'U'],
-            ['q' => '¿Qué empresa invierte en FPS como Xtart?', 'a' => 'samsung', 'l' => 'M'],
-            ['q' => '¿En qué clase de Xtart no hay un ordenador solo?', 'a' => '2º dam', 'l' => 'P'],
-            ['q' => '¿Qué estabilizante llevan las patatas de Vicente Vidal?', 'a' => 'e-61', 'l' => 'E'],
-            ['q' => '¿Qué hacer si alguien se atraganta con una Oreo?', 'a' => 'maniobra heimlich', 'l' => 'R'],
-            ['q' => '¿Dónde está el extintor de la clase 2ºDAM?', 'a' => 'al lado de la puerta', 'l' => 'S'],
+            ['q' => 'Nombre del director del centro', 'a' => 'eduardo', 'l' => 'N'],
+            ['q' => '¿Cuántas clases de desarrollo web hay en total en el centro?', 'a' => '1', 'l' => 'H'],
+            ['q' => '¿Qué empresa coreana invierte en FP como XTART para promocionar sus productos?', 'a' => 'samsung', 'l' => 'O'],
+            ['q' => '¿Cuántas ventanas hay en la clase de DAW?', 'a' => '5', 'l' => 'A'],
+            ['q' => '¿Cuántas plantas tiene el centro?', 'a' => '3', 'l' => 'C'],
         ];
-        $finalPassword = 'jumpers';
+        $finalPassword = 'nacho';
 
         $action = (string) $request->input('action', 'answer');
         $index = (int) session('prueba9_index', 0);
@@ -842,7 +840,7 @@ class JuegoController extends Controller
 
         if ($action === 'answer') {
             if ($index >= count($questions)) {
-                return response()->json(['success' => true, 'state' => 'password', 'letters' => array_values($letters)]);
+                return response()->json(['success' => true, 'state' => 'password', 'letters' => array_values($letters), 'total' => count($questions)]);
             }
 
             $user = $this->normalizarRespuesta((string) $request->input('answer', ''));
