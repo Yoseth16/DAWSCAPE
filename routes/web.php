@@ -34,7 +34,7 @@ Route::post('/empezar', [JuegoController::class, 'empezarPartida']);
 
 Route::get('/sergio-intro', function () {
     return view('sergio_intro');
-})->name('sergio.intro')->middleware('check.fase');
+})->name('sergio.intro');
 
 // Grupo protegido para las fases del juego (Asegura progreso lineal)
 Route::middleware(['check.fase'])->group(function () {

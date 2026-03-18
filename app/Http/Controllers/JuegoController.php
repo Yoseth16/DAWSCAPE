@@ -205,7 +205,7 @@ class JuegoController extends Controller
             } else {
                 // Autocalcular destino según nivel
                 $destinos = [
-                    1 => route('prueba1'),
+                    1 => route('sergio.intro'),
                     2 => route('prueba2'),
                     3 => route('prueba3'),
                     4 => route('prueba4'),
@@ -216,7 +216,7 @@ class JuegoController extends Controller
                     9 => route('prueba9'),
                     10 => route('final'),
                 ];
-                $destino = $destinos[$nivelDB] ?? route('prueba1');
+                $destino = $destinos[$nivelDB] ?? route('sergio.intro');
             }
 
             return redirect($destino);
