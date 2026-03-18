@@ -595,25 +595,25 @@
             position: fixed;
             bottom: 10px;
             left: 10px;
+            right: max(1.5rem, calc((100vw - 1600px) / 2 + 1.5rem));
             z-index: 9999;
             background: rgba(0, 0, 0, 0.72);
             border: 1px solid rgba(0, 255, 65, 0.18);
             border-radius: 3px;
-            padding: 6px 10px 7px;
+            padding: 12px 20px 14px;
             font-family: 'Share Tech Mono', monospace;
-            max-width: 250px;
             backdrop-filter: blur(4px);
         }
 
         .org-credits-header {
             display: flex;
             align-items: center;
-            gap: 6px;
-            margin-bottom: 5px;
-            padding-bottom: 4px;
+            gap: 8px;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
             border-bottom: 1px solid rgba(0, 255, 65, 0.15);
             color: rgba(0, 255, 65, 0.55);
-            font-size: 0.6rem;
+            font-size: 0.8rem;
             letter-spacing: 2px;
             text-transform: uppercase;
         }
@@ -625,12 +625,12 @@
 
         .org-credits-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2px 8px;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 4px 16px;
         }
 
         .org-credits-grid span {
-            font-size: 0.58rem;
+            font-size: 0.85rem;
             color: rgba(0, 220, 200, 0.65);
             letter-spacing: 0.3px;
             white-space: nowrap;
