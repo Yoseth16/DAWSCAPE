@@ -105,7 +105,7 @@ function updateTable(partidas) {
     let newHtml = '';
 
     if (partidas.length === 0) {
-        newHtml = `<tr><td colspan="6" style="text-align:center; padding: 4rem 2rem; color:var(--text-muted);"><i class="ph ph-ghost" style="font-size:3rem; opacity:0.3; margin-bottom:1rem; display:block;"></i>Sistema vacío.</td></tr>`;
+        newHtml = `<tr><td colspan="8" style="text-align:center; padding: 4rem 2rem; color:var(--text-muted);"><i class="ph ph-ghost" style="font-size:3rem; opacity:0.3; margin-bottom:1rem; display:block;"></i>Sistema vacío.</td></tr>`;
     } else {
         partidas.forEach(p => {
             const isVisible = (p.nombre_equipo + p.email + p.clase).toLowerCase().includes(searchVal);
@@ -158,6 +158,11 @@ function updateTable(partidas) {
                 </td>
                 <td><span style="background:#f1f5f9; padding:4px 10px; border-radius:6px; font-size:0.85rem; font-weight:600; color:var(--text-muted);">${p.clase}</span></td>
                 <td>${statusHtml}</td>
+                <td style="text-align:center;">
+                    ${p.codice
+                        ? `<span title="Combinación Secreta" style="font-family:'Courier New',monospace; font-weight:700; color:#b45309; background:#fffbeb; border:1px solid #fcd34d; padding:2px 6px; border-radius:6px; font-size:0.85rem;">${p.codice}</span>`
+                        : `<span style="color:var(--text-muted); font-size:1.2rem; font-weight:bold;">—</span>`}
+                </td>
                 <td class="time-display">${timeHtml}</td>
                 <td style="text-align:center; font-weight:600;">
                     ${p.pistas_count > 0

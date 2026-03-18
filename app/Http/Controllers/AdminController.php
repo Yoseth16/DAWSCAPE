@@ -169,7 +169,10 @@ class AdminController extends Controller
                     'icono' => $p->icono,
                     'logros' => $p->logros ?? [],
                     'avatar' => strtoupper(substr($p->nombre_equipo, 0, 1)),
-                    'pistas_count' => $pistasCount
+                    'pistas_count' => $pistasCount,
+                    'codice' => $p->combinacion_codice
+                        ? implode('-', $p->combinacion_codice)
+                        : null
                 ];
             })
         ]);

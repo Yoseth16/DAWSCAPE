@@ -469,9 +469,6 @@
     <button class="hint-close" onclick="closeHint()" aria-label="Cerrar">✕</button>
     <div class="hint-slot-label" id="hintSlotLabel">Dígito 1</div>
     <div class="hint-location" id="hintLocation">—</div>
-    <div class="hint-note">
-      🔍 Busca el código QR en esa ubicación y escanéalo para descubrir el acertijo que revela el número.
-    </div>
   </div>
 </div>
 
