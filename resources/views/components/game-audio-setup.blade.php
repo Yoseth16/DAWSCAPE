@@ -77,6 +77,11 @@
             function unlock() {
                 if (!window.audioManager) return;
 
+                // Reanudar AudioContext de WebAudio API (SFX de click)
+                if (window.audioManager._audioCtx && window.audioManager._audioCtx.state === 'suspended') {
+                    window.audioManager._audioCtx.resume().catch(() => {});
+                }
+
                 window.audioManager.bgMusic.play()
                     .then(() => {
                         window.audioManager.isPlaying = true;

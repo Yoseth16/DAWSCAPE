@@ -387,19 +387,109 @@
         box-shadow: 0 0 14px rgba(0,255,136,0.4);
       }
       @media print {
-        body * { visibility: hidden; }
-        .diploma-card, .diploma-card * { visibility: visible; }
+        @page {
+          size: A4 landscape;
+          margin: 0;
+        }
+
+        /* Disable all animations and transitions */
+        * {
+          animation: none !important;
+          transition: none !important;
+        }
+
+        /* Hide everything first */
+        body * {
+          visibility: hidden;
+        }
+
+        /* Show only the diploma */
+        .diploma-card, .diploma-card * {
+          visibility: visible;
+        }
+
         .diploma-card {
-          position: fixed; top: 0; left: 0;
-          width: 100%; height: 100%;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          margin: 0;
+          padding: 1.5cm 2cm;
+          box-sizing: border-box;
+          overflow: hidden;
+          page-break-inside: avoid;
+          page-break-after: avoid;
+          page-break-before: avoid;
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
           border: 3px solid #00ff88 !important;
-          box-shadow: none;
-          padding: 1.5cm 2cm;
+          box-shadow: none !important;
         }
-        .diplo-scanlines { display: none; }
-        @page { size: A4 landscape; margin: 0; }
+
+        .diploma-card *, .diploma-card *::before, .diploma-card *::after {
+          box-sizing: border-box;
+          box-shadow: none !important;
+          text-shadow: none !important;
+        }
+
+        /* Keep key colors visible without glow effects */
+        .diplo-title {
+          color: #ffffff !important;
+          text-shadow: none !important;
+        }
+        .diplo-team-name {
+          color: #00ff88 !important;
+          text-shadow: none !important;
+        }
+        .diploma-award-title {
+          color: #ffd700 !important;
+          text-shadow: none !important;
+        }
+        .diplo-corner {
+          text-shadow: none !important;
+        }
+
+        /* Hide decorative overlays that cause rendering issues */
+        .diplo-scanlines { display: none !important; }
+        .diplo-watermark { display: none !important; }
+
+        /* Ensure content fits without overflow */
+        .diplo-content {
+          position: relative;
+          z-index: 2;
+        }
+        .diplo-title {
+          font-size: 2.2rem !important;
+        }
+        .diplo-team-name {
+          font-size: 2.2rem !important;
+        }
+        .diploma-award-emoji {
+          font-size: 2.5rem !important;
+        }
+        .diploma-award-title {
+          font-size: 1.2rem !important;
+        }
+        .diplo-stats {
+          gap: 0.3rem 1.5rem !important;
+          margin: 0.3rem auto !important;
+        }
+        .diplo-sep {
+          margin: 0.3rem 0 !important;
+        }
+        .diplo-footer {
+          margin-top: 0.3rem !important;
+        }
+        .diplo-seal {
+          width: 100px !important;
+          height: 100px !important;
+        }
+
+        /* Hide non-diploma UI elements */
+        .diploma-section { padding: 0 !important; margin: 0 !important; }
+        .diploma-actions { display: none !important; }
+        .particles { display: none !important; }
       }
 
       .btn {

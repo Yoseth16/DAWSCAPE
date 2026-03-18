@@ -9,7 +9,7 @@
     ]
   },
   "resources/css/app.css": {
-    "file": "assets/app-efWpui40.css",
+    "file": "assets/app-BGqcQIVr.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -18,7 +18,7 @@
     ]
   },
   "resources/css/maquina-cafe.css": {
-    "file": "assets/maquina-cafe-ruGCHMl-.css",
+    "file": "assets/maquina-cafe-CeQMGXc0.css",
     "src": "resources/css/maquina-cafe.css",
     "isEntry": true,
     "name": "maquina-cafe",
@@ -36,13 +36,13 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-DRD1zSnv.js",
+    "file": "assets/app-Q8eVBwOd.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true
   },
   "resources/js/prueba6.js": {
-    "file": "assets/prueba6-CEuQAf_o.js",
+    "file": "assets/prueba6-C8Jk48vK.js",
     "name": "prueba6",
     "src": "resources/js/prueba6.js",
     "isEntry": true

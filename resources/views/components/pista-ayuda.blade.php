@@ -442,10 +442,12 @@
     }
 
     // ═══ SONIDO DE HABLA ═══
+    var _speakingAudioUrl = ((window.AUDIO_BASE_URL || '/sonido').replace(/\/$/, '')) + '/hablando-pista.mp3';
+
     function iniciarSonidoHabla() {
         try {
             if (speakingAudio) { speakingAudio.pause(); }
-            speakingAudio = new Audio('/sonido/hablando-pista.mp3');
+            speakingAudio = new Audio(_speakingAudioUrl);
             speakingAudio.loop = true;
             // Volumen alto para que destaque claramente sobre la música reducida
             speakingAudio.volume = 0.85;

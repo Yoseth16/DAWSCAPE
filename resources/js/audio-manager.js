@@ -103,10 +103,12 @@ class AudioManager {
     // Web Audio API context para SFX de baja latencia (click)
     this._audioCtx = null;
     this._clickBuffer = null;
+    this._userHasInteracted = false;
     this._initWebAudioClick();
 
     this.initializeSFX();
     this.setupEventListeners();
+    this._setupUserGestureUnlock();
   }
 
   /**
@@ -120,6 +122,8 @@ class AudioManager {
 
   /**
    * Precarga el sonido de click usando Web Audio API para latencia mínima.
+   * En iOS Safari el AudioContext arranca en estado 'suspended'
+   * y se reanuda en _setupUserGestureUnlock() con el primer gesto.
    */
   _initWebAudioClick() {
     try {
@@ -127,31 +131,90 @@ class AudioManager {
       if (!AudioContext) return;
       this._audioCtx = new AudioContext();
 
-      fetch(this._url('minecraft_click.mp3'))
-        .then(r => r.arrayBuffer())
-        .then(buf => this._audioCtx.decodeAudioData(buf))
-        .then(decoded => { this._clickBuffer = decoded; })
-        .catch(() => {});
+      this._loadClickBuffer();
     } catch(e) {}
   }
 
   /**
+   * Descarga y decodifica el buffer del click.
+   * Se llama tanto en init como tras reanudar el AudioContext.
+   */
+  _loadClickBuffer() {
+    if (!this._audioCtx) return;
+    fetch(this._url('minecraft_click.mp3'))
+      .then(r => r.arrayBuffer())
+      .then(buf => this._audioCtx.decodeAudioData(buf))
+      .then(decoded => { this._clickBuffer = decoded; })
+      .catch(() => {});
+  }
+
+  /**
    * Reproduce el click de minecraft con latencia mínima vía Web Audio API.
+   * Cada llamada crea un BufferSource nuevo, así que múltiples clicks
+   * rápidos se solapan sin cortarse.
    */
   _playClickWebAudio() {
     if (!this._audioCtx || !this._clickBuffer) return false;
     // Reanudar contexto si está suspendido (política de autoplay)
     if (this._audioCtx.state === 'suspended') {
       this._audioCtx.resume().catch(() => {});
+      return false; // No intentar reproducir hasta que se reanude
     }
-    const source = this._audioCtx.createBufferSource();
-    const gainNode = this._audioCtx.createGain();
-    source.buffer = this._clickBuffer;
-    gainNode.gain.value = this.targetVolume * this.sfxRatio;
-    source.connect(gainNode);
-    gainNode.connect(this._audioCtx.destination);
-    source.start(0);
-    return true;
+    try {
+      const source = this._audioCtx.createBufferSource();
+      const gainNode = this._audioCtx.createGain();
+      source.buffer = this._clickBuffer;
+      gainNode.gain.value = this.targetVolume * this.sfxRatio;
+      source.connect(gainNode);
+      gainNode.connect(this._audioCtx.destination);
+      source.start(0);
+      return true;
+    } catch(e) {
+      return false;
+    }
+  }
+
+  /**
+   * Registra listeners de primer gesto del usuario (click/touchstart/keydown)
+   * para desbloquear el AudioContext y pre-inicializar el audio en iOS Safari.
+   * Sin este paso, iOS no permite ninguna reproducción de audio.
+   */
+  _setupUserGestureUnlock() {
+    const self = this;
+    const eventos = ['click', 'touchstart', 'keydown'];
+
+    function onFirstGesture() {
+      if (self._userHasInteracted) return;
+      self._userHasInteracted = true;
+
+      // Reanudar AudioContext si está suspendido (iOS Safari)
+      if (self._audioCtx && self._audioCtx.state === 'suspended') {
+        self._audioCtx.resume().then(() => {
+          // Re-cargar buffer si no se cargó antes
+          if (!self._clickBuffer) self._loadClickBuffer();
+        }).catch(() => {});
+      }
+
+      // Pre-inicializar los Audio de SFX reproduciéndolos en silencio.
+      // iOS Safari requiere que el primer .play() ocurra dentro de un
+      // evento de usuario directo.
+      Object.keys(self.sfx).forEach((key) => {
+        const a = self.sfx[key];
+        a.muted = true;
+        a.play().then(() => {
+          a.pause();
+          a.muted = false;
+          a.currentTime = 0;
+        }).catch(() => {
+          a.muted = false;
+        });
+      });
+
+      // Eliminar todos los listeners tras el primer gesto
+      eventos.forEach((ev) => document.removeEventListener(ev, onFirstGesture, true));
+    }
+
+    eventos.forEach((ev) => document.addEventListener(ev, onFirstGesture, { once: false, capture: true }));
   }
 
   /**
@@ -452,7 +515,9 @@ class AudioManager {
   }
 
   /**
-   * Reproducir efecto de sonido
+   * Reproducir efecto de sonido.
+   * Clona el elemento de audio para que pulsaciones rápidas no se corten
+   * entre sí; el clon se elimina automáticamente al terminar.
    * @param {string} sfxKey
    */
   playSFX(sfxKey) {
@@ -467,12 +532,18 @@ class AudioManager {
     }
 
     try {
-      this.sfx[sfxKey].currentTime = 0;
-      this.sfx[sfxKey].play().catch((err) => {
-        console.error(`Error reproduciendo SFX '${sfxKey}':`, err);
-      });
+      // Clonar el nodo de audio para permitir reproducción simultánea
+      const clone = this.sfx[sfxKey].cloneNode();
+      clone.volume = this.targetVolume * this.sfxRatio;
+      clone.play().catch(() => {});
+      // Liberar el clon cuando termine para no acumular nodos en memoria
+      clone.addEventListener('ended', () => { clone.remove(); }, { once: true });
     } catch (err) {
-      console.error('Error con SFX:', err);
+      // Fallback: reproducir el original reiniciándolo
+      try {
+        this.sfx[sfxKey].currentTime = 0;
+        this.sfx[sfxKey].play().catch(() => {});
+      } catch(e) {}
     }
   }
 
