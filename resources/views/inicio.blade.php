@@ -452,12 +452,11 @@
   }
 })();
 
-// Minecraft click sound
-const clickSound = new Audio('/sonido/minecraft_click.mp3');
-clickSound.volume = 0.5;
+// Minecraft click sound — usa Web Audio API vía audioManager para latencia mínima
 function playClick() {
-  clickSound.currentTime = 0;
-  clickSound.play().catch(() => {});
+  if (window.audioManager) {
+    window.audioManager.playSFX('click');
+  }
 }
 
 // Hex → RGB

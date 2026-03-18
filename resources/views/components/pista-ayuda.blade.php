@@ -496,66 +496,23 @@
         }, VELOCIDAD_TEXTO);
     }
 
-    // ═══ AUDIO DUCKING (bajar música al abrir pista) ═══
-    var volumenAntesDucking = null;
+    // ═══ PAUSA/REANUDA MÚSICA AL ABRIR/CERRAR PISTA ═══
 
-    function aplicarDucking() {
+    function pausarMusica() {
         if (!window.audioManager) return;
         try {
-            // Intentar usar el método dedicado de ducking (nuevo)
-            if (typeof window.audioManager.duckMusic === 'function') {
-                window.audioManager.duckMusic(0.08, 300);
-            } else {
-                // Fallback: usar setVolume directamente (método antiguo)
-                var current = window.audioManager.bgMusic ? window.audioManager.bgMusic.volume : 0.5;
-                if (volumenAntesDucking === null) {
-                    volumenAntesDucking = current;
-                }
-                // Reducir al 8% con transición manual
-                var targetVol = Math.max(current * 0.08, 0.02);
-                var startVol = current;
-                var startTime = Date.now();
-                var fadeInterval = setInterval(function() {
-                    var elapsed = Date.now() - startTime;
-                    var progress = Math.min(elapsed / 300, 1);
-                    if (window.audioManager.bgMusic) {
-                        window.audioManager.bgMusic.volume = startVol - (startVol - targetVol) * progress;
-                    }
-                    if (progress >= 1) {
-                        clearInterval(fadeInterval);
-                    }
-                }, 20);
-            }
+            window.audioManager.pauseMusic();
         } catch(e) {
-            console.warn('Error aplicando ducking:', e);
+            console.warn('Error pausando música:', e);
         }
     }
 
-    function restaurarDucking() {
+    function reanudarMusica() {
         if (!window.audioManager) return;
         try {
-            // Intentar usar el método dedicado (nuevo)
-            if (typeof window.audioManager.unduckMusic === 'function') {
-                window.audioManager.unduckMusic(400);
-            } else if (volumenAntesDucking !== null) {
-                // Fallback: restaurar manualmente
-                var targetVol = volumenAntesDucking;
-                var startVol = window.audioManager.bgMusic ? window.audioManager.bgMusic.volume : 0.02;
-                var startTime = Date.now();
-                var fadeInterval = setInterval(function() {
-                    var elapsed = Date.now() - startTime;
-                    var progress = Math.min(elapsed / 400, 1);
-                    if (window.audioManager.bgMusic) {
-                        window.audioManager.bgMusic.volume = startVol + (targetVol - startVol) * progress;
-                    }
-                    if (progress >= 1) {
-                        clearInterval(fadeInterval);
-                        volumenAntesDucking = null;
-                    }
-                }, 20);
-            }
+            window.audioManager.resumeMusic();
         } catch(e) {
-            console.warn('Error restaurando ducking:', e);
+            console.warn('Error reanudando música:', e);
         }
     }
 
@@ -566,7 +523,7 @@
         buttonsDiv.classList.remove('visible');
         closeBtn.classList.remove('visible');
         speechText.innerHTML = '';
-        aplicarDucking();
+        pausarMusica();
     }
 
     function cerrarDialogo() {
@@ -577,7 +534,7 @@
         if (typewriterInterval) { clearInterval(typewriterInterval); typewriterInterval = null; }
         detenerSonidoHabla();
         detenerAnimBoca();
-        restaurarDucking();
+        reanudarMusica();
     }
 
     function mostrarBotones() {
