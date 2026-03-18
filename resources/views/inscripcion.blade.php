@@ -284,6 +284,9 @@
 </head>
 <body>
 
+@include('components.game-audio-setup', ['trackKey' => 'prueba10'])
+@include('components.music-player')
+
 <div class="particles" id="particles"></div>
 
 <div class="screen">

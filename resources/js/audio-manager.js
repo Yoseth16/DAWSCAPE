@@ -96,7 +96,13 @@ class AudioManager {
       error: 'Error.mp3',
       hint: 'Boton-Pista.mp3',
       speaking: 'hablando-pista.mp3',
+      click: 'minecraft_click.mp3',
     };
+
+    // Web Audio API context para SFX de baja latencia (click)
+    this._audioCtx = null;
+    this._clickBuffer = null;
+    this._initWebAudioClick();
 
     this.initializeSFX();
     this.setupEventListeners();
@@ -109,6 +115,42 @@ class AudioManager {
    */
   _url(filename) {
     return this.baseUrl + '/' + filename;
+  }
+
+  /**
+   * Precarga el sonido de click usando Web Audio API para latencia mínima.
+   */
+  _initWebAudioClick() {
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      this._audioCtx = new AudioContext();
+
+      fetch(this._url('minecraft_click.mp3'))
+        .then(r => r.arrayBuffer())
+        .then(buf => this._audioCtx.decodeAudioData(buf))
+        .then(decoded => { this._clickBuffer = decoded; })
+        .catch(() => {});
+    } catch(e) {}
+  }
+
+  /**
+   * Reproduce el click de minecraft con latencia mínima vía Web Audio API.
+   */
+  _playClickWebAudio() {
+    if (!this._audioCtx || !this._clickBuffer) return false;
+    // Reanudar contexto si está suspendido (política de autoplay)
+    if (this._audioCtx.state === 'suspended') {
+      this._audioCtx.resume().catch(() => {});
+    }
+    const source = this._audioCtx.createBufferSource();
+    const gainNode = this._audioCtx.createGain();
+    source.buffer = this._clickBuffer;
+    gainNode.gain.value = this.targetVolume * this.sfxRatio;
+    source.connect(gainNode);
+    gainNode.connect(this._audioCtx.destination);
+    source.start(0);
+    return true;
   }
 
   /**
@@ -413,6 +455,11 @@ class AudioManager {
    * @param {string} sfxKey
    */
   playSFX(sfxKey) {
+    // Click: usar Web Audio API para latencia mínima
+    if (sfxKey === 'click') {
+      if (this._playClickWebAudio()) return;
+    }
+
     if (!this.sfx[sfxKey]) {
       console.warn(`SFX '${sfxKey}' no encontrado`);
       return;
