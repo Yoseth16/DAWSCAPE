@@ -823,34 +823,45 @@
 <style>
 .val-modal-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
     z-index: 10000; display: flex; justify-content: center; align-items: center;
     opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
 }
 .val-modal-overlay.active { opacity: 1; pointer-events: auto; }
 .val-modal {
-    background: #111; border: 2px solid #facc15; border-radius: 12px;
+    background: #041a0e; border: 2px solid #00ff88; border-radius: 0;
     padding: 2rem; width: 90%; max-width: 400px;
-    box-shadow: 0 0 20px rgba(250, 204, 21, 0.2);
-    text-align: center; color: white; font-family: 'Share Tech Mono', monospace;
+    box-shadow: 0 0 30px rgba(0, 255, 136, 0.25), inset 0 0 40px rgba(0, 255, 136, 0.03);
+    text-align: center; color: #c8ffdf; font-family: 'Share Tech Mono', monospace;
     transform: translateY(20px); transition: transform 0.5s ease;
+    position: relative;
+}
+.val-modal::before {
+    content: '// VALORACIÓN DEL SISTEMA';
+    position: absolute; top: -0.65rem; left: 1rem;
+    background: #041a0e; padding: 0 0.5rem;
+    color: #00ff88; font-size: 0.65rem; letter-spacing: 0.2em;
 }
 .val-modal-overlay.active .val-modal { transform: translateY(0); }
-.val-title { color: #facc15; font-size: 1.5rem; margin-bottom: 1rem; text-shadow: 0 0 10px rgba(250, 204, 21, 0.5); }
+.val-title { color: #00ff88; font-size: 1.3rem; margin-bottom: 1rem; text-shadow: 0 0 12px rgba(0, 255, 136, 0.7); letter-spacing: 0.1em; text-transform: uppercase; }
 .val-stars { display: flex; justify-content: center; gap: 10px; margin-bottom: 1.5rem; flex-direction: row-reverse; }
 .val-stars input { display: none; }
-.val-stars label { font-size: 2.5rem; color: #444; cursor: pointer; transition: color 0.2s, text-shadow 0.2s; }
-.val-stars label:hover, .val-stars label:hover ~ label, .val-stars input:checked ~ label { color: #facc15; text-shadow: 0 0 15px rgba(250, 204, 21, 0.8); }
-.val-textarea { width: 100%; background: #222; border: 1px solid #444; border-radius: 8px; color: white; padding: 0.75rem; font-family: inherit; resize: none; margin-bottom: 1.5rem; margin-top: 1rem; }
-.val-textarea:focus { outline: none; border-color: #facc15; }
+.val-stars label { font-size: 2.5rem; color: #1a4a2e; cursor: pointer; transition: color 0.2s, text-shadow 0.2s; }
+.val-stars label:hover, .val-stars label:hover ~ label, .val-stars input:checked ~ label { color: #00ff88; text-shadow: 0 0 15px rgba(0, 255, 136, 0.9); }
+.val-textarea { width: 100%; background: #020c06; border: 1px solid #00ff8840; border-radius: 0; color: #c8ffdf; padding: 0.75rem; font-family: inherit; resize: none; margin-bottom: 1.5rem; margin-top: 1rem; }
+.val-textarea:focus { outline: none; border-color: #00ff88; box-shadow: 0 0 8px rgba(0, 255, 136, 0.3); }
+.val-textarea::placeholder { color: #445544; }
 .val-buttons { display: flex; gap: 1rem; }
-.val-btn { flex: 1; padding: 0.75rem; border-radius: 8px; font-weight: bold; font-family: inherit; cursor: pointer; text-transform: uppercase; border: none; transition: all 0.2s; }
-.val-btn-submit { background: #facc15; color: #000; }
-.val-btn-submit.disabled { opacity: 0.5; cursor: not-allowed; }
-.val-btn-submit:not(.disabled):hover { box-shadow: 0 0 15px rgba(250, 204, 21, 0.6); }
-.val-btn-skip { background: transparent; border: 1px solid #666; color: #aaa; }
-.val-btn-skip:hover { background: #333; color: white; }
-.val-msg { display: none; margin-top: 1rem; color: #00ff88; font-weight: bold; }
+.val-btn { flex: 1; padding: 0.75rem; border-radius: 0; font-weight: bold; font-family: inherit; cursor: pointer; text-transform: uppercase; border: none; transition: all 0.2s; letter-spacing: 0.1em; }
+.val-btn-submit { background: transparent; color: #00ff88; border: 2px solid #00ff88; position: relative; overflow: hidden; }
+.val-btn-submit::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: #00ff88; transition: left 0.3s; z-index: 0; }
+.val-btn-submit span { position: relative; z-index: 1; }
+.val-btn-submit:not(.disabled):hover::before { left: 0; }
+.val-btn-submit:not(.disabled):hover { color: #020c06; box-shadow: 0 0 18px rgba(0, 255, 136, 0.5); }
+.val-btn-submit.disabled { opacity: 0.35; cursor: not-allowed; border-color: #00ff8860; color: #00ff8860; }
+.val-btn-skip { background: transparent; border: 1px solid #2a4a35; color: #88ccaa; }
+.val-btn-skip:hover { background: #0a1f10; border-color: #00ff8860; color: #c8ffdf; }
+.val-msg { display: none; margin-top: 1rem; color: #00ff88; font-weight: bold; text-shadow: 0 0 8px rgba(0, 255, 136, 0.5); letter-spacing: 0.05em; }
 </style>
 
 <div class="val-modal-overlay" id="valModalOverlay">
@@ -869,7 +880,7 @@
         
         <div class="val-buttons" id="valButtons">
             <button class="val-btn val-btn-skip" id="btnSkipVal">Omitir</button>
-            <button class="val-btn val-btn-submit disabled" id="btnSubmitVal" disabled>Enviar valoración</button>
+            <button class="val-btn val-btn-submit disabled" id="btnSubmitVal" disabled><span>Enviar valoración</span></button>
         </div>
         
         <div class="val-msg" id="valMsg">[OK] Valoración registrada.<br>¡Gracias por tu feedback!</div>
@@ -929,7 +940,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Deshabilitar boton
         btnSubmit.disabled = true;
-        btnSubmit.textContent = 'Enviando...';
+        btnSubmit.querySelector('span').textContent = 'Enviando...';
 
         fetch('/valoraciones', {
             method: 'POST',
@@ -955,12 +966,12 @@ document.addEventListener('DOMContentLoaded', () => {
               } else {
                   console.error(data);
                   btnSubmit.disabled = false;
-                  btnSubmit.textContent = 'Enviar valoración';
+                  btnSubmit.querySelector('span').textContent = 'Enviar valoración';
               }
           }).catch(err => {
               console.error('Error', err);
               btnSubmit.disabled = false;
-              btnSubmit.textContent = 'Enviar valoración';
+              btnSubmit.querySelector('span').textContent = 'Enviar valoración';
           });
     });
 });
