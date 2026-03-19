@@ -60,6 +60,8 @@ El proyecto integra tecnologías modernas como **Laravel Reverb** para actualiza
 - **Gestión de QRs dinámicos**: Creación, edición y descarga de códigos QR para ubicaciones físicas
 - **Testing directo**: Rutas de bypass para que el administrador pueda probar cada prueba individualmente
 - **Logs de equipo**: Auditoría completa de acciones por equipo
+- **Gestión de Valoraciones**: Interfaz para consultar el feedback (estrellas) dejado por los equipos al terminar la partida.
+- **Diploma Interactivo**: Previsualización y entrega de diploma digital (con animaciones personalizadas) al finalizar el juego.
 
 ---
 
@@ -72,10 +74,10 @@ El proyecto integra tecnologías modernas como **Laravel Reverb** para actualiza
 | **3** | Operación Cafeína | Ángel | Físico (QR) | Escanear QR en la máquina de café y calcular un checksum |
 | **4** | Operación Repuestos | Arturo | Físico (QR) | Localizar QR en máquina de snacks y calcular checksum |
 | **5** | Protocolo Espejo | Eloy | Físico (QR) | Descifrar palabra invertida en taquillas (alfabeto espejo) |
-| **6** | Sobrecarga del Sistema | Miguel | Digital | Simon Says cooperativo de 15 pasos con penalización de 30 s/fallo |
+| **6** | Sobrecarga del Sistema | Mígue | Digital | Simon Says cooperativo de 15 pasos con penalización de 30 s/fallo |
 | **7** | El Códice Oculto | Nacho | Físico (QR) | Candado digital de 4 dígitos con acertijos en ubicaciones físicas |
 | **8** | Cultura General | Dinámico | Digital | 5 preguntas aleatorias del banco de preguntas del admin |
-| **9** | Juego de Pistas | Todos | Mixto | 7 preguntas secuenciales que revelan letras → contraseña final |
+| **9** | Juego de Pistas | Miguel Ángel | Mixto | 5 preguntas secuenciales que revelan letras → contraseña final |
 
 ### 🎖️ Sistema de Logros
 
@@ -114,6 +116,7 @@ El proyecto integra tecnologías modernas como **Laravel Reverb** para actualiza
 | JavaScript | ES6+ (Vanilla JS) + Alpine.js |
 | Audio | AudioManager personalizado (`audio-manager.js`) |
 | Gráficos | Chart.js |
+| Captura de Diplomas | html2canvas |
 | Iconos | Phosphor Icons |
 | Fuentes | Google Fonts (Orbitron, Share Tech Mono, Outfit) |
 | WebSocket Client | Laravel Echo + Pusher JS |
@@ -439,6 +442,7 @@ resources/views/components/
 | `log_juegos` | Auditoría completa de acciones |
 | `qrs` | Códigos QR dinámicos (ubicación, fase requerida, código secreto) |
 | `pregunta_dinamicas` | Banco de preguntas para Prueba 8 (gestionado por admin) |
+| `valoraciones` | Feedback y puntuación enviada por los equipos al completar el escape |
 
 ### Sistema de Penalización de Tiempo
 
@@ -464,7 +468,7 @@ Tiempo = (ahora - inicio_juego - tiempo_pausado) + penalizacion_segundos
 | `SQLSTATE[HY000] [2002] Connection refused` | Verificar que MySQL esté corriendo y credenciales en `.env` |
 | QRs no se generan | `php artisan storage:link && chmod -R 775 storage` |
 | WebSockets no funcionan | Verificar que `php artisan reverb:start` esté corriendo y puerto 8080 abierto |
-| Audio no suena | Verificar que los `.mp3` existen en `public/sonido/` y que Vite compiló correctamente (`npm run build`) |
+| Audio no suena / `audioManager is undefined` | Ejecutar script `fix-audio-server.sh` (Linux) o `fix-audio-server.ps1` (Windows) para regenerar assets con Vite. |
 | Error 404 en archivos de audio | Asegurar que `window.AUDIO_BASE_URL` se inyecte con `asset('sonido')` desde Blade |
 
 ---
@@ -570,7 +574,7 @@ Tiempo = (ahora - inicio_juego - tiempo_pausado) + penalizacion_segundos
 ---
 
 <details>
-<summary><strong>Prueba 6 — Sobrecarga del Sistema / Simon Says (Miguel)</strong></summary>
+<summary><strong>Prueba 6 — Sobrecarga del Sistema / Simon Says (Mígue)</strong></summary>
 
 **Tipo**: Digital cooperativo — Simon Says de 15 pasos.
 
@@ -597,20 +601,20 @@ Tiempo = (ahora - inicio_juego - tiempo_pausado) + penalizacion_segundos
 
 | Dígito | Ubicación del QR | Pista del acertijo |
 |--------|------------------|--------------------|
-| 0 | Máquina de café | "No vale nada a la izquierda, multiplica a la derecha… nació en India" |
-| 1 | Puerta de dirección | "Cuadrado, cubo y raíz dan igual… número atómico del hidrógeno" |
-| 2 | Baño planta baja | "Base del sistema binario… único primo par" |
-| 3 | Cristal de la biblioteca | "Leyes de Newton… puntos para definir un plano" |
-| 4 | Tablón de anuncios principal | "Cámaras del corazón… letras del ADN (A,C,G,T)" |
-| 5 | Silla del profesor taller 1 | "Sólidos platónicos… anillos olímpicos" |
-| 6 | Junto al extintor pasillo norte | "Primer número perfecto (1+2+3)… número atómico del carbono" |
-| 7 | Mesa de ping pong del patio | "pH del agua pura… vértebras cervicales" |
-| 8 | Canasta de baloncesto | "Bits en un byte… planetas del sistema solar" |
-| 9 | Mostrador de conserjería | "Multiplica por cualquier cosa y la suma de dígitos vuelve a mí… círculos del infierno de Dante" |
+| 0 | Mostrador de secretaría | No valgo absolutamente nada si me pones a la izquierda, pero multiplico tu riqueza si me pones a la derecha. Fui el último dígito en inventarse, nacido en la India para representar la nada y el vacío absoluto. |
+| 1 | Mesa de Nescafé cafetería | Soy el único número cuyo cuadrado, cubo y raíz son exactamente idénticos a mí mismo. En la tabla periódica, corono al elemento más ligero y abundante de todo el universo. |
+| 2 | Aseos de cafetería | En informática, soy la base fundamental de todo el lenguaje que entienden las máquinas. Soy la excepción a la regla: el único número par que tiene el honor de ser primo. |
+| 3 | Extintor final del pasillo junto a la cristalera del LAB 103 | Newton necesitó exactamente este número de leyes para explicar el movimiento del universo. Si quieres definir un plano geométrico perfecto en el espacio sin que cojee, me necesitas estrictamente. |
+| 4 | Clase vacía esquina donde las escaleras interiores que no funcionan | Lato sin descanso en tu pecho gracias a mis cavidades anatómicas. En la genética, soy el total de letras químicas (A, C, G, T) que escriben el libro de la vida. |
+| 5 | Máquinas de vending planta 1 junto a los aseos de emergencias en el Oasis | En la geometría clásica, represento el total de sólidos platónicos perfectos que existen. En el emblema de los Juegos Olímpicos, doy forma a los anillos que representan las partes habitadas del mundo. |
+| 6 | Puertas "X EMERGENCIAS+PROTECCION CIVIL" junto al cuadro de luces | Soy el primer número perfecto, la suma de mis divisores exactos (1, 2 y 3) te dará mi valor. En química, soy el cimiento de la vida, el número atómico del carbono. |
+| 7 | Taquillas Oasis planta 2 | Químicamente hablando, soy la neutralidad perfecta, el pH del agua pura. Anatómicamente, soy el número de vértebras cervicales que comparte un humano con una jirafa. |
+| 8 | Aseos cerrados donde el cartel sin salida y la plancha amarilla que cierra el paso | En el mundo digital, formo la unidad básica de memoria (el byte) cuando agrupo a mis pequeños soldados (los bits). Soy el número de planetas reconocidos oficialmente en nuestro sistema solar. |
+| 9 | Plantas de al lado de las escaleras en la planta 0 | Tengo una maldición: multiplícame por el entero que quieras; si sumas las cifras del resultado, siempre volverás a mí. Soy el total de círculos del Infierno de Dante. |
 
 **Validación**: Los 4 dígitos deben coincidir exactamente con la combinación del equipo (el orden importa). Se cuenta cada intento en `intentos_codice`.
 
-**Pista** (penalización +8 min): *"Cuatro dígitos escondidos en cuatro rincones del edificio. No los busquéis al azar: cada QR os dará un acertijo. Resolved el acertijo, descubrid el número, y colocadlos en el orden correcto."*
+**Pista** (penalización +8 min): *"Cuatro dígitos escondidos en cuatro rincones del edificio. No los busquéis al azar: cada QR os dará un acertijo. Resolved el acertijo, descubrid el número, y colocadlos en el orden correcto. ¡Drift hacia la victoria!"*
 
 </details>
 
@@ -638,15 +642,13 @@ Tiempo = (ahora - inicio_juego - tiempo_pausado) + penalizacion_segundos
 
 | # | Pregunta | Respuesta | Letra |
 |---|----------|-----------|-------|
-| 1 | ¿Cuántas escaleras mecánicas no funcionan casi siempre? | `2` | **J** |
-| 2 | ¿Cuántas clases de desarrollo web hay en total? | `2` | **U** |
-| 3 | ¿Qué empresa invierte en FPS como Xtart? | `samsung` | **M** |
-| 4 | ¿En qué clase de Xtart no hay un ordenador solo? | `2º dam` | **P** |
-| 5 | ¿Qué estabilizante llevan las patatas de Vicente Vidal? | `e-61` | **E** |
-| 6 | ¿Qué hacer si alguien se atraganta con una Oreo? | `maniobra heimlich` | **R** |
-| 7 | ¿Dónde está el extintor de la clase 2ºDAM? | `al lado de la puerta` | **S** |
+| 1 | Nombre del director del centro | `eduardo` | **N** |
+| 2 | ¿Cuántas clases de desarrollo web hay en total en el centro? | `1` | **H** |
+| 3 | ¿Qué empresa coreana invierte en FP como XTART para promocionar sus productos? | `samsung` | **O** |
+| 4 | ¿Cuántas ventanas hay en la clase de DAW? | `5` | **A** |
+| 5 | ¿Cuántas plantas tiene el centro? | `3` | **C** |
 
-**Fase 2 — Contraseña final**: Las letras recopiladas forman → **`jumpers`**
+**Fase 2 — Contraseña final**: Las letras recopiladas (N, H, O, A, C) forman → **`nacho`**
 
 **Validación**: Las respuestas se normalizan (minúsculas, sin acentos, espacios colapsados). Tras 5 fallos acumulados aparece la pista: *"Piensa en lo que ves cada día en el instituto."*
 
@@ -665,9 +667,9 @@ Tiempo = (ahora - inicio_juego - tiempo_pausado) + penalizacion_segundos
 | **Ángel** | Prueba 3 — Operación Cafeína |
 | **Arturo** | Prueba 4 — Operación Repuestos |
 | **Eloy** | Prueba 5 — Protocolo Espejo |
-| **Miguel** | Prueba 6 — Sobrecarga del Sistema |
+| **Mígue** | Prueba 6 — Sobrecarga del Sistema |
 | **Nacho** | Prueba 7 — El Códice Oculto |
-| **Miguel Ángel** | Prueba 9 — JUMPERS |
+| **Miguel Ángel** | Prueba 9 — Juego de Pistas |
 | **Coordinación** | Sistema de inscripción, ranking, administración, audio, infraestructura |
 
 ---
