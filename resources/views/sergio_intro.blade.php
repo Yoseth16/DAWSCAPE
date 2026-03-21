@@ -380,7 +380,7 @@
   }
 
   // ── Texto de Sergio ──
-  var textoSergio = "Hey, mira que rico te escapas... Tenéis que resolver 9 pruebas en orden. Algunas son acertijos en pantalla, otras os van a mandar por el instituto a buscar pistas escondidas, así que estad muy atentos. Cada pista extra que pidáis suma 8 minutos a vuestro tiempo, así que pensad antes de usarlas. Gana el equipo que termine en menos tiempo. Introducid vuestras credenciales y empezamos.";
+  var textoSergio = "Hey, mira que rico te escapas... Tenéis que resolver 9 pruebas en orden. Algunas son acertijos en pantalla, otras os van a mandar por el instituto a buscar pistas escondidas, así que estad muy atentos. Cada pista extra que pidáis suma 8 minutos a vuestro tiempo, así que pensad antes de usarlas. Gana el equipo que termine en menos tiempo.";
 
   // Iniciar con un pequeño delay para que la animación de entrada se vea
   setTimeout(function() {

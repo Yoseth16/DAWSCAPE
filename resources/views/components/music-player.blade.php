@@ -1,11 +1,9 @@
 <!-- Botón de música (play/pausa) -->
 <button id="musicToggleBtn" class="music-mute-btn" type="button" title="Reproducir / Pausar música">
-  <span id="musicToggleIcon">▶️</span>
+  <span id="musicToggleIcon">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,4 20,12 6,20"/></svg>
+  </span>
 </button>
-
-<!-- Indicador de volumen en móvil -->
-<div id="mobileVolumeHint" class="mobile-volume-hint" aria-label="Usa los botones de tu dispositivo para el volumen">
-</div>
 
 <!-- Indicador global de estado de música -->
 <div class="now-playing-banner" id="nowPlayingBanner" aria-live="polite">
@@ -114,32 +112,7 @@
     box-shadow: 0 2px 8px rgba(0, 255, 136, 0.2);
   }
 
-  /* Hint de volumen para móvil */
-  .mobile-volume-hint {
-    display: none;
-    position: fixed;
-    bottom: 0.75rem;
-    left: 3.2rem;
-    z-index: 900;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.6rem;
-    color: var(--music-player-primary);
-    background: var(--music-player-bg);
-    border: 1px solid var(--music-player-border);
-    border-radius: 6px;
-    padding: 0.25rem 0.5rem;
-    white-space: nowrap;
-    pointer-events: none;
-    opacity: 0.85;
-    backdrop-filter: blur(6px);
-  }
 
-  /* Mostrar hint solo en dispositivos móviles / táctiles */
-  @media (pointer: coarse) and (max-width: 1024px) {
-    .mobile-volume-hint {
-      display: block;
-    }
-  }
 
   /* Mobile: ligeramente más pegado al borde y sin molestar al contenido */
   @media (max-width: 600px) {
@@ -161,11 +134,7 @@
       box-shadow: 0 3px 10px rgba(0, 255, 136, 0.25);
     }
 
-    .mobile-volume-hint {
-      left: 2.9rem;
-      bottom: 0.65rem;
-      font-size: 0.55rem;
-    }
+
   }
 </style>
 
@@ -177,20 +146,15 @@
     const nowPlayingTitle = document.getElementById('nowPlayingTitle');
     const nowPlayingPrefix = document.getElementById('nowPlayingPrefix');
     const nowPlayingSuffix = document.getElementById('nowPlayingSuffix');
-    const mobileHint = document.getElementById('mobileVolumeHint');
-
     if (!toggleBtn || !toggleIcon || !nowPlayingBanner) return;
-
-    // Fallback JS para mostrar el hint en móviles detectados por UA
-    if (mobileHint && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-      mobileHint.style.display = 'block';
-    }
 
     let currentMode = 'hidden'; // 'playing' | 'paused' | 'hidden'
     let pauseHintTimeout = null;
 
     function updateIcon(isPlaying) {
-      toggleIcon.textContent = isPlaying ? '⏸' : '▶️';
+      toggleIcon.innerHTML = isPlaying
+        ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="4" width="4" height="16"/><rect x="15" y="4" width="4" height="16"/></svg>'
+        : '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,4 20,12 6,20"/></svg>';
     }
 
     function clearPauseTimeout() {

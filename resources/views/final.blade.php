@@ -1131,22 +1131,29 @@ document.addEventListener('DOMContentLoaded', () => {
             })
         }).then(res => res.json())
           .then(data => {
-              if(data.success || data.message === 'Ya valorado') {
-                  localStorage.setItem('dawscape_valorado_{{ $partida->id ?? '' }}', 'true');
-                  buttonsContainer.style.display = 'none';
+              localStorage.setItem('dawscape_valorado_{{ $partida->id ?? '' }}', 'true');
+              buttonsContainer.style.display = 'none';
+              if (data.success) {
                   msg.style.display = 'block';
-                  setTimeout(() => {
-                      overlay.classList.remove('active');
-                  }, 2000);
+              } else if (data.message === 'Ya valorado') {
+                  msg.innerHTML = '[OK] Ya habías valorado anteriormente.<br>¡Gracias!';
+                  msg.style.display = 'block';
               } else {
-                  console.error(data);
-                  btnSubmit.disabled = false;
-                  btnSubmit.querySelector('span').textContent = 'Enviar valoración';
+                  msg.innerHTML = '[OK] Valoración registrada.<br>¡Gracias!';
+                  msg.style.display = 'block';
               }
+              setTimeout(() => {
+                  overlay.classList.remove('active');
+              }, 2000);
           }).catch(err => {
               console.error('Error', err);
-              btnSubmit.disabled = false;
-              btnSubmit.querySelector('span').textContent = 'Enviar valoración';
+              localStorage.setItem('dawscape_valorado_{{ $partida->id ?? '' }}', 'true');
+              buttonsContainer.style.display = 'none';
+              msg.innerHTML = '[OK] ¡Gracias por participar!';
+              msg.style.display = 'block';
+              setTimeout(() => {
+                  overlay.classList.remove('active');
+              }, 2000);
           });
     });
 });

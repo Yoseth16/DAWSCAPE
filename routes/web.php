@@ -209,7 +209,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/prueba/prueba6', [JuegoController::class, 'mostrarPrueba6'])->name('admin.prueba.prueba6');
     Route::get('/prueba/prueba7', [JuegoController::class, 'mostrarPrueba7'])->name('admin.prueba.prueba7');
     Route::get('/prueba/prueba8', [JuegoController::class, 'mostrarPrueba8'])->name('admin.prueba.prueba8');
-    Route::get('/prueba/prueba9', [JuegoController::class, 'mostrarPrueba9'])->name('admin.prueba.prueba9');
+    Route::get('/prueba/prueba9', function () {
+        session([
+            'email' => 'admin-test@prueba9.test',
+            'nombre_equipo' => 'ADMIN TEST',
+            'clase' => 'Pruebas',
+            'prueba_8_completada' => true,
+        ]);
+        return app(\App\Http\Controllers\JuegoController::class)->mostrarPrueba9();
+    })->name('admin.prueba.prueba9');
 
     // Bypass para ver el diploma final de prueba (sin necesidad de haber jugado)
     Route::get('/prueba/final', function () {
