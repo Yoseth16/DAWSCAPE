@@ -195,10 +195,15 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Respuestas válidas</label>
-                        <input type="text" name="respuesta_correcta" class="form-control" required placeholder="Ej: París, Paris, PARIS">
+                        <label class="form-label">Respuesta principal</label>
+                        <input type="text" name="respuesta_correcta" class="form-control" required placeholder="Ej: París">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Respuestas alternativas</label>
+                        <input type="text" name="respuestas_alternativas" class="form-control" placeholder="Ej: paris, París, la ciudad de la luz">
                         <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 6px; display: block; line-height: 1.4;">
-                            * Puedes indicar <strong>varias respuestas correctas separadas por comas</strong>. El sistema las comparará sin tildes ni mayúsculas.
+                            * Separa cada alternativa con una coma. Se compararán <strong>sin tildes ni mayúsculas</strong>.
                         </small>
                     </div>
 
@@ -221,8 +226,8 @@
                         <thead>
                             <tr>
                                 <th style="width: 10%">Estado</th>
-                                <th style="width: 50%">Enunciado</th>
-                                <th style="width: 25%">Respuesta</th>
+                                <th style="width: 40%">Enunciado</th>
+                                <th style="width: 35%">Respuestas</th>
                                 <th style="width: 15%; text-align: center;">Acciones</th>
                             </tr>
                         </thead>
@@ -237,7 +242,16 @@
                                         @endif
                                     </td>
                                     <td style="line-height: 1.5;">{{ $p->enunciado }}</td>
-                                    <td><span class="answer-text">{{ $p->respuesta_correcta }}</span></td>
+                                    <td>
+                                        <span class="answer-text">{{ $p->respuesta_correcta }}</span>
+                                        @if($p->respuestas_alternativas && count($p->respuestas_alternativas) > 0)
+                                            <div style="margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px;">
+                                                @foreach($p->respuestas_alternativas as $alt)
+                                                    <span style="display: inline-block; background: #f1f5f9; color: #64748b; padding: 2px 8px; border-radius: 6px; font-size: 0.75rem; border: 1px solid #e2e8f0;">{{ $alt }}</span>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </td>
                                     <td style="text-align: center; white-space: nowrap;">
 
                                         <!-- Botón Editar -->

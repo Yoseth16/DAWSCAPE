@@ -14,49 +14,64 @@
 
         .kpi-card {
             background: var(--surface-color);
-            border-radius: 0;
+            border-radius: 12px;
             padding: 1.5rem;
             border: 1px solid var(--border-color);
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.03);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
             display: flex;
             align-items: center;
             gap: 1.2rem;
             transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
         }
 
         .kpi-card:hover {
-            border-color: rgba(0, 255, 136, 0.35);
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.08);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
         }
 
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+        .kpi-card.kpi-blue::before { background: #3b82f6; }
+        .kpi-card.kpi-green::before { background: #10b981; }
+        .kpi-card.kpi-yellow::before { background: #f59e0b; }
+        .kpi-card.kpi-purple::before { background: #8b5cf6; }
+
         .kpi-icon-wrap {
-            width: 54px;
-            height: 54px;
-            border-radius: 0;
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.7rem;
+            font-size: 1.5rem;
             flex-shrink: 0;
         }
 
-        .kpi-blue { background: rgba(0, 136, 255, 0.1); color: #55aaff; border: 1px solid rgba(0, 136, 255, 0.2); }
-        .kpi-green { background: rgba(0, 255, 136, 0.08); color: #00ff88; border: 1px solid rgba(0, 255, 136, 0.2); }
-        .kpi-yellow { background: rgba(255, 170, 0, 0.1); color: #ffaa00; border: 1px solid rgba(255, 170, 0, 0.2); }
-        .kpi-purple { background: rgba(168, 85, 247, 0.1); color: #bb88ff; border: 1px solid rgba(168, 85, 247, 0.2); }
+        .kpi-blue .kpi-icon-wrap { background: #eff6ff; color: #3b82f6; }
+        .kpi-green .kpi-icon-wrap { background: #ecfdf5; color: #10b981; }
+        .kpi-yellow .kpi-icon-wrap { background: #fffbeb; color: #f59e0b; }
+        .kpi-purple .kpi-icon-wrap { background: #f5f3ff; color: #8b5cf6; }
 
         .kpi-info h4 {
             margin: 0;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
 
         .kpi-info p {
             margin: 5px 0 0 0;
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: 700;
             color: var(--text-main);
             line-height: 1;
@@ -71,94 +86,95 @@
         }
 
         .panel-heading {
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 700;
-            color: var(--brand-color);
+            color: var(--text-main);
             margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
             gap: 8px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            font-size: 0.85rem;
+            letter-spacing: -0.2px;
         }
 
-        .panel-heading i { color: var(--brand-color); filter: drop-shadow(0 0 4px rgba(0, 255, 136, 0.5)); }
+        .panel-heading i { color: var(--brand-color); }
 
         .chart-container { position: relative; height: 250px; width: 100%; display: flex; justify-content: center; }
 
         /* Podium List */
         .podium-list { display: flex; flex-direction: column; gap: 12px; }
         .podium-item {
-            display: flex; align-items: center; padding: 12px 16px; border-radius: 0;
-            background: rgba(0, 255, 136, 0.02); border: 1px solid var(--border-color); transition: all 0.2s;
+            display: flex; align-items: center; padding: 12px 16px; border-radius: 10px;
+            background: #ffffff; border: 1px solid var(--border-color); transition: all 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
         }
-        .podium-item:hover { border-color: rgba(0, 255, 136, 0.3); background: rgba(0, 255, 136, 0.04); }
+        .podium-item:hover { border-color: #cbd5e1; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03); }
 
         .pos-badge {
-            width: 38px; height: 38px; border-radius: 0; display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 1.1rem; margin-right: 15px;
+            width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 1.1rem; margin-right: 15px;
         }
-        .pos-1 { background: rgba(234, 179, 8, 0.15); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.3); box-shadow: 0 0 10px rgba(234, 179, 8, 0.15); }
-        .pos-2 { background: rgba(148, 163, 184, 0.1); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.25); }
-        .pos-3 { background: rgba(217, 119, 6, 0.15); color: #d97706; border: 1px solid rgba(217, 119, 6, 0.25); }
-        .pos-other { background: rgba(100, 116, 139, 0.08); color: #5a8a6e; border: 1px solid rgba(100, 116, 139, 0.15); }
+        .pos-1 { background: #fef08a; color: #854d0e; }
+        .pos-2 { background: #e2e8f0; color: #475569; }
+        .pos-3 { background: #fed7aa; color: #9a3412; }
+        .pos-other { background: #f1f5f9; color: #64748b; }
 
         .podium-details { flex: 1; min-width: 0; }
-        .podium-name { font-weight: 700; color: var(--text-main); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .podium-name { font-weight: 600; color: var(--text-main); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .podium-class { font-size: 0.8rem; color: var(--text-muted); }
-        .podium-time { font-family: 'Orbitron', monospace; font-weight: 700; color: var(--success-color); font-size: 1.1rem; text-shadow: 0 0 8px rgba(0, 255, 136, 0.3); }
+        .podium-time { font-weight: 700; color: var(--success-color); font-size: 1.1rem; font-variant-numeric: tabular-nums; }
 
         /* --- TABLE --- */
-        .table-responsive { border-radius: 0; overflow: hidden; border: 1px solid var(--border-color); background: var(--surface-color); }
+        .table-responsive { border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); background: var(--surface-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
         .table-custom { width: 100%; margin: 0; border-collapse: collapse; }
         .table-custom th {
-            background-color: rgba(0, 255, 136, 0.04); color: var(--brand-color); font-weight: 600; text-transform: uppercase;
-            letter-spacing: 1px; font-size: 0.7rem; padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--border-color);
+            background-color: #f8fafc; color: var(--text-muted); font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.5px; font-size: 0.75rem; padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color);
         }
-        .table-custom td { padding: 1.2rem 1.5rem; vertical-align: middle; border-bottom: 1px solid var(--border-color); color: var(--text-main); }
-        .table-custom tr:hover { background-color: rgba(0, 255, 136, 0.02); }
+        .table-custom td { padding: 1rem 1.5rem; vertical-align: middle; border-bottom: 1px solid var(--border-color); color: var(--text-main); }
+        .table-custom tr:hover td { background-color: #f8fafc; }
+        .table-custom tr:last-child td { border-bottom: none; }
 
         /* Avatares */
         .team-cell { display: flex; align-items: center; gap: 15px; }
         .avatar {
-            width: 42px; height: 42px; border-radius: 0; border: 1px solid var(--border-color);
+            width: 40px; height: 40px; border-radius: 50%; border: 2px solid #ffffff;
             color: var(--brand-color); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem;
-            background: rgba(0, 255, 136, 0.05);
+            background: #eff6ff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         .team-meta .t-name { font-weight: 600; margin-bottom: 2px; }
         .team-meta .t-email { font-size: 0.8rem; color: var(--text-muted); }
 
         /* Badges */
         .status-pill {
-            display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 0;
-            font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;
+            display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 6px;
+            font-size: 0.75rem; font-weight: 600;
         }
-        .status-success { background: rgba(0, 255, 136, 0.1); color: #00ff88; border: 1px solid rgba(0, 255, 136, 0.25); }
-        .status-danger { background: rgba(255, 34, 68, 0.1); color: #ff6680; border: 1px solid rgba(255, 34, 68, 0.25); }
-        .status-warning { background: rgba(255, 170, 0, 0.1); color: #ffaa00; border: 1px solid rgba(255, 170, 0, 0.25); }
 
-        .time-display { font-family: 'Orbitron', monospace; font-weight: 600; font-size: 1rem; color: var(--brand-color); }
-        .text-live { color: var(--warning-color); }
+        .time-display { font-weight: 600; font-size: 0.95rem; color: var(--text-main); font-variant-numeric: tabular-nums; }
+        .text-live { color: #2563eb; }
+        .text-success { color: #15803d; }
+        .text-danger { color: #b91c1c; }
 
         /* Botones Acción */
         .btn-action {
-            width: 34px; height: 34px; border-radius: 0; display: inline-flex; align-items: center; justify-content: center;
-            border: 1px solid var(--border-color); cursor: pointer; transition: all 0.2s; color: var(--text-muted); background: transparent;
+            width: 32px; height: 32px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center;
+            border: 1px solid transparent; cursor: pointer; transition: all 0.2s; color: var(--text-muted); background: transparent;
         }
-        .btn-action:hover { border-color: rgba(255, 34, 68, 0.4); color: var(--danger-color); background: rgba(255, 34, 68, 0.05); }
+        .btn-action:hover { color: var(--danger-color); background: #fee2e2; }
 
         .export-btn {
-            background: var(--surface-color); color: var(--brand-color); border: 1px solid var(--border-color); padding: 0.6rem 1.2rem; border-radius: 0;
-            font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s; font-family: inherit;
+            background: #ffffff; color: var(--text-main); border: 1px solid var(--border-color); padding: 0.5rem 1rem; border-radius: 8px;
+            font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; font-size: 0.9rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
         }
-        .export-btn:hover { border-color: var(--brand-color); box-shadow: 0 0 12px rgba(0, 255, 136, 0.15); color: var(--brand-color); }
+        .export-btn:hover { border-color: #cbd5e1; background: #f8fafc; color: var(--text-main); }
+        .export-btn i { color: var(--brand-color); }
 
         /* Buscador */
         .search-wrapper { position: relative; margin-bottom: 1.5rem; max-width: 400px; }
-        .search-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.2rem; }
-        .search-input { width: 100%; padding: 0.8rem 1rem 0.8rem 2.8rem; border: 1px solid var(--border-color); border-radius: 0; background: #010a04; color: var(--text-main); transition: all 0.3s; outline: none; font-family: inherit; }
-        .search-input:focus { border-color: var(--brand-color); box-shadow: 0 0 8px rgba(0, 255, 136, 0.2); }
+        .search-wrapper i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 1.1rem; }
+        .search-input { width: 100%; padding: 0.6rem 1rem 0.6rem 2.5rem; border: 1px solid var(--border-color); border-radius: 8px; background: #ffffff; color: var(--text-main); transition: all 0.2s; outline: none; font-size: 0.95rem; }
+        .search-input:focus { border-color: var(--brand-color); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
     </style>
 @endpush
 
@@ -200,8 +216,8 @@
 
         <!-- TARJETAS DE MÉTRICAS (KPIs) -->
         <div class="kpi-grid">
-            <div class="kpi-card">
-                <div class="kpi-icon-wrap kpi-blue">
+            <div class="kpi-card kpi-blue">
+                <div class="kpi-icon-wrap">
                     <i class="ph ph-users-three"></i>
                 </div>
                 <div class="kpi-info">
@@ -209,8 +225,8 @@
                     <p>{{ $totalInscritos }}</p>
                 </div>
             </div>
-            <div class="kpi-card">
-                <div class="kpi-icon-wrap kpi-blue">
+            <div class="kpi-card kpi-blue">
+                <div class="kpi-icon-wrap">
                     <i class="ph ph-clipboard"></i>
                 </div>
                 <div class="kpi-info">
@@ -218,8 +234,8 @@
                     <p>{{ $inscritosNoIniciados }}</p>
                 </div>
             </div>
-            <div class="kpi-card">
-                <div class="kpi-icon-wrap kpi-yellow">
+            <div class="kpi-card kpi-yellow">
+                <div class="kpi-icon-wrap">
                     <i class="ph ph-activity"></i>
                 </div>
                 <div class="kpi-info">
@@ -227,8 +243,8 @@
                     <p>{{ $equiposActivos }}</p>
                 </div>
             </div>
-            <div class="kpi-card">
-                <div class="kpi-icon-wrap kpi-green">
+            <div class="kpi-card kpi-green">
+                <div class="kpi-icon-wrap">
                     <i class="ph ph-flag-checkered"></i>
                 </div>
                 <div class="kpi-info">
@@ -236,15 +252,15 @@
                     <p>{{ $equiposFinalizados }}</p>
                 </div>
             </div>
-            <div class="kpi-card">
-                <div class="kpi-icon-wrap kpi-purple">
+            <div class="kpi-card kpi-purple">
+                <div class="kpi-icon-wrap">
                     <i class="ph ph-timer"></i>
                 </div>
                 <div class="kpi-info">
                     <h4>Promedio Éxito</h4>
                     <p>
                         @if($tiempoMedioSegundos > 0)
-                            {{ floor($tiempoMedioSegundos / 60) }}<span style="font-size:1rem; color:var(--text-muted)">m</span>
+                            {{ floor($tiempoMedioSegundos / 60) }}<span style="font-size:1rem; color:var(--text-muted); font-weight:600; margin-left:2px;">m</span>
                         @else
                             --
                         @endif

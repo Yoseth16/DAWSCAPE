@@ -10,7 +10,8 @@
     return [
         'label' => '// PROTOCOLO ' . str_pad($index + 1, 2, '0', STR_PAD_LEFT),
         'riddle' => $pregunta->enunciado,
-        'answer' => $pregunta->respuesta_correcta
+        'answer' => $pregunta->respuesta_correcta,
+        'alternatives' => $pregunta->respuestas_alternativas ?? []
     ];
 })->toJson() }}">
 <style>
@@ -517,10 +518,14 @@ function checkAnswer() {
 
   const q = questions[currentQ];
   const userAns = normalize(val);
-  const alternatives = String(q.answer || '')
-    .split(',')
-    .map(a => normalize(a))
-    .filter(a => a.length > 0);
+  
+  const alternatives = [];
+  if (q.alternatives && q.alternatives.length > 0) {
+      q.alternatives.forEach(a => alternatives.push(normalize(a)));
+  } else {
+      String(q.answer || '').split(',').forEach(a => alternatives.push(normalize(a)));
+  }
+  alternatives.push(normalize(q.answer || ''));
 
   const isCorrect = alternatives.includes(userAns);
 

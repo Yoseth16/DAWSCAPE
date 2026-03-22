@@ -231,12 +231,19 @@ class AdminController extends Controller
     {
         $request->validate([
             'enunciado' => 'required|string',
-            'respuesta_correcta' => 'required|string|max:255'
+            'respuesta_correcta' => 'required|string|max:255',
+            'respuestas_alternativas' => 'nullable|string'
         ]);
+
+        $alternativas = [];
+        if ($request->filled('respuestas_alternativas')) {
+            $alternativas = array_values(array_filter(array_map('trim', explode(',', $request->respuestas_alternativas))));
+        }
 
         \App\Models\PreguntaDinamica::create([
             'enunciado' => $request->enunciado,
             'respuesta_correcta' => $request->respuesta_correcta,
+            'respuestas_alternativas' => $alternativas,
             'activa' => true
         ]);
 
@@ -253,12 +260,19 @@ class AdminController extends Controller
     {
         $request->validate([
             'enunciado' => 'required|string',
-            'respuesta_correcta' => 'required|string|max:255'
+            'respuesta_correcta' => 'required|string|max:255',
+            'respuestas_alternativas' => 'nullable|string'
         ]);
+
+        $alternativas = [];
+        if ($request->filled('respuestas_alternativas')) {
+            $alternativas = array_values(array_filter(array_map('trim', explode(',', $request->respuestas_alternativas))));
+        }
 
         $pregunta = \App\Models\PreguntaDinamica::findOrFail($id);
         $pregunta->enunciado = $request->enunciado;
         $pregunta->respuesta_correcta = $request->respuesta_correcta;
+        $pregunta->respuestas_alternativas = $alternativas;
         $pregunta->save();
 
         return redirect()->route('admin.preguntas')->with('success', 'Pregunta actualizada correctamente.');

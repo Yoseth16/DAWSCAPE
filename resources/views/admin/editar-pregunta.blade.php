@@ -157,12 +157,20 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">Respuestas válidas</label>
+                <label class="form-label">Respuesta principal</label>
                 <input type="text" name="respuesta_correcta" class="form-control" required value="{{ old('respuesta_correcta', $pregunta->respuesta_correcta) }}">
-                <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 6px; display: block; line-height: 1.4;">
-                    * Puedes indicar <strong>varias respuestas correctas separadas por comas</strong>. El sistema las comparará sin tildes ni mayúsculas.
-                </small>
                 @error('respuesta_correcta')
+                    <div class="error-text">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Respuestas alternativas</label>
+                <input type="text" name="respuestas_alternativas" class="form-control" value="{{ old('respuestas_alternativas', implode(', ', $pregunta->respuestas_alternativas ?? [])) }}" placeholder="Ej: paris, París, la ciudad de la luz">
+                <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 6px; display: block; line-height: 1.4;">
+                    * Separa cada alternativa con una coma. Se compararán <strong>sin tildes ni mayúsculas</strong>.
+                </small>
+                @error('respuestas_alternativas')
                     <div class="error-text">{{ $message }}</div>
                 @enderror
             </div>
