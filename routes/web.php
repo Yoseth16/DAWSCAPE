@@ -207,7 +207,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ]);
     })->name('admin.prueba.prueba5');
     Route::get('/prueba/prueba6', [JuegoController::class, 'mostrarPrueba6'])->name('admin.prueba.prueba6');
-    Route::get('/prueba/prueba7', [JuegoController::class, 'mostrarPrueba7'])->name('admin.prueba.prueba7');
+    Route::get('/prueba/prueba7', function () {
+        session([
+            'email' => 'admin-test@prueba7.test',
+            'nombre_equipo' => 'ADMIN TEST',
+            'clase' => 'Pruebas',
+        ]);
+        return app(\App\Http\Controllers\JuegoController::class)->mostrarPrueba7();
+    })->name('admin.prueba.prueba7');
     Route::get('/prueba/prueba8', [JuegoController::class, 'mostrarPrueba8'])->name('admin.prueba.prueba8');
     Route::get('/prueba/prueba9', function () {
         session([

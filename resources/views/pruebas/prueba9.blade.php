@@ -464,11 +464,11 @@
 
 <script>
   const QUESTIONS = [
-    { q: "Nombre del director del centro", letter: "N" },
-    { q: "¿Cuántas clases de desarrollo web hay en total en el centro?", letter: "H" },
-    { q: "¿Qué empresa coreana invierte en FP como XTART para promocionar sus productos?", letter: "O" },
-    { q: "¿Cuántas ventanas hay en la clase de DAW?", letter: "A" },
-    { q: "¿Cuántas plantas tiene el centro?", letter: "C" },
+    { q: "El director del centro se llama E_____o. Su nombre tiene 7 letras y es muy común en España. ¿Cómo se llama?", letter: "N" },
+    { q: "Contad las ventanas de vuestra clase de DAW. El número está entre 4 y 6.", letter: "A" },
+    { q: "Vuestro centro tiene planta baja, primera y segunda planta. ¿Cuántas plantas tiene en total?", letter: "C" },
+    { q: "En todo el centro, ¿cuántas clases están dedicadas exclusivamente a DAW (Desarrollo de Aplicaciones Web)? Solo hay una.", letter: "H" },
+    { q: "¿Qué marca coreana famosa por los móviles Galaxy y las TV QLED invierte en tu FP a través del programa XTART?", letter: "O" },
   ];
 
   const SERVER_PROGRESS = @json($progress ?? ['index' => 0, 'letters' => [], 'fails' => 0]);

@@ -779,23 +779,23 @@ class JuegoController extends Controller
 
         $ids = session('prueba8_preguntas', []);
         $respuestasUsuario = $request->input('respuestas_usuario', []);
-        
+
         if (count($ids) !== 5 || count($respuestasUsuario) !== 5) {
             return response()->json(['success' => false, 'message' => 'Datos de validación incompletos o corruptos.'], 400);
         }
-        
+
         $preguntas = PreguntaDinamica::whereIn('id', $ids)->get()->keyBy('id');
-        
+
         foreach ($ids as $index => $id) {
             $pregunta = $preguntas[$id] ?? null;
             if (!$pregunta) {
                  return response()->json(['success' => false, 'message' => 'Pregunta no encontrada en la base de datos.'], 400);
             }
-            
+
             $respuestaUsuario = strtolower(trim($respuestasUsuario[$index] ?? ''));
             $respuestaCorrecta = strtolower(trim($pregunta->respuesta_correcta));
             $alternativas = array_map('strtolower', $pregunta->respuestas_alternativas ?? []);
-            
+
             $normalizer = function($str) {
                 if (class_exists(\Normalizer::class)) {
                     $str = \Normalizer::normalize($str, \Normalizer::FORM_D);
@@ -803,13 +803,13 @@ class JuegoController extends Controller
                 }
                 return $str;
             };
-            
+
             $respuestaUsuario = $normalizer($respuestaUsuario);
             $respuestaCorrecta = $normalizer($respuestaCorrecta);
             $alternativas = array_map($normalizer, $alternativas);
 
             $esCorrecta = $respuestaUsuario === $respuestaCorrecta || in_array($respuestaUsuario, $alternativas);
-            
+
             if (!$esCorrecta) {
                 return response()->json(['success' => false, 'message' => 'Validación fallida en el servidor. Respuestas incorrectas.'], 400);
             }
@@ -871,11 +871,11 @@ class JuegoController extends Controller
         }
 
         $questions = [
-            ['q' => 'Nombre del director del centro', 'a' => 'eduardo', 'l' => 'N'],
-            ['q' => '¿Cuántas clases de desarrollo web hay en total en el centro?', 'a' => '1', 'l' => 'H'],
-            ['q' => '¿Qué empresa coreana invierte en FP como XTART para promocionar sus productos?', 'a' => 'samsung', 'l' => 'O'],
-            ['q' => '¿Cuántas ventanas hay en la clase de DAW?', 'a' => '5', 'l' => 'A'],
-            ['q' => '¿Cuántas plantas tiene el centro?', 'a' => '3', 'l' => 'C'],
+            ['q' => 'El director del centro se llama E_____o. Su nombre tiene 7 letras y es muy común en España. ¿Cómo se llama?', 'a' => 'eduardo', 'l' => 'N'],
+            ['q' => 'Contad las ventanas de vuestra clase de DAW. El número está entre 4 y 6.', 'a' => '5', 'l' => 'A'],
+            ['q' => 'Vuestro centro tiene planta baja, primera y segunda planta. ¿Cuántas plantas tiene en total?', 'a' => '3', 'l' => 'C'],
+            ['q' => 'En todo el centro, ¿cuántas clases están dedicadas exclusivamente a DAW (Desarrollo de Aplicaciones Web)? Solo hay una.', 'a' => '1', 'l' => 'H'],
+            ['q' => '¿Qué marca coreana famosa por los móviles Galaxy y las TV QLED invierte en tu FP a través del programa XTART?', 'a' => 'samsung', 'l' => 'O'],
         ];
         $finalPassword = 'nacho';
 
