@@ -18,7 +18,7 @@ return [
             'creador' => 'Ángel',
             'imagen' => 'angel.png',
             'imagen_habla' => 'angel2.png',
-            'texto' => 'Tenéis que SUMAR tres cosas de la máquina de café: 1) Contad TODOS los botones (los de bebidas, Start, Stop, azúcar... ¡todos!). 2) Buscad el precio del Té al Limón y pasadlo a céntimos. 3) Mirad hasta qué número llega la barra de nivel de azúcar. Sumad esos tres números y tendréis la respuesta.',
+            'texto' => 'Para sacar la clave, solo tienes que buscar tres números específicos que te dan en el acertijo y sumarlos. Olvídate de la "Seguridad física" y la "Esencia de cítricos", lo que importa son los números que representan: Los botones: fíjate en el primer número que te dan (en este caso es 18). El precio del té: busca el segundo número de la lista (es el 80). El nivel de azúcar: mira el último número (es el 5).',
         ],
         4 => [
             'creador' => 'Arturo',
