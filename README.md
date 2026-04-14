@@ -97,7 +97,7 @@ El proyecto integra tecnologías modernas como **Laravel Reverb** para actualiza
 |------------|------------|
 | Framework | Laravel 12.x |
 | Lenguaje | PHP 8.2+ |
-| Base de Datos | MySQL 8.0 / MariaDB 10.3+ |
+| Base de Datos | MySQL 8.0 / MariaDB 10.3+ · SQLite (desarrollo) |
 | ORM | Eloquent |
 | WebSockets | Laravel Reverb + Pusher JS |
 | Broadcasting | Evento `Top10Updated` (canal `top10`) |
@@ -230,10 +230,12 @@ La aplicación estará disponible en `http://localhost:8000`.
 
 ### Credenciales por Defecto
 
-| Rol | Email | Contraseña |
-|-----|-------|------------|
+| Rol | Usuario | Contraseña |
+|-----|---------|------------|
 | Administrador | `1daw` | `1daw` |
 
+> El formulario de login pide **usuario** (campo `name` de la tabla `users`), no email. El `LoginRequest` resuelve internamente el email asociado al usuario.
+>
 > ⚠️ **Cambiar estas credenciales en producción.**
 
 ---
@@ -460,6 +462,132 @@ Tiempo = (ahora - inicio_juego - tiempo_pausado) + penalizacion_segundos
 
 ---
 
+## ✅ Verificación del Sistema — Tests Ejecutados
+
+Estos son los chequeos que se han pasado sobre el repositorio para validar que todo el juego y el panel de administración funcionan correctamente. Sirven como guía rápida de *smoke tests* cuando se hacen cambios grandes.
+
+### 1. Sintaxis y compilación
+
+| Test | Comando / Acción | Resultado esperado |
+|------|------------------|--------------------|
+| PHP lint de toda la app | `find app -name "*.php" -exec php -l {} \;` | `No syntax errors` en todos los ficheros |
+| Compilación Blade | Iterar todos los `resources/views/**/*.blade.php` con `Blade::compileString()` | Todas las vistas compilan sin excepciones |
+| Búsqueda de conflictos de merge | `grep -r '^<<<<<<< HEAD' app/ resources/ routes/` | Sin coincidencias |
+| Migraciones | `php artisan migrate:status` | Todas `Ran` |
+| Nombres de rutas en Blade | Script que extrae `route('...')` de cada vista y comprueba contra `Route::getRoutes()` | Todos los nombres existen |
+| Assets `asset('...')` y `src="/..."` | Script que comprueba que cada ruta estática existe en `public/` | Sin rutas rotas |
+
+### 2. Smoke test de rutas públicas (sin login)
+
+```bash
+php artisan serve --port=8765
+```
+
+| Ruta | Código | Nota |
+|------|--------|------|
+| `GET /` | **200** | `inicio.blade.php` |
+| `GET /legal` | **200** | Aviso legal / RGPD |
+| `GET /inscripcion` | **200** | Formulario de inscripción previa |
+| `GET /top10` | **200** | Pantalla pública de ranking live |
+| `GET /api/top10`, `/top10/datos` | **200** | JSON con `ticker`, `top10`, `finalizados` |
+| `GET /dashboard` (sin login) | **302** | Redirige a `/login` (middleware `auth`) |
+| `GET /prueba1` (sin sesión de juego) | **302** | Redirige por middleware `check.fase` |
+
+### 3. Login como administrador
+
+```bash
+curl -c cookies.txt http://127.0.0.1:8765/login   # obtiene CSRF
+curl -b cookies.txt -c cookies.txt -X POST http://127.0.0.1:8765/login \
+     -d "_token=..." -d "username=1daw" -d "password=1daw"
+```
+
+- Usuario sembrado por `AdminSeeder`: `1daw@dawscape.com` / `1daw` (pero el login se hace con **username** = `1daw`, no con el email).
+- `Hash::check('1daw', $user->password) === true`.
+- Redirige a `/dashboard` con `302` + `Location: /dashboard`.
+
+### 4. Páginas del panel de administración (autenticado)
+
+Todas devuelven `200` y HTML sin trazas de `Whoops`, `ErrorException`, `Undefined variable`, etc.:
+
+| Ruta | Controlador | Tamaño aprox. |
+|------|-------------|---------------|
+| `/dashboard` | `AdminController@adminPanel` | ~34 KB |
+| `/admin/analitica` | `AdminController@analitica` | ~29 KB |
+| `/admin/live` | `AdminController@liveFeed` | ~44 KB |
+| `/admin/qrs` | `QrController@mostrarGestor` | ~40 KB |
+| `/preguntas` | `AdminController@gestionarPreguntas` | ~400 KB |
+| `/admin/valoraciones` | `ValoracionController@index` | ~20 KB |
+| `/admin/system` | `AdminController@systemHealth` | ~44 KB |
+
+### 5. Visor de datos `/admin/database/{table}`
+
+Las 8 tablas permitidas en `AdminController::showTable()` responden `200`:
+
+`partidas`, `inscripcions`, `log_juegos`, `pistas_usadas`, `pregunta_dinamicas`, `qrs`, `users`, `hitos_fases`.
+
+> ⚠️ Nombres reales de tabla: `qrs` (no `qr_codes`) y `valoraciones` (no `valoracions`). La tabla `valoraciones` tiene su propia vista en `/admin/valoraciones` y **no** está expuesta por `showTable`.
+
+### 6. APIs JSON del admin
+
+| Endpoint | Respuesta |
+|----------|-----------|
+| `GET /admin/api/stats` | `{"metrics":{total,finalizados,activos,promedio},"chart":{labels,data},"bottlenecks":[],...}` |
+| `GET /admin/api/inscripciones` | `{"total_inscritos","no_iniciados","iniciados","inscripciones_pendientes":[]}` |
+| `GET /admin/api/equipos-activos` | Array de equipos en curso |
+| `GET /api/top10`, `/top10/datos` | `{"ticker","top10","finalizados","timestamp"}` |
+
+### 7. Acciones CRUD del panel
+
+| Acción | Endpoint | Verificado |
+|--------|----------|------------|
+| Crear pregunta dinámica | `POST /preguntas` (campos: `enunciado`, `respuesta_correcta`, `respuestas_alternativas`) | Registro creado en BD |
+| Editar pregunta | `GET /admin/pregunta/{id}/edit` + `PUT /admin/pregunta/{id}` | 200 + modelo actualizado |
+| Alternar activa | `POST /preguntas/{id}/toggle` | Campo `activa` invertido |
+| Eliminar pregunta | `DELETE /preguntas/{id}` | Registro borrado |
+| Crear QR dinámico | `POST /admin/qrs` | Registro creado |
+| Eliminar QR | `DELETE /admin/qrs/{id}` | Registro borrado |
+| Ajustar tiempo live | `POST /admin/live/ajustar-tiempo` | 200/302 con payload `uuid` + `segundos` |
+| Export PDF Top 20 | `GET /admin/exportar-top20` | `200 application/pdf` (DomPDF + `ranking-pdf.blade.php`) |
+
+### 8. Rutas de bypass del admin para pruebas
+
+Con sesión de administrador, se puede entrar a cada prueba sin jugar las anteriores. Todas devuelven `200`:
+
+`/prueba/prueba1`, `/prueba/prueba2`, `/prueba/prueba3`, `/prueba/prueba4`, `/prueba/prueba5`, `/prueba/prueba6`, `/prueba/prueba7`, `/prueba/prueba8`, `/prueba/prueba9`, `/prueba/final`.
+
+`/prueba/final` usa una `Partida` ficticia (no persistida) con un conjunto de hitos de ejemplo para previsualizar el diploma.
+
+### 9. Flujo completo con datos reales
+
+Creando una `Partida` finalizada de prueba con `php artisan tinker`:
+
+```php
+App\Models\Partida::create([
+  'uuid' => Str::uuid(),
+  'email' => 'test@dawscape.fun',
+  'nombre_equipo' => 'EQUIPO-REVIEW',
+  'clase' => '1DAW A',
+  'fase_actual' => config('fases.fases.finalizado.db'),
+  'tiempo_segundos' => 2700,
+  'penalizacion_segundos' => 0,
+  'tiempo_inicio' => now()->subHour(),
+  'tiempo_fin' => now(),
+]);
+```
+
+- `/dashboard`, `/admin/analitica`, `/admin/live`, `/admin/system` siguen devolviendo `200` con los KPIs y gráficos rellenos.
+- `/top10` y `/api/top10` reflejan la nueva partida.
+- `/admin/exportar-top20` genera un PDF válido con la partida dentro.
+- `storage/logs/laravel.log` no recibe errores nuevos durante el test.
+
+### 10. Comprobaciones adicionales
+
+- `php artisan about` — entorno OK (Laravel 12.53, PHP 8.3, SQLite, Reverb, Breeze).
+- `php artisan migrate:status` — sin migraciones pendientes.
+- `Mail\CodigoAccesoInscripcion::envelope()` define `to: [$this->inscripcion->correo]`, por lo que `Mail::send(new CodigoAccesoInscripcion($inscripcion))` en `InscripcionController::guardar()` resuelve correctamente el destinatario.
+
+---
+
 ## 🐛 Solución de Problemas
 
 | Problema | Solución |
@@ -636,7 +764,7 @@ Tiempo = (ahora - inicio_juego - tiempo_pausado) + penalizacion_segundos
 <details>
 <summary><strong>Prueba 9 — Juego de Pistas (Prueba Final)</strong></summary>
 
-**Tipo**: Mixto — 7 preguntas secuenciales que revelan letras para formar una contraseña.
+**Tipo**: Mixto — 5 preguntas secuenciales que revelan letras para formar una contraseña.
 
 **Fase 1 — Preguntas y letras**:
 
