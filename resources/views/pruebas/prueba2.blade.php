@@ -371,8 +371,8 @@ function submitAnswer() {
         failedAttempts++;
         if (window.audioManager) window.audioManager.playSFX('error');
         printError("[ERROR] Clave no reconocida. Verificad los sectores de memoria.");
-        if (failedAttempts >= 5) {
-    
+    }
+}
 
 inputField.addEventListener('keydown', function(e) {
     if (e.key === 'Enter') { e.preventDefault(); submitAnswer(); }
