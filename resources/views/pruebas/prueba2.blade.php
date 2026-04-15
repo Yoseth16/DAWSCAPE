@@ -296,9 +296,6 @@
     <label class="terminal-label">Introduce la clave maestra de 5 caracteres:</label>
     <input class="answer-input" id="answer-input" type="text" maxlength="5" placeholder="_ _ _ _ _" autocomplete="off" spellcheck="false" autocapitalize="characters" inputmode="text">
     <button class="submit-btn" id="submit-btn" onclick="submitAnswer()">▶ ENVIAR RESPUESTA</button>
-    <div class="hint" id="system-hint">
-        [PISTA DEL SISTEMA] — Los sectores de memoria forman el nombre de un municipio famoso de Murcia.
-    </div>
   </div>
 
   <div class="console-out" id="console-out"></div>
@@ -350,7 +347,6 @@ let failedAttempts = 0;
 const correctAnswer = "cieza";
 const inputField = document.getElementById('answer-input');
 const consoleOut = document.getElementById('console-out');
-const hintBox = document.getElementById('system-hint');
 const nextBtn = document.getElementById('next-btn');
 let solved = false;
 
@@ -376,10 +372,7 @@ function submitAnswer() {
         if (window.audioManager) window.audioManager.playSFX('error');
         printError("[ERROR] Clave no reconocida. Verificad los sectores de memoria.");
         if (failedAttempts >= 5) {
-            hintBox.style.display = 'block';
-        }
-    }
-}
+    
 
 inputField.addEventListener('keydown', function(e) {
     if (e.key === 'Enter') { e.preventDefault(); submitAnswer(); }

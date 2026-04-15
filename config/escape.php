@@ -12,7 +12,7 @@ return [
             'creador' => 'Yoseth',
             'imagen' => 'yoseth.png',
             'imagen_habla' => 'yoseth2.png',
-            'texto' => 'Buscad 5 letras repartidas por las máquinas del edificio (cafetería, vending, etc.). Cada máquina tiene una letra pegada o escondida. Cuando tengáis las 5 letras, reordenadlas para formar el nombre de un municipio de la Región de Murcia conocido por sus melocotones. Pista extra: empieza por C.',
+            'texto' => 'Buscad 5 letras repartidas por las máquinas del edificio (cafetería, vending, etc.). Cada máquina tiene una letra pegada o escondida. Cuando tengáis las 5 letras, reordenadlas para formar el nombre de un municipio de la Región de Murcia conocido por sus melocotones.',
         ],
         3 => [
             'creador' => 'Ángel',
