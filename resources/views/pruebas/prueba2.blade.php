@@ -297,7 +297,7 @@
     <input class="answer-input" id="answer-input" type="text" maxlength="5" placeholder="_ _ _ _ _" autocomplete="off" spellcheck="false" autocapitalize="characters" inputmode="text">
     <button class="submit-btn" id="submit-btn" onclick="submitAnswer()">▶ ENVIAR RESPUESTA</button>
     <div class="hint" id="system-hint">
-        [PISTA DEL SISTEMA] — Los sectores de memoria forman el nombre de una mujer.
+        [PISTA DEL SISTEMA] — Los sectores de memoria forman el nombre de un municipio famoso de Murcia.
     </div>
   </div>
 
@@ -347,7 +347,7 @@ setInterval(actualizarTimer, 1000);
 
 // ── LÓGICA DE VALIDACIÓN ─────────────────────────────────────
 let failedAttempts = 0;
-const correctAnswer = "rocio";
+const correctAnswer = "cieza";
 const inputField = document.getElementById('answer-input');
 const consoleOut = document.getElementById('console-out');
 const hintBox = document.getElementById('system-hint');
@@ -387,7 +387,7 @@ inputField.addEventListener('keydown', function(e) {
 
 function validateWord(word) {
     // Basic normalization handling to make sure accents don't break logic just in case,
-    // though ROCIO doesn't necessarily need it, better safe than sorry.
+    // though CIEZA doesn't necessarily need it, better safe than sorry.
     const normalized = word.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     return normalized === correctAnswer;
 }

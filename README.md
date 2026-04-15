@@ -634,11 +634,11 @@ App\Models\Partida::create([
 
 **Tipo**: Físico/Digital — Buscar 5 letras ocultas en máquinas del edificio y formar un anagrama.
 
-**Respuesta correcta**: `rocio`
+**Respuesta correcta**: `cieza`
 
 **Validación**: Se normaliza a minúsculas, se eliminan acentos (`Normalizer::FORM_D`) y se recortan espacios.
 
-**Pista** (penalización +8 min): *"Cinco fragmentos dispersos por el edificio. Cada máquina guarda una letra. El nombre de una mujer emerge del caos cuando ordenas el desorden."*
+**Pista** (penalización +8 min): *"Cinco fragmentos dispersos por el edificio. Cada máquina guarda una letra. El nombre de un municipio de Murcia emerge del caos cuando ordenas el desorden."*
 
 </details>
 

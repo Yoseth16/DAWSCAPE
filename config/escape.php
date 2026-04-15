@@ -12,7 +12,7 @@ return [
             'creador' => 'Yoseth',
             'imagen' => 'yoseth.png',
             'imagen_habla' => 'yoseth2.png',
-            'texto' => 'Buscad 5 letras repartidas por las máquinas del edificio (cafetería, vending, etc.). Cada máquina tiene una letra pegada o escondida. Cuando tengáis las 5 letras, reordenadlas para formar un nombre de mujer de 5 letras muy común en España. Pista extra: empieza por R.',
+            'texto' => 'Buscad 5 letras repartidas por las máquinas del edificio (cafetería, vending, etc.). Cada máquina tiene una letra pegada o escondida. Cuando tengáis las 5 letras, reordenadlas para formar el nombre de un municipio de la Región de Murcia conocido por sus melocotones. Pista extra: empieza por C.',
         ],
         3 => [
             'creador' => 'Ángel',
@@ -57,7 +57,7 @@ return [
             ['201', 'doscientos uno']
         ],
         // La prueba 2 la maneja el front-end con un anagrama, pero el back valida también
-        'prueba2' => 'rocio',
+        'prueba2' => 'cieza',
         'prueba3' => 103, // Checksum: 18 botones + 80 cents + 5 azucar
         'prueba4' => 141, // Checksum Oasis: 6 filas + cod 128 cafe + 7 items A1
         'prueba5' => 'zasielx', // Palabra espejo
