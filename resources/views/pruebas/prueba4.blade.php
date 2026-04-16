@@ -294,9 +294,9 @@
   <div class="logo">OPERACIÓN REPUESTOS</div>
   <div class="intro-text">
     <span class="icon">🔌</span>
-    <p>El cortafuegos ha caído y el sistema está expuesto. El código fuente de la supervivencia se ha filtrado en el <strong>Oasis</strong>.</p>
+    <p>El cortafuegos ha caído y el sistema está expuesto. El código fuente de la supervivencia se ha filtrado en las <strong>máquinas de la planta baja</strong>.</p>
     <br>
-    <p><strong>Busca la terminal negra donde los paquetes de datos se convierten en snacks. Escanea el acceso para completar la brecha.</strong></p>
+    <p><strong>Bajad a la planta baja y buscad las máquinas expendedoras. Escanead el QR para acceder al desafío.</strong></p>
     <div style="margin-top: 1.25rem; display:flex; justify-content:center;">
       <button id="btn-scan" type="button" class="btn btn-scan-main">📷 ESCANEAR</button>
     </div>
@@ -317,12 +317,12 @@
   <div class="logo">TERMINAL OASIS</div>
   <div class="intro-text">
     <p style="color:var(--red)">Acceso al núcleo denegado.</p>
-    <p style="margin-top:0.5rem;">El cortafuegos de la red Oasis requiere un código de verificación basado en el inventario de hardware actual.</p>
-    <p style="margin-top:0.5rem; color:#668877;">Para generar el código de bypass, combina estos tres factores de la unidad de suministros:</p>
+    <p style="margin-top:0.5rem;">El cortafuegos requiere un código de verificación basado en los datos de las máquinas de la planta baja.</p>
+    <p style="margin-top:0.5rem; color:#668877;">Para generar el código de bypass, combina estos tres factores:</p>
     <ul class="term-list">
-        <li>Censo total de ranuras de almacenamiento (número de bandejas o filas horizontales visibles).</li>
-        <li>Valor numérico identificador asignado al producto de café (código indicado en la máquina) de la unidad lateral.</li>
-        <li>Índice de capacidad de la ranura A1 (número de productos que caben en el primer espiral de arriba a la izquierda).</li>
+        <li>El precio total en céntimos de todos los productos de una fila horizontal completa de la máquina de snacks.</li>
+        <li>El número de tipos de productos diferentes que caben en esa misma fila horizontal.</li>
+        <li>El código numérico asignado a las palmeras de chocolate.</li>
     </ul>
     <p style="text-align: center; margin-top: 1.5rem; font-size: 0.9em;"><strong>Introduce la suma total para purgar el sistema.</strong></p>
     <div class="form-group">
@@ -332,7 +332,7 @@
         <button class="challenge-btn" id="btn-verificar" type="button">EJECUTAR BYPASS →</button>
     </div>
     <div class="hint-box" id="hint-box">
-        <strong>[PISTA DEL SISTEMA]</strong><br>La respuesta es la suma de tres números. Cuenta las filas horizontales, averigua el código numérico del café y suma cuántos productos exactos entran en el alambre del hueco A1.
+        <strong>[PISTA DEL SISTEMA]</strong><br>La respuesta es la suma de tres números: el precio total en céntimos de una fila (130), el número de tipos de producto en esa fila (7) y el código de las palmeras de chocolate (31). Súmalos.
     </div>
   </div>
 </div>

@@ -456,9 +456,9 @@ const questions = [
   },
   {
     label: "// ACERTIJO FINAL",
-    riddle: `Has llegado lejos, agente. Pero el último candado requiere lógica pura.\n\nSuma todos los números que has descubierto: el código de la sala, las máquinas, las pantallas y las luces.\n\nEl resultado final es la suma de todos los valores.\n\n¿Cuál es el código de salida?`,
-    answer: "201",
-    alt: ["doscientos uno"]
+    riddle: `Has llegado lejos, agente. Pero el último candado requiere lógica pura.\n\nSuma todos los números que has descubierto: el código de la sala, las máquinas, las pantallas y las luces.\n\n115 + 16 + 32 + 14 = ?\n\n¿Cuál es el código de salida?`,
+    answer: "177",
+    alt: ["ciento setenta y siete"]
   }
 ];
 

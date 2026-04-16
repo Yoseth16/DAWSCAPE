@@ -323,7 +323,7 @@
   <div class="intro-text">
     <p>El abecedario ha sido invertido para proteger la clave. La correspondencia original ha sido corrompida.</p>
     <p style="margin-top:0.5rem; color:#668877;">Nueva tabla de conversión:</p>
-    <p style="color:var(--green); letter-spacing:0.1em; text-align:center; padding: 0.5rem; background: #0a0a0a; border: 1px dashed #00ff8840; margin: 0.5rem 0;">Z = 1 &nbsp; Y = 2 &nbsp; X = 3 &nbsp; ... &nbsp; A = 27</p>
+    <p style="color:var(--green); letter-spacing:0.1em; text-align:center; padding: 0.5rem; background: #0a0a0a; border: 1px dashed #00ff8840; margin: 0.5rem 0;">Z = 1 &nbsp; Y = 2 &nbsp; X = 3 &nbsp; ... &nbsp; A = 26</p>
     <p style="margin-top:0.8rem; color:var(--red); font-weight:bold; text-align:center; border:1px dashed var(--red); padding:0.6rem; background:rgba(255,34,68,0.05);">RECUERDA QUE DEBES USAR EL ABECEDARIO INGLÉS (26 LETRAS)</p>
     <p style="margin-top:0.5rem;">El núcleo del sistema está oculto en varias unidades numeradas del 1 al 64. Cada número representa una letra bajo el Protocolo Espejo.</p>
     <div style="margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1rem;">

@@ -24,7 +24,7 @@ return [
             'creador' => 'Arturo',
             'imagen' => 'arturo.png',
             'imagen_habla' => 'arturo2.png',
-            'texto' => 'Tenéis que SUMAR tres cosas de la máquina de snacks del Oasis: 1) Contad las filas horizontales (bandejas) que se ven dentro de la máquina. 2) En la máquina de al lado, buscad el código numérico asignado al café (es un número de 3 cifras). 3) Contad cuántos productos caben exactamente en el primer espiral de arriba a la izquierda (A1). Sumad los tres números.',
+            'texto' => 'Tenéis que SUMAR tres cosas de las máquinas de la planta baja: 1) Sumad el precio en céntimos de todos los productos de una fila horizontal completa de la máquina de snacks (da 130). 2) Contad cuántos tipos de productos diferentes hay en esa fila (son 7). 3) Buscad el código numérico de las palmeras de chocolate (es el 31). Sumad los tres: 130 + 7 + 31 = 168.',
         ],
         5 => [
             'creador' => 'Eloy',
@@ -54,12 +54,12 @@ return [
             ['32', 'treinta y dos'],
             ['14', 'catorce'],
             ['5x0lh8bx100127t'],
-            ['201', 'doscientos uno']
+            ['177', 'ciento setenta y siete']
         ],
         // La prueba 2 la maneja el front-end con un anagrama, pero el back valida también
         'prueba2' => 'cieza',
         'prueba3' => 103, // Checksum: 18 botones + 80 cents + 5 azucar
-        'prueba4' => 141, // Checksum Oasis: 6 filas + cod 128 cafe + 7 items A1
+        'prueba4' => 168, // Checksum planta baja: 130 céntimos fila + 7 tipos producto + 31 código palmeras
         'prueba5' => 'zasielx', // Palabra espejo
     ],
 ];
