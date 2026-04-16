@@ -300,7 +300,7 @@
     <br>
     <p>Para conseguir esa clave, mezcla estos tres datos del equipo:</p>
     <ul class="term-list">
-        <li>El censo total de disparadores táctiles (botones) de la máquina.</li>
+        <li>El censo de disparadores táctiles destinados únicamente a las bebidas (ignora los tres botones adicionales).</li>
         <li>El valor nominal (en céntimos) de la esencia de cítricos (Té al Limón).</li>
         <li>El umbral de saturación de glucosa (nivel máximo de azúcar).</li>
     </ul>

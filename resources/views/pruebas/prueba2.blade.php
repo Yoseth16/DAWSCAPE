@@ -288,8 +288,8 @@
 <div class="screen">
 
   <div class="alert-box">
-    <p>La clave maestra de enrutamiento ha sido fragmentada por un malware. Los 5 paquetes de datos resultantes se han ocultado en la red de Nodos de Suministro (Máquinas Expendedoras) repartidos por todo el edificio.</p>
-    <p><strong>Vuestra misión:</strong> Localizad las 5 máquinas de bebidas del instituto. Cada máquina tiene pegado un sector de memoria (una letra). Reunidlas todas y descifrad el anagrama para reconstruir el código de acceso.</p>
+    <p>La clave maestra ha sido rota en pedazos por un virus informático. Los 5 fragmentos se han escondido en las máquinas expendedoras de todo el edificio.</p>
+    <p><strong>Vuestra misión:</strong> Localizad las 5 máquinas de bebidas del instituto. En alguna parte de cada máquina encontraréis pegada una pieza de información (una letra). Reunidlas todas y ordenad las letras para descubrir la palabra secreta y conseguir el código de acceso.</p>
   </div>
 
   <div class="terminal-box">

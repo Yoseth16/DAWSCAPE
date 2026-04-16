@@ -234,6 +234,11 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
+  @keyframes pulse-glow {
+    0%, 100% { text-shadow: 0 0 15px var(--green), 0 0 40px #00ff8860; }
+    50% { text-shadow: 0 0 30px var(--green), 0 0 70px #00ff8840; }
+  }
+
   /* ═══ MOBILE ═══ */
   @media (max-width: 600px) {
     .sergio-screen { padding: 1.5rem 1rem; }
@@ -266,8 +271,11 @@
     </div>
   </div>
 
-  <!-- Botón (aparece al terminar el texto) -->
+  <!-- Mensaje de redirección (aparece al terminar el texto) -->
   <div class="action-btn-wrapper" id="actionBtnWrapper">
+    <div style="text-align:center; margin-bottom:1.2rem; font-family:'Orbitron',sans-serif; font-size:clamp(1rem,3vw,1.3rem); color:var(--green); text-shadow:0 0 15px var(--green); letter-spacing:0.15em; animation: pulse-glow 2s ease-in-out infinite;">
+      Dirígete al Aula 115
+    </div>
     <a href="{{ route('prueba1') }}" class="btn">ENTRAR A DAWSCAPE →</a>
   </div>
 </div>

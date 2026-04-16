@@ -450,13 +450,13 @@ const questions = [
   },
   {
     label: "// ACERTIJO 05",
-    riddle: `Soy el guardián del aula.\nMe encuentras en el lugar más visible de todos,\npresidiendo la pizarra, mirando a todos.\n\nNo soy un número ni una palabra,\nsino una cadena de caracteres que nació en fábrica.\n\nEncuéntrame. Léeme. Introdúceme.\n\n¿Cuál es mi código?`,
+    riddle: `Soy el guardián del aula. Mi hogar es el lugar más visible de todos, pero aguardo oculto a un costado, a espaldas de la pizarra.\n\nNo soy un número ni una palabra, sino una cadena de caracteres que nació en fábrica.\n\nEncuéntrame. Léeme. Introdúceme.\n\n¿Cuál es mi código?`,
     answer: "5x0lh8bx100127t",
     alt: ["5x0lh8bx100127t"]
   },
   {
     label: "// ACERTIJO FINAL",
-    riddle: `Has llegado lejos, agente.\nPero el último candado requiere lógica pura.\n\nSuma todos los números que has descubierto:\nla sala, las máquinas, las pantallas y las luces.\n\nAhora, extrae todos los dígitos ocultos en el código de serie\ny súmalos entre sí.\n\nEl resultado final es la suma de ambos valores.\n\n¿Cuál es el código de salida?`,
+    riddle: `Has llegado lejos, agente. Pero el último candado requiere lógica pura.\n\nSuma todos los números que has descubierto: el código de la sala, las máquinas, las pantallas y las luces.\n\nEl resultado final es la suma de todos los valores.\n\n¿Cuál es el código de salida?`,
     answer: "201",
     alt: ["doscientos uno"]
   }

@@ -538,7 +538,10 @@
     return await res.json();
   }
 
+  let sendingAnswer = false;
   async function sendAnswer() {
+    if (sendingAnswer) return;
+    sendingAnswer = true;
     const btn = document.getElementById('btn-send');
     const inp = document.getElementById('answer-input');
     const feedback = document.getElementById('feedback');
@@ -552,12 +555,15 @@
         feedback.className = 'feedback err';
         feedback.textContent = data.message || '[ERROR] Respuesta incorrecta. Inténtalo de nuevo.';
         document.getElementById('system-hint').classList.toggle('visible', fails >= 5);
+        if (window.audioManager) window.audioManager.playSFX('error');
         btn.disabled = false;
+        sendingAnswer = false;
         inp.focus();
         return;
       }
 
-      // Correcta: guardar letra local para mostrar inmediatamente
+      // Correcta
+      if (window.audioManager) window.audioManager.playSFX('correct');
       if (data.letter) letters.push(data.letter);
       renderLetters('letters-row', letters);
 
@@ -566,20 +572,26 @@
         renderLetters('letters-row-final', data.letters || letters);
         showScreen('screen-password');
         document.getElementById('password-input').focus();
+        sendingAnswer = false;
         return;
       }
 
       index = data.nextIndex || (index + 1);
       refreshQuestionUI();
       btn.disabled = false;
+      sendingAnswer = false;
     } catch (e) {
       feedback.className = 'feedback err';
       feedback.textContent = '[ERROR] Fallo de conexión. Inténtalo de nuevo.';
       btn.disabled = false;
+      sendingAnswer = false;
     }
   }
 
+  let sendingPassword = false;
   async function sendPassword() {
+    if (sendingPassword) return;
+    sendingPassword = true;
     const btn = document.getElementById('btn-password');
     const inp = document.getElementById('password-input');
     const feedback = document.getElementById('feedback-pass');
@@ -592,20 +604,26 @@
         feedback.className = 'feedback err';
         feedback.textContent = data.message || '[ERROR] Contraseña incorrecta. Inténtalo de nuevo.';
         document.getElementById('system-hint-pass').classList.toggle('visible', fails >= 5);
+        if (window.audioManager) window.audioManager.playSFX('error');
         btn.disabled = false;
+        sendingPassword = false;
         inp.focus();
         return;
       }
 
       if (data.state === 'done') {
+        if (window.audioManager) window.audioManager.playSFX('correct');
         showScreen('screen-done');
+        sendingPassword = false;
         return;
       }
       btn.disabled = false;
+      sendingPassword = false;
     } catch (e) {
       feedback.className = 'feedback err';
       feedback.textContent = '[ERROR] Fallo de conexión. Inténtalo de nuevo.';
       btn.disabled = false;
+      sendingPassword = false;
     }
   }
 
@@ -623,9 +641,9 @@
   document.getElementById('btn-password').addEventListener('click', sendPassword);
   document.getElementById('btn-final').addEventListener('click', () => window.location.href = '/final');
 
-  // Enter key support for inputs
-  document.getElementById('answer-input').addEventListener('keydown', e => { if (e.key === 'Enter') sendAnswer(); });
-  document.getElementById('password-input').addEventListener('keydown', e => { if (e.key === 'Enter') sendPassword(); });
+  // Enter key support for inputs (guards prevent double-submit)
+  document.getElementById('answer-input').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); sendAnswer(); } });
+  document.getElementById('password-input').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); sendPassword(); } });
 
   // Matrix rain effect
   (function matrixRain() {
@@ -681,3 +699,4 @@
 </body>
 </html>
 
+@include('components.live-listener')
