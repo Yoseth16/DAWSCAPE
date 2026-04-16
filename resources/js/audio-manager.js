@@ -92,11 +92,12 @@ class AudioManager {
     };
 
     // SFX (rutas relativas a baseUrl)
+    // Nota: 'speaking' (hablando-pista.mp3) NO va aquí — lo gestiona
+    // pista-ayuda.blade.php con su propio Audio() porque necesita loop.
     this.sfxFiles = {
       correct: 'Acierto.mp3',
       error: 'Error.mp3',
       hint: 'Boton-Pista.mp3',
-      speaking: 'hablando-pista.mp3',
       click: 'minecraft_click.mp3',
     };
 
@@ -195,20 +196,11 @@ class AudioManager {
         }).catch(() => {});
       }
 
-      // Pre-inicializar los Audio de SFX reproduciéndolos en silencio.
-      // iOS Safari requiere que el primer .play() ocurra dentro de un
-      // evento de usuario directo.
-      Object.keys(self.sfx).forEach((key) => {
-        const a = self.sfx[key];
-        a.muted = true;
-        a.play().then(() => {
-          a.pause();
-          a.muted = false;
-          a.currentTime = 0;
-        }).catch(() => {
-          a.muted = false;
-        });
-      });
+      // NO pre-reproducir SFX aquí: consumiría el gesto de usuario
+      // y puede impedir que bgMusic arranque (el navegador solo
+      // permite un número limitado de play() por gesto). Los SFX
+      // funcionan correctamente cuando se llaman desde playSFX()
+      // porque en ese punto el usuario ya ha interactuado.
 
       // Eliminar todos los listeners tras el primer gesto
       eventos.forEach((ev) => document.removeEventListener(ev, onFirstGesture, true));

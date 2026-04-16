@@ -320,9 +320,9 @@
     <p style="margin-top:0.5rem;">El cortafuegos requiere un código de verificación basado en los datos de las máquinas de la planta baja.</p>
     <p style="margin-top:0.5rem; color:#668877;">Para generar el código de bypass, combina estos tres factores:</p>
     <ul class="term-list">
-        <li>El precio total en céntimos de todos los productos de una fila horizontal completa de la máquina de snacks.</li>
-        <li>El número de tipos de productos diferentes que caben en esa misma fila horizontal.</li>
-        <li>El código numérico asignado a las palmeras de chocolate.</li>
+        <li>El precio en céntimos de la palmera de chocolate.</li>
+        <li>El número de tipos de productos diferentes que caben en la misma fila donde está la palmera de chocolate.</li>
+        <li>El número del código del producto de la palmera de chocolate.</li>
     </ul>
     <p style="text-align: center; margin-top: 1.5rem; font-size: 0.9em;"><strong>Introduce la suma total para purgar el sistema.</strong></p>
     <div class="form-group">
@@ -332,7 +332,7 @@
         <button class="challenge-btn" id="btn-verificar" type="button">EJECUTAR BYPASS →</button>
     </div>
     <div class="hint-box" id="hint-box">
-        <strong>[PISTA DEL SISTEMA]</strong><br>La respuesta es la suma de tres números: el precio total en céntimos de una fila (130), el número de tipos de producto en esa fila (7) y el código de las palmeras de chocolate (31). Súmalos.
+        <strong>[PISTA DEL SISTEMA]</strong><br>La respuesta es la suma de tres números: el precio en céntimos de la palmera de chocolate (130), el número de tipos de producto en esa fila (7) y el código del producto de la palmera (31). Súmalos.
     </div>
   </div>
 </div>

@@ -24,7 +24,7 @@ return [
             'creador' => 'Arturo',
             'imagen' => 'arturo.png',
             'imagen_habla' => 'arturo2.png',
-            'texto' => 'Tenéis que SUMAR tres cosas de las máquinas de la planta baja: 1) Sumad el precio en céntimos de todos los productos de una fila horizontal completa de la máquina de snacks (da 130). 2) Contad cuántos tipos de productos diferentes hay en esa fila (son 7). 3) Buscad el código numérico de las palmeras de chocolate (es el 31). Sumad los tres: 130 + 7 + 31 = 168.',
+            'texto' => 'Tenéis que SUMAR tres cosas de las máquinas de la planta baja: 1) El precio en céntimos de la palmera de chocolate (es 130). 2) Contad cuántos tipos de productos diferentes caben en la misma fila donde está la palmera (son 7). 3) Buscad el número del código del producto de la palmera de chocolate (es el 31). Sumad los tres: 130 + 7 + 31 = 168.',
         ],
         5 => [
             'creador' => 'Eloy',
@@ -59,7 +59,7 @@ return [
         // La prueba 2 la maneja el front-end con un anagrama, pero el back valida también
         'prueba2' => 'cieza',
         'prueba3' => 103, // Checksum: 18 botones + 80 cents + 5 azucar
-        'prueba4' => 168, // Checksum planta baja: 130 céntimos fila + 7 tipos producto + 31 código palmeras
+        'prueba4' => 168, // Checksum planta baja: 130 céntimos palmera + 7 tipos producto fila + 31 código palmera
         'prueba5' => 'zasielx', // Palabra espejo
     ],
 ];

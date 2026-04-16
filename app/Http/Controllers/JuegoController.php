@@ -642,7 +642,7 @@ class JuegoController extends Controller
             'acertijo'  => 'En la geometría clásica, represento el total de sólidos platónicos perfectos que existen. En el emblema de los Juegos Olímpicos, doy forma a los anillos que representan las partes habitadas del mundo.'
         ],
         6 => [
-            'ubicacion' => 'Puertas "X EMERGENCIAS+PROTECCION CIVIL" junto al cuadro de luces',
+            'ubicacion' => 'Puertas X EMERGENCIAS+PROTECCION CIVIL junto al cuadro de luces',
             'acertijo'  => 'Soy el primer número perfecto, la suma de mis divisores exactos (1, 2 y 3) te dará mi valor. En química, soy el cimiento de la vida, el número atómico del carbono.'
         ],
         7 => [

@@ -548,19 +548,19 @@
 
 <script>
 // ── CONFIG INYECTADA DESDE EL SERVIDOR ─────────────────────
-const PISTAS = JSON.parse( '{!! json_encode($pistas) !!}' );
+const PISTAS = @json($pistas);
 let intentosFallidos = parseInt("{{ $intentos_fallidos ?? 0 }}") || 0;
 
-// ── TIMER ───────────────────────────────────────────────────
-let tiempoInicial = parseInt("{{ $tiempo_transcurrido ?? 0 }}") || 0;
+// ── TIMER (global para compatibilidad con pista-ayuda) ──────
+var tiempoInicial = parseInt("{{ $tiempo_transcurrido ?? 0 }}") || 0;
 const loadTimeMs = Date.now();
 const timerDisplay = document.getElementById('cronometro');
 const MAX_MINUTOS = 90;
 
 function actualizarTimer() {
-  let tiempo = tiempoInicial + Math.floor((Date.now() - loadTimeMs) / 1000);
-  let m = Math.floor(tiempo / 60);
-  let s = tiempo % 60;
+  var tiempo = tiempoInicial + Math.floor((Date.now() - loadTimeMs) / 1000);
+  var m = Math.floor(tiempo / 60);
+  var s = tiempo % 60;
   if (timerDisplay) timerDisplay.textContent = (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s);
   if (m >= MAX_MINUTOS) { window.location.href = '/final'; return; }
 }
