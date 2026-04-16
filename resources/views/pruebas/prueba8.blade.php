@@ -400,7 +400,7 @@
   <div class="win-title">ACCESO MAESTRO CONCEDIDO</div>
   <div class="subtitle">// Firewall Colapsado Integrado</div>
   <div class="result-panel" id="win-stats"></div>
-  <a href="/prueba9" class="btn">CONTINUAR A LA SIGUIENTE PRUEBA →</a>
+  <a href="/prueba9" class="btn" id="btn-continuar" style="pointer-events:none; opacity:0.4;">VERIFICANDO CON EL SERVIDOR...</a>
 </div>
 
 <script>
@@ -574,6 +574,8 @@ function showWin() {
     `<span style="font-size:0.8rem; color:#445544">// ENVIANDO HASH DE VALIDACIÓN AL BACKEND...</span>`;
   showScreen('screen-win');
 
+  var btnContinuar = document.getElementById('btn-continuar');
+
   fetch("/prueba8", {
     method: 'POST',
     headers: {
@@ -584,7 +586,34 @@ function showWin() {
       completed: true,
       respuestas_usuario: userAnswers
     })
-  }).then(() => {}).catch(err => console.error('Error al notificar al servidor:', err));
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data.success) {
+      document.getElementById('win-stats').innerHTML =
+        `Niveles de Conocimiento comprobados: <span>${questions.length} / ${questions.length}</span><br><br>` +
+        `<span style="font-size:0.8rem; color:var(--green);">// VALIDACIÓN COMPLETADA ✓</span>`;
+      btnContinuar.textContent = 'CONTINUAR A LA SIGUIENTE PRUEBA →';
+      btnContinuar.style.pointerEvents = 'auto';
+      btnContinuar.style.opacity = '1';
+    } else {
+      document.getElementById('win-stats').innerHTML =
+        `<span style="color:var(--red);">Error de validación en el servidor. Recarga la página e inténtalo de nuevo.</span>`;
+      btnContinuar.textContent = 'REINTENTAR';
+      btnContinuar.href = '/prueba8';
+      btnContinuar.style.pointerEvents = 'auto';
+      btnContinuar.style.opacity = '1';
+    }
+  })
+  .catch(function(err) {
+    console.error('Error al notificar al servidor:', err);
+    document.getElementById('win-stats').innerHTML =
+      `<span style="color:var(--red);">Error de conexión. Recarga la página e inténtalo de nuevo.</span>`;
+    btnContinuar.textContent = 'REINTENTAR';
+    btnContinuar.href = '/prueba8';
+    btnContinuar.style.pointerEvents = 'auto';
+    btnContinuar.style.opacity = '1';
+  });
 }
 </script>
 </body>
