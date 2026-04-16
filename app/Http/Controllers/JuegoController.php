@@ -71,6 +71,38 @@ class JuegoController extends Controller
         return $partida->pistasUsadas()->pluck('prueba_numero')->toArray();
     }
 
+    /**
+     * Si la partida ya superó esta prueba (su peso es menor que el actual),
+     * devuelve un Redirect a la fase real del equipo. Evita que se vuelva
+     * a jugar (refresco, atrás del navegador, etc.) y se duplique el hito.
+     */
+    private function redirigirSiYaSuperada($partida, int $pesoPrueba)
+    {
+        if (!$partida) return null;
+
+        $faseActualConfig = collect(config('fases.fases'))->firstWhere('db', $partida->fase_actual);
+        $pesoActual = $faseActualConfig['peso'] ?? 0;
+
+        if ($pesoActual <= $pesoPrueba) return null;
+
+        $rutas = [
+            config('fases.fases.prueba1.db')    => 'prueba1',
+            config('fases.fases.prueba2.db')    => 'prueba2',
+            config('fases.fases.prueba3.db')    => 'prueba3',
+            config('fases.fases.prueba4.db')    => 'prueba4',
+            config('fases.fases.prueba5.db')    => 'prueba5',
+            config('fases.fases.prueba6.db')    => 'prueba6',
+            config('fases.fases.prueba7.db')    => 'prueba7',
+            config('fases.fases.prueba8.db')    => 'prueba8',
+            config('fases.fases.prueba9.db')    => 'prueba9',
+            config('fases.fases.finalizado.db') => 'final',
+            config('fases.fases.timeout.db')    => 'final',
+        ];
+
+        $ruta = $rutas[$partida->fase_actual] ?? null;
+        return $ruta ? redirect()->route($ruta) : null;
+    }
+
     // =====================================================
     // SISTEMA DE PISTAS / AYUDA
     // =====================================================
@@ -260,6 +292,9 @@ class JuegoController extends Controller
 
         if ($this->timerService->verificarTimeout()) return redirect()->route('final')->with('timeout', true);
 
+        $partida = $this->timerService->obtenerPartidaActiva();
+        if ($redir = $this->redirigirSiYaSuperada($partida, 1)) return $redir;
+
         // Mostrar briefing de Sergio antes de la primera prueba (solo una vez)
         if (!session('sergio_intro_visto')) {
             session(['sergio_intro_visto' => true]);
@@ -267,7 +302,6 @@ class JuegoController extends Controller
         }
 
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
-        $partida = $this->timerService->obtenerPartidaActiva();
         $this->logAccion($partida, config('fases.fases.prueba1.db'), 'Entra a la prueba');
         $yaUsada = in_array(1, $this->obtenerPistasUsadas($partida));
         $pistaConfig = config('escape.pistas.1');
@@ -276,6 +310,10 @@ class JuegoController extends Controller
 
     public function validarPrueba1(ValidarPrueba1Request $request)
     {
+        if (session('prueba1mario_superada')) {
+            return response()->json(['success' => true]);
+        }
+
         $partida = $this->timerService->obtenerPartidaActiva();
 
         if (!$request->completed) {
@@ -327,8 +365,10 @@ class JuegoController extends Controller
 
         if ($this->timerService->verificarTimeout()) return redirect()->route('final')->with('timeout', true);
 
-        $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $partida = $this->timerService->obtenerPartidaActiva();
+        if ($redir = $this->redirigirSiYaSuperada($partida, 2)) return $redir;
+
+        $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $this->logAccion($partida, config('fases.fases.prueba2.db'), 'Entra a la prueba');
         $yaUsada = in_array(2, $this->obtenerPistasUsadas($partida));
         $pistaConfig = config('escape.pistas.2');
@@ -337,6 +377,10 @@ class JuegoController extends Controller
 
     public function validarPrueba2(Request $request)
     {
+        if (session('prueba2yoseth_superada')) {
+            return response()->json(['success' => true]);
+        }
+
         $respuestaCorrecta = config('escape.respuestas.prueba2');
         $input = strtolower(trim($request->input('answer', '')));
         // Normalizar: quitar acentos
@@ -369,8 +413,10 @@ class JuegoController extends Controller
 
         if ($this->timerService->verificarTimeout()) return redirect()->route('final')->with('timeout', true);
 
-        $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $partida = $this->timerService->obtenerPartidaActiva();
+        if ($redir = $this->redirigirSiYaSuperada($partida, 3)) return $redir;
+
+        $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $this->logAccion($partida, config('fases.fases.prueba3.db'), 'Entra a la prueba');
         $yaUsada = in_array(3, $this->obtenerPistasUsadas($partida));
         $pistaConfig = config('escape.pistas.3');
@@ -379,6 +425,9 @@ class JuegoController extends Controller
 
     public function validarPrueba3(ValidarPrueba3Request $request)
     {
+        if (session('prueba3angel_superada')) {
+            return response()->json(['success' => true]);
+        }
 
         $CHECKSUM_CORRECTO = config('escape.respuestas.prueba3'); // 18 botones + 80 cents + 5 azucar
         $partida = $this->timerService->obtenerPartidaActiva();
@@ -419,8 +468,10 @@ class JuegoController extends Controller
 
         if ($this->timerService->verificarTimeout()) return redirect()->route('final')->with('timeout', true);
 
-        $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $partida = $this->timerService->obtenerPartidaActiva();
+        if ($redir = $this->redirigirSiYaSuperada($partida, 4)) return $redir;
+
+        $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $this->logAccion($partida, config('fases.fases.prueba4.db'), 'Entra a la prueba');
         $yaUsada = in_array(4, $this->obtenerPistasUsadas($partida));
         $pistaConfig = config('escape.pistas.4');
@@ -429,6 +480,9 @@ class JuegoController extends Controller
 
     public function validarPrueba4(ValidarPrueba4Request $request)
     {
+        if (session('prueba4arturo_superada')) {
+            return response()->json(['success' => true]);
+        }
 
         $CHECKSUM_OASIS = config('escape.respuestas.prueba4'); // Ej: 6 filas + cod 128 cafe + 7 items A1 -> Total manual: 141
         $partida = $this->timerService->obtenerPartidaActiva();
@@ -469,8 +523,10 @@ class JuegoController extends Controller
 
         if ($this->timerService->verificarTimeout()) return redirect()->route('final')->with('timeout', true);
 
-        $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $partida = $this->timerService->obtenerPartidaActiva();
+        if ($redir = $this->redirigirSiYaSuperada($partida, 5)) return $redir;
+
+        $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $this->logAccion($partida, config('fases.fases.prueba5.db'), 'Entra a la prueba');
         $yaUsada = in_array(5, $this->obtenerPistasUsadas($partida));
         $pistaConfig = config('escape.pistas.5');
@@ -479,6 +535,9 @@ class JuegoController extends Controller
 
     public function validarPrueba5(ValidarPrueba5Request $request)
     {
+        if (session('prueba5eloy_superada')) {
+            return response()->json(['success' => true]);
+        }
 
         $PALABRA_ESPEJO = config('escape.respuestas.prueba5');
         $input_normalizado = strtolower(trim($request->checksum));
@@ -524,6 +583,9 @@ class JuegoController extends Controller
 
         if ($this->timerService->verificarTimeout()) return redirect()->route('final')->with('timeout', true);
 
+        $partida = $this->timerService->obtenerPartidaActiva();
+        if ($redir = $this->redirigirSiYaSuperada($partida, 6)) return $redir;
+
         // Generar secuencia en el backend (ej: 15 pasos)
         $maxSteps = 15;
         $sequence = [];
@@ -535,7 +597,6 @@ class JuegoController extends Controller
         session(['prueba6_sequence' => $sequence]);
 
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
-        $partida = $this->timerService->obtenerPartidaActiva();
         $this->logAccion($partida, config('fases.fases.prueba6.db'), 'Entra a la prueba');
         $yaUsada = in_array(6, $this->obtenerPistasUsadas($partida));
         $pistaConfig = config('escape.pistas.6');
@@ -544,6 +605,10 @@ class JuegoController extends Controller
 
     public function validarPrueba6(ValidarPrueba6Request $request)
     {
+        if (session('prueba6migue_superada')) {
+            return response()->json(['success' => true]);
+        }
+
         $partida = $this->timerService->obtenerPartidaActiva();
 
         if (!$request->completed || !is_array($request->expected_sequence)) {
@@ -664,6 +729,7 @@ class JuegoController extends Controller
         if ($this->timerService->verificarTimeout()) return redirect()->route('final')->with('timeout', true);
 
         $partida = $this->timerService->obtenerPartidaActiva();
+        if ($redir = $this->redirigirSiYaSuperada($partida, 7)) return $redir;
 
         // Generar y persistir combinación única por equipo si aún no existe
         if ($partida && empty($partida->combinacion_codice)) {
@@ -692,6 +758,10 @@ class JuegoController extends Controller
 
     public function validarPrueba7(Request $request)
     {
+        if (session('prueba7_superada')) {
+            return response()->json(['success' => true]);
+        }
+
         $partida = $this->timerService->obtenerPartidaActiva();
 
         if (!$partida) {
@@ -752,8 +822,10 @@ class JuegoController extends Controller
     {
         if ($this->timerService->verificarTimeout()) return redirect()->route('final')->with('timeout', true);
 
-        $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $partida = $this->timerService->obtenerPartidaActiva();
+        if ($redir = $this->redirigirSiYaSuperada($partida, 8)) return $redir;
+
+        $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $this->logAccion($partida, config('fases.fases.prueba8.db'), 'Entra a la prueba (Cortafuegos)');
 
         $preguntasAsignadas = PreguntaDinamica::where('activa', true)
@@ -768,6 +840,10 @@ class JuegoController extends Controller
 
     public function validarPrueba8(Request $request)
     {
+        if (session('prueba8_superada')) {
+            return response()->json(['success' => true]);
+        }
+
         $partida = $this->timerService->obtenerPartidaActiva();
         if (!$partida) {
             return response()->json(['success' => false, 'message' => 'Sesión no encontrada.'], 401);
@@ -834,8 +910,10 @@ class JuegoController extends Controller
     {
         if ($this->timerService->verificarTimeout()) return redirect()->route('final')->with('timeout', true);
 
-        $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $partida = $this->timerService->obtenerPartidaActiva();
+        if ($redir = $this->redirigirSiYaSuperada($partida, 9)) return $redir;
+
+        $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $this->logAccion($partida, config('fases.fases.prueba9.db'), 'Entra a la prueba');
 
         $index = (int) session('prueba9_index', 0);
@@ -865,6 +943,10 @@ class JuegoController extends Controller
 
     public function validarPrueba9(Request $request)
     {
+        if (session('prueba9_superada')) {
+            return response()->json(['success' => true, 'state' => 'done']);
+        }
+
         $partida = $this->timerService->obtenerPartidaActiva();
         if (!$partida) {
             return response()->json(['success' => false, 'message' => 'Sesión no encontrada.'], 401);
@@ -979,13 +1061,6 @@ class JuegoController extends Controller
                 'fase_actual'     => config('fases.fases.finalizado.db'),
             ]);
 
-            \App\Models\HitoFase::create([
-                'partida_id'            => $partida->id,
-                'fase'                  => 'JUEGO FINALIZADO',
-                'segundos_transcurridos' => $segundos_totales,
-                'alcanzado_at'          => Carbon::now()
-            ]);
-
             Top10Updated::dispatch();
             AdminDashboardUpdated::dispatch();
 
@@ -1011,8 +1086,12 @@ class JuegoController extends Controller
         $hitos = [];
         if ($partida) {
             $hitos_db = \App\Models\HitoFase::where('partida_id', $partida->id)
+                ->where('fase', '!=', 'JUEGO FINALIZADO') // legacy: ya no se crea, pero filtramos por compatibilidad
                 ->orderBy('segundos_transcurridos', 'asc')
-                ->get();
+                ->orderBy('id', 'asc')
+                ->get()
+                ->unique('fase') // legacy: si una partida antigua duplicó una prueba, nos quedamos con el primero
+                ->values();
 
             $last_seconds = 0;
             foreach ($hitos_db as $hito) {
