@@ -345,7 +345,7 @@
         <button class="challenge-btn" id="btn-verificar" type="button">VERIFICAR PALABRA CLAVE →</button>
     </div>
     <div class="hint-box" id="hint-box">
-        <strong>[PISTA DEL SISTEMA]</strong><br>La palabra que buscas ya está escrita en la pantalla. Solo necesitas encontrarla en las taquillas correctas. Revisa la tabla de conversión detalladamente.
+        <strong>[PISTA DEL SISTEMA]</strong><br>Tienes que mirar las taquillas del 1 al 6, arriba hay unos números. Esos números corresponden a letras usando el protocolo espejo, por ejemplo el 1 es la letra Z, el 2 la letra Y, el 3 la letra X y así sucesivamente. Recoge las letras de las taquillas correctas y ordénalas para formar la palabra clave.
     </div>
   </div>
 </div>
