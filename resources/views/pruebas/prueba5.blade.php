@@ -336,7 +336,7 @@
     </div>
     <div style="margin: 1.5rem 0; padding: 1rem; background: #0a0a0a; border: 1px dashed var(--green); text-align: center; font-family: 'Orbitron', sans-serif;">
         <div style="color: #88ccaa; font-size: 0.95rem;">→ Ubicación a visitar: El oasis</div>
-        <div style="color: var(--green); font-size: 1.05rem; margin-top: 0.5rem; font-weight:bold;">Taquillas: 1 – 26 – 8 – 18 – 22 – 15 – 3</div>
+        <div style="color: var(--green); font-size: 1.05rem; margin-top: 0.5rem; font-weight:bold;">Dirígete al oasis y descúbrelo por ti mismo</div>
     </div>
     <p style="text-align: center; font-size: 0.9em;"><strong>Introduce la palabra clave reconstruida:</strong></p>
     <div class="form-group">
