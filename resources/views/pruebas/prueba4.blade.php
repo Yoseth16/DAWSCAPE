@@ -320,9 +320,9 @@
     <p style="margin-top:0.5rem;">El cortafuegos requiere un código de verificación basado en los datos de las máquinas de la planta baja.</p>
     <p style="margin-top:0.5rem; color:#668877;">Para generar el código de bypass, combina estos tres factores:</p>
     <ul class="term-list">
-        <li>El precio en céntimos de la palmera de chocolate.</li>
-        <li>El número de tipos de productos diferentes que caben en la misma fila donde está la palmera de chocolate.</li>
-        <li>El número del código del producto de la palmera de chocolate.</li>
+        <li>El precio en céntimos del producto más goloso de la playa....</li>
+        <li>El número de tipos de productos diferentes que caben en la misma fila donde está ese producto que nos recuerda a la naturaleza.</li>
+        <li>El número del código del mismo producto que estamos hablando, el cual lleva cacao</li>
     </ul>
     <p style="text-align: center; margin-top: 1.5rem; font-size: 0.9em;"><strong>Introduce la suma total para purgar el sistema.</strong></p>
     <div class="form-group">
