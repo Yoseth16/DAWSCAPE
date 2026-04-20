@@ -273,7 +273,7 @@
   <div class="intro-text">
     <p>El servidor se está sobrecalentando y el administrador necesita combustible negro.</p>
     <br>
-    <p><strong>Busca la fuente de energía líquida donde los profesores se resetean cada mañana.</strong></p>
+    <p><strong>Busca la fuente de energía líquida donde los profesores y alumnos se resetean cada mañana.</strong></p>
     <br>
     <p style="font-size: 0.85rem; color:#445544; margin-top: 1rem;">// Continúa cuando encuentres la pista en la localización física.</p>
     <div style="margin-top: 1.25rem; display:flex; justify-content:center;">
