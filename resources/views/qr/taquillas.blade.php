@@ -310,19 +310,21 @@
     <p>El abecedario ha sido invertido para proteger la clave. La correspondencia original ha sido corrompida.</p>
     <p style="margin-top:0.5rem; color:#668877;">Nueva tabla de conversión:</p>
     <p style="color:var(--green); letter-spacing:0.1em; text-align:center; padding: 0.5rem; background: var(--terminal); border: 1px dashed #00ff8840; margin: 0.5rem 0;">Z = 1 &nbsp; Y = 2 &nbsp; X = 3 &nbsp; ... &nbsp; A = 26</p>
+    <p style="margin-top:0.8rem; color:var(--red); font-weight:bold; text-align:center; border:1px dashed var(--red); padding:0.6rem; background:rgba(255,34,68,0.05);">RECUERDA QUE DEBES USAR EL ABECEDARIO INGLÉS (26 LETRAS)</p>
     <p style="margin-top:0.5rem;">El núcleo del sistema está oculto en varias unidades numeradas del 1 al 64. Cada número representa una letra bajo el Protocolo Espejo.</p>
 
     <div style="margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1rem;">
         <p style="color:var(--red); font-size: 0.9em;">// INSTRUCCIONES DEL SISTEMA:</p>
         <ul class="term-list">
-            <li>Traducir cada letra a su número correspondiente.</li>
-            <li>Buscar las taquillas cuyo número coincida.</li>
-            <li>Recuperar las letras almacenadas en su interior y ordenarlas.</li>
+            <li>Buscar las taquillas que tienen pegadas el número, del 1 al 7. </li>
+            <li>Traducir el número de taquilla a su letra .</li>
+            <li>Recuperar las letras y ponerlas siguiendo el orden del 1 al 7.</li>
         </ul>
     </div>
 
     <div class="conversion-table">
-        <div class="conversion-target">→ Taquillas a visitar: 1 – 26 – 8 – 18 – 22 – 15 – 3</div>
+        <div class="conversion-target">→ Ubicación a visitar: OASIS de la P2 (Planta 2)</div>
+        <div style="color: var(--green); font-size: 1.05rem; margin-top: 0.5rem; font-weight:bold;">Dirígete al OASIS de la P2 y descúbrelo por ti mismo</div>
     </div>
 
     <p style="text-align: center; font-size: 0.9em;"><strong>Introduce la palabra clave reconstruida:</strong></p>
@@ -335,7 +337,7 @@
     </div>
 
     <div class="hint-box" id="hint-box">
-        <strong>[PISTA DEL SISTEMA]</strong><br>La palabra que buscas ya está escrita en la pantalla. Solo necesitas encontrarla en las taquillas correctas. Revisa la tabla de descifrado detalladamente.
+        <strong>[PISTA DEL SISTEMA]</strong><br>Tienes que mirar las taquillas del 1 al 7, arriba hay unos números. Esos números corresponden a letras usando el protocolo espejo, por ejemplo el 1 es la letra Z, el 2 la letra Y, el 3 la letra X y así sucesivamente. Recoge las letras de las taquillas correctas para formar la palabra clave.
     </div>
   </div>
 </div>
