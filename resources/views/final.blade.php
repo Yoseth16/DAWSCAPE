@@ -1507,8 +1507,8 @@
           });
     });
 
-    // ═══ INICIAR AUTOMÁTICAMENTE tras 5 segundos ═══
-    setTimeout(iniciarDialogo, 5000);
+    // ═══ INICIAR AUTOMÁTICAMENTE tras 1,5 segundos ═══
+    setTimeout(iniciarDialogo, 1500);
 })();
 </script>
 </body>
