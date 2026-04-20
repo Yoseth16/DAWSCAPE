@@ -354,7 +354,7 @@
 
 <!-- INTRO -->
 <div class="screen active" id="screen-intro">
-  <div class="logo">AULA 115</div>
+  <div class="logo">LAB 115</div>
   <div class="subtitle">// Sistema de Escape · Nivel Clasificado</div>
   <div class="intro-text">
     <p>Agente, el sistema de seguridad del <strong style="color:var(--green)">Aula de Informática</strong> ha sido activado.</p>

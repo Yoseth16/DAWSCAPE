@@ -137,6 +137,9 @@ class Top10Controller extends Controller
                 default => 'jugando',
             };
 
+            $penalizacionPista = (int) config('escape.penalizacion_pista', 480);
+            $pistasUsadas = $penalizacionPista > 0 ? (int) floor($penalizacion / $penalizacionPista) : 0;
+
             return [
                 'id' => $partida->id,
                 'nombre_equipo' => $partida->nombre_equipo,
@@ -152,6 +155,7 @@ class Top10Controller extends Controller
                 'color_hex' => $partida->color_hex ?? '#3b82f6',
                 'icono' => $partida->icono ?? 'ph-user-focus',
                 'logros' => $partida->logros ?? [],
+                'pistas_usadas' => $pistasUsadas,
                 'ranking_posicion_bloqueada' => $partida->ranking_posicion_bloqueada ? (int)$partida->ranking_posicion_bloqueada : null,
             ];
         });

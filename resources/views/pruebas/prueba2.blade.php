@@ -289,7 +289,7 @@
 
   <div class="alert-box">
     <p>La clave maestra ha sido rota en pedazos por un virus informático. Los 5 fragmentos se han escondido en las máquinas expendedoras de todo el edificio.</p>
-    <p><strong>Vuestra misión:</strong> Localizad las 5 máquinas de bebidas del instituto. En alguna parte de cada máquina encontraréis pegada una pieza de información (una letra). Reunidlas todas y ordenad las letras para descubrir la palabra secreta y conseguir el código de acceso.</p>
+    <p><strong>Vuestra misión:</strong> Localizad las máquinas expendedoras del instituto. En total hay <strong>6 máquinas</strong>, pero <strong>la pista solo está en 5 de ellas</strong>. En alguna parte de cada una encontraréis pegada una pieza de información (una letra). Reunid las 5 letras y ordenadlas para descubrir la palabra secreta y conseguir el código de acceso.</p>
   </div>
 
   <div class="terminal-box">

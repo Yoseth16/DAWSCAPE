@@ -274,7 +274,7 @@
   <!-- Mensaje de redirección (aparece al terminar el texto) -->
   <div class="action-btn-wrapper" id="actionBtnWrapper">
     <div style="text-align:center; margin-bottom:1.2rem; font-family:'Orbitron',sans-serif; font-size:clamp(1rem,3vw,1.3rem); color:var(--green); text-shadow:0 0 15px var(--green); letter-spacing:0.15em; animation: pulse-glow 2s ease-in-out infinite;">
-      Dirígete al Aula 115
+      Dirígete al LAB 115
     </div>
     <a href="{{ route('prueba1') }}" class="btn">ENTRAR A DAWSCAPE →</a>
   </div>

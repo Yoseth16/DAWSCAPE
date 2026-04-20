@@ -49,7 +49,7 @@ return [
 
     'respuestas' => [
         'prueba1' => [
-            ['115', 'aula 115'],
+            ['115', 'aula 115', 'lab 115'],
             ['16', 'dieciseis'],
             ['32', 'treinta y dos'],
             ['14', 'catorce'],
