@@ -217,12 +217,43 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('admin.prueba.prueba7');
     Route::get('/prueba/prueba8', [JuegoController::class, 'mostrarPrueba8'])->name('admin.prueba.prueba8');
     Route::get('/prueba/prueba9', function () {
+        $email = 'admin-test@prueba9.test';
+
+        // Upsert de la Partida de prueba del admin.
+        // validarPrueba9() necesita una Partida real para registrar intentos,
+        // hitos y marcar FINALIZADO. Reseteamos en cada entrada para que el
+        // test sea repetible.
+        $partida = \App\Models\Partida::firstOrNew(['email' => $email]);
+        $partida->fill([
+            'nombre_equipo'              => 'ADMIN TEST',
+            'clase'                      => 'Pruebas',
+            'fase_actual'                => config('fases.fases.prueba9.db'),
+            'inicio_juego'               => now(),
+            'tiempo_segundos'            => 0,
+            'tiempo_pausado_segundos'    => 0,
+            'ultima_pausa_at'            => null,
+            'penalizacion_segundos'      => 0,
+            'estado'                     => 'activo',
+            'intentos_prueba9'           => 0,
+            'hints_used'                 => false,
+            'ranking_posicion_bloqueada' => null,
+        ])->save();
+
         session([
-            'email' => 'admin-test@prueba9.test',
-            'nombre_equipo' => 'ADMIN TEST',
-            'clase' => 'Pruebas',
-            'prueba_8_completada' => true,
+            'email'                => $email,
+            'nombre_equipo'        => 'ADMIN TEST',
+            'clase'                => 'Pruebas',
+            'prueba_8_completada'  => true,
         ]);
+
+        // Limpiar estado de sesión de prueba9 para poder re-testear la finalización
+        session()->forget([
+            'prueba9_index',
+            'prueba9_letters',
+            'prueba9_intentos_fallidos',
+            'prueba9_superada',
+        ]);
+
         return app(\App\Http\Controllers\JuegoController::class)->mostrarPrueba9();
     })->name('admin.prueba.prueba9');
 
