@@ -57,11 +57,17 @@ El proyecto integra tecnologías modernas como **Laravel Reverb** para actualiza
 - **Dashboard en tiempo real**: Monitorización de todos los equipos activos y pendientes de inicio
 - **Métricas KPI**: Total inscritos, pendientes, en progreso, completados, tiempo promedio
 - **Gráficos interactivos**: Distribución por fases con Chart.js
-- **Gestión de QRs dinámicos**: Creación, edición y descarga de códigos QR para ubicaciones físicas
+- **Analítica de pruebas**: Estadísticas detalladas de rendimiento por prueba y cuellos de botella
+- **Live Feed / Sala de control**: Ajuste de tiempo en directo y monitorización de equipos activos
+- **System Health**: Estado del sistema, colas, WebSockets, logs y métricas técnicas
+- **Gestión de QRs dinámicos**: Creación, edición, impresión y descarga de códigos QR para ubicaciones físicas
+- **Gestión de preguntas dinámicas**: CRUD completo del banco de preguntas para Prueba 8
+- **Visor de base de datos**: Consulta en modo lectura de las tablas principales
 - **Testing directo**: Rutas de bypass para que el administrador pueda probar cada prueba individualmente
 - **Logs de equipo**: Auditoría completa de acciones por equipo
-- **Gestión de Valoraciones**: Interfaz para consultar el feedback (estrellas) dejado por los equipos al terminar la partida.
-- **Diploma Interactivo**: Previsualización y entrega de diploma digital (con animaciones personalizadas) al finalizar el juego.
+- **Gestión de Valoraciones**: Interfaz para consultar el feedback (estrellas) dejado por los equipos al terminar la partida
+- **Diploma Interactivo**: Previsualización y entrega de diploma digital (con animaciones personalizadas) al finalizar el juego
+- **Exportación PDF**: Ranking Top 20 en formato PDF para impresión
 
 ---
 
@@ -287,10 +293,16 @@ chmod +x deploy.sh
 
 1. **Login** → `/login` con credenciales de administrador
 2. **Dashboard** → `/dashboard` — Monitorizar equipos en tiempo real
-3. **Gestión de QRs** → `/admin/qrs` — Crear y descargar QRs para ubicaciones físicas
-4. **Exportar ranking** → Generar PDF del Top 20
-5. **Proyección pública** → `/top10` — Mostrar en pantalla grande para el público
-6. **Testing de pruebas** → `/prueba/prueba{N}` — Probar cada prueba individualmente
+3. **Analítica** → `/admin/analitica` — Estadísticas detalladas por prueba
+4. **Live Feed** → `/admin/live` — Sala de control con ajuste de tiempo en directo
+5. **Gestión de QRs** → `/admin/qrs` — Crear, editar e imprimir QRs para ubicaciones físicas
+6. **Gestión de preguntas** → `/preguntas` — CRUD del banco de preguntas dinámicas (Prueba 8)
+7. **Valoraciones** → `/admin/valoraciones` — Consultar feedback de equipos
+8. **System Health** → `/admin/system` — Estado del sistema y métricas técnicas
+9. **Visor BD** → `/admin/database/{tabla}` — Consultar tablas en modo lectura
+10. **Exportar ranking** → Generar PDF del Top 20
+11. **Proyección pública** → `/top10` — Mostrar en pantalla grande para el público
+12. **Testing de pruebas** → `/prueba/prueba{N}` — Probar cada prueba individualmente
 
 ---
 
@@ -299,42 +311,56 @@ chmod +x deploy.sh
 ```
 DAWSCAPE/
 ├── app/
-│   ├── Events/                  # Eventos de Broadcasting (Top10Updated, PanicToggled…)
+│   ├── Events/                  # AdminDashboardUpdated, DirectMessage, PanicToggled, TiempoAjustado, Top10Updated
 │   ├── Http/
 │   │   ├── Controllers/
-│   │   │   ├── AdminController      # Dashboard, KPIs, gestión, exportación PDF
+│   │   │   ├── AdminController      # Dashboard, analítica, live feed, system health, exportación PDF
 │   │   │   ├── InscripcionController # Registro previo, QR de equipo, email
 │   │   │   ├── JuegoController       # Lógica de las 9 pruebas + pistas
-│   │   │   ├── QrController          # Escaneo y validación de QRs físicos
-│   │   │   └── Top10Controller       # Ranking en tiempo real
-│   │   ├── Middleware/          # CheckFase (anti-salto de pruebas)
-│   │   └── Requests/           # Form Requests de validación
+│   │   │   ├── QrController          # Gestión y validación de QRs físicos
+│   │   │   ├── Top10Controller       # Ranking en tiempo real
+│   │   │   └── ValoracionController  # Feedback de equipos al finalizar
+│   │   ├── Middleware/
+│   │   │   ├── AdminAuth            # Verificación de rol administrador
+│   │   │   └── CheckFase            # Anti-salto de pruebas (progreso lineal)
+│   │   └── Requests/           # EmpezarPartidaRequest, ValidarPrueba*Request, GuardarQrRequest…
 │   ├── Mail/                    # Mailable: CodigoAccesoInscripcion
-│   ├── Models/                  # Partida, Inscripcion, HitoFase, Qr, PreguntaDinamica…
+│   ├── Models/                  # Partida, Inscripcion, HitoFase, Qr, PreguntaDinamica, Valoracion…
 │   ├── Services/
 │   │   ├── AdminStatsService    # Cálculos de métricas para el dashboard
 │   │   └── GameTimerService     # Cronómetro con pausa, penalización y timeout
-│   └── View/Components/        # Componentes Blade reutilizables
+│   └── View/Components/        # AppLayout, GuestLayout
 ├── config/
 │   ├── escape.php               # Respuestas correctas, pistas y penalizaciones
 │   └── fases.php                # Definición de fases, nombres y pesos para ranking
 ├── database/
-│   ├── migrations/              # Migraciones (partidas, inscripciones, hitos, QRs…)
-│   └── seeders/                 # Datos iniciales (admin, preguntas dinámicas, QRs)
+│   ├── migrations/              # Migraciones (partidas, inscripciones, hitos, QRs, valoraciones…)
+│   └── seeders/                 # AdminSeeder, PreguntasDinamicasSeeder, QrSeeder
 ├── public/
 │   └── sonido/                  # Archivos de audio (.mp3) por prueba y SFX
 ├── resources/
 │   ├── css/                     # Estilos personalizados
 │   ├── js/
+│   │   ├── app.js               # Entry point (Alpine.js)
 │   │   ├── audio-manager.js     # Clase AudioManager (instancia global)
-│   │   └── sfx-integration.js   # Dispara SFX en eventos de validación
+│   │   ├── echo.js              # Configuración Laravel Echo + Pusher
+│   │   ├── prueba6.js           # Lógica Simon Says (secuencia, validación, penalización)
+│   │   ├── sfx-integration.js   # Dispara SFX en eventos de validación
+│   │   └── validation-sfx-helper.js # Helper para SFX en formularios
 │   └── views/
-│       ├── admin/               # Vistas del panel de administración
-│       ├── pruebas/             # Vistas de las 9 pruebas
-│       ├── qr/                  # Vistas de validación de QR (café, snacks, taquillas)
-│       └── components/          # game-audio-setup, music-player, timer…
+│       ├── admin/               # dashboard, analitica, live-feed, system-health, logs, gestionar-preguntas/qrs, valoraciones…
+│       ├── components/          # game-audio-setup, music-player, qr-scanner, pista-ayuda, achievements-toast, live-listener…
+│       ├── emails/              # codigo-acceso.blade.php (email con código de acceso)
+│       ├── layouts/             # app, guest, admin, navigation
+│       ├── pruebas/             # Vistas de las 9 pruebas (prueba1–prueba9)
+│       ├── qr/                  # maquina-cafe, maquina-snacks, taquillas, codice-digito, plantilla-pista…
+│       ├── inicio.blade.php     # Pantalla de inicio
+│       ├── final.blade.php      # Diploma y pantalla de victoria
+│       ├── sergio_intro.blade.php # Briefing narrativo antes de Prueba 1
+│       ├── top10.blade.php      # Ranking público en tiempo real
+│       └── inscripcion*.blade.php # Formulario de inscripción y éxito
 ├── routes/
-│   ├── web.php                  # Rutas principales (público + auth)
+│   ├── web.php                  # Rutas principales (público + auth + admin)
 │   ├── channels.php             # Canales de Broadcasting (top10)
 │   └── auth.php                 # Autenticación (Breeze)
 └── storage/
@@ -404,6 +430,8 @@ Todos los archivos `.mp3` se ubican en `public/sonido/`:
 | `Acierto.mp3` | SFX: respuesta correcta |
 | `Error.mp3` | SFX: respuesta incorrecta |
 | `Boton-Pista.mp3` | SFX: botón de pista |
+| `hablando-pista.mp3` | SFX: narración de pista |
+| `minecraft_click.mp3` | SFX: click de interfaz |
 
 ### Arquitectura
 
@@ -617,7 +645,7 @@ App\Models\Partida::create([
 | 3 | `32`, `treinta y dos` |
 | 4 | `14`, `catorce` |
 | 5 | `5x0lh8bx100127t` |
-| 6 | `201`, `doscientos uno` |
+| 6 | `177`, `ciento setenta y siete` |
 
 **Validación**: Las 6 respuestas deben proporcionarse en orden. No distingue mayúsculas/minúsculas ni acentos.
 
@@ -668,15 +696,15 @@ App\Models\Partida::create([
 
 **Tipo**: Físico (QR) — Localizar QR en la máquina de snacks y calcular checksum.
 
-**Respuesta correcta**: `141`
+**Respuesta correcta**: `168`
 
-**Desglose del checksum**: 6 filas + código 128 del café + 7 items en A1 = **141**
+**Desglose del checksum**: 130 céntimos palmera + 7 tipos producto fila + 31 código palmera = **168**
 
 **Código QR de acceso**: `ACCESO_FASE_4` (texto plano) o QR dinámico con `fase_requerida = "Prueba 4 Arturo"`
 
 **Validación**: La entrada se convierte a entero.
 
-**Pista** (penalización +8 min): *"La estructura vertical, el código del elixir oscuro y la primera columna del alfabeto. Tres valores que, unidos, desbloquean el siguiente nivel."*
+**Pista** (penalización +8 min): *"Tenéis que SUMAR tres cosas de las máquinas de la planta baja: 1) El precio en céntimos de la palmera de chocolate. 2) Cuántos tipos de productos diferentes caben en la misma fila donde está la palmera. 3) El número del código del producto de la palmera de chocolate. Sumadlos."*
 
 </details>
 
@@ -815,7 +843,7 @@ Este proyecto es de código abierto y está disponible bajo la **Licencia MIT**.
 Objetivos técnicos alcanzados:
 
 - ✅ Backend robusto con Laravel 12
-- ✅ Base de datos relacional compleja (7 tablas interrelacionadas)
+- ✅ Base de datos relacional compleja (8+ tablas interrelacionadas)
 - ✅ Autenticación y autorización (Breeze + middleware personalizado)
 - ✅ Validación de formularios con Form Requests
 - ✅ Generación de archivos (PDF con DomPDF, QR con SimpleSoftwareIO)
