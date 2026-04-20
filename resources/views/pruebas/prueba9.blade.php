@@ -465,9 +465,9 @@
 <script>
   const QUESTIONS = [
     { q: "El director del centro se llama E_____o. Su nombre tiene 7 letras y es muy común en España. ¿Cómo se llama?", letter: "N" },
-    { q: "Contad las ventanas de vuestra clase de DAW. El número está entre 4 y 6.", letter: "A" },
+    { q: "Contad las ventanas de la clase de DAW. El número está entre 4 y 6.", letter: "A" },
     { q: "Vuestro centro tiene planta baja, primera y segunda planta. ¿Cuántas plantas tiene en total?", letter: "C" },
-    { q: "En todo el centro, ¿cuántas clases están dedicadas exclusivamente a DAW (Desarrollo de Aplicaciones Web)? Solo hay una.", letter: "H" },
+    { q: "En todo el centro, ¿cuántas clases están dedicadas exclusivamente a DAW (Desarrollo de Aplicaciones Web)?", letter: "H" },
     { q: "¿Qué marca coreana famosa por los móviles Galaxy y las TV QLED invierte en tu FP a través del programa XTART?", letter: "O" },
   ];
 
