@@ -329,9 +329,9 @@
     <div style="margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1rem;">
         <p style="color:var(--red); font-size: 0.9em;">// INSTRUCCIONES DEL SISTEMA:</p>
         <ul class="term-list">
-            <li>Traducir cada número a su letra correspondiente.</li>
-            <li>Buscar las taquillas cuyo número coincida.</li>
-            <li>Recuperar las letras y ordenarlas.</li>
+            <li>Buscar las taquillas que tienen pegadas el número, del 1 al 7. </li>
+            <li>Traducir el número de taquilla a su letra .</li>
+            <li>Recuperar las letras y ponerlas siguiendo el orden del 1 al 7.</li>
         </ul>
     </div>
     <div style="margin: 1.5rem 0; padding: 1rem; background: #0a0a0a; border: 1px dashed var(--green); text-align: center; font-family: 'Orbitron', sans-serif;">
@@ -345,7 +345,7 @@
         <button class="challenge-btn" id="btn-verificar" type="button">VERIFICAR PALABRA CLAVE →</button>
     </div>
     <div class="hint-box" id="hint-box">
-        <strong>[PISTA DEL SISTEMA]</strong><br>Tienes que mirar las taquillas del 1 al 6, arriba hay unos números. Esos números corresponden a letras usando el protocolo espejo, por ejemplo el 1 es la letra Z, el 2 la letra Y, el 3 la letra X y así sucesivamente. Recoge las letras de las taquillas correctas y ordénalas para formar la palabra clave.
+        <strong>[PISTA DEL SISTEMA]</strong><br>Tienes que mirar las taquillas del 1 al 7, arriba hay unos números. Esos números corresponden a letras usando el protocolo espejo, por ejemplo el 1 es la letra Z, el 2 la letra Y, el 3 la letra X y así sucesivamente. Recoge las letras de las taquillas correctas para formar la palabra clave.
     </div>
   </div>
 </div>
