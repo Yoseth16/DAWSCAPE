@@ -159,101 +159,146 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/admin/qrs/{id}', [QrController::class, 'eliminarQr']);
 
     // Rutas de Testing Directo (Bypass para el profesor)
-    Route::get('/prueba/prueba1', [JuegoController::class, 'mostrarPrueba1'])->name('admin.prueba.prueba1');
-    Route::get('/prueba/prueba2', [JuegoController::class, 'mostrarPrueba2'])->name('admin.prueba.prueba2');
-    Route::get('/prueba/prueba3', function () {
-        // Crear sesión temporal para admin con email falso
-        // Además, marcamos progreso mínimo para que el validador QR (anti-salto) permita entrar
-        session([
-            'email' => 'admin-test@prueba3.test',
-            'nombre_equipo' => 'ADMIN TEST',
-            'clase' => 'Pruebas',
-            'prueba_2_completada' => true,
-        ]);
-        return view('qr.maquina-cafe', [
-            'tiempo_transcurrido' => 0,
-            'titulo_prueba' => '[ADMIN TEST] Máquina de Café',
-            'identificador' => 'admin-bypass'
-        ]);
-    })->name('admin.prueba.prueba3');
+    //
+    // Cada bypass hace upsert de una Partida con email admin-test@pruebaN.test
+    // y fase_actual fijada a la prueba concreta, de forma que los validators
+    // POST (que leen obtenerPartidaActiva() + fase_actual) encuentren siempre
+    // una partida y se pueda completar el flujo end-to-end de cada prueba.
+    //
+    // Cada entrada al bypass RESETEA la partida admin de esa prueba y limpia
+    // las flags de sesión pruebaN_*_superada, para que el test sea repetible
+    // y no arrastre estado del intento anterior.
+    $adminBypass = function (int $n, array $sessionExtras = [], ?\Closure $after = null) {
+        $email = "admin-test@prueba{$n}.test";
+        $faseKey = "fases.fases.prueba{$n}";
 
-    Route::get('/prueba/prueba4', function () {
-        // Crear sesión temporal para admin con email falso
-        session([
-            'email' => 'admin-test@prueba4.test',
-            'nombre_equipo' => 'ADMIN TEST',
-            'clase' => 'Pruebas',
-            'prueba_3_completada' => true,
-        ]);
-        return view('qr.maquina-snacks', [
-            'tiempo_transcurrido' => 0,
-            'titulo_prueba' => '[ADMIN TEST] Máquina Oasis',
-            'identificador' => 'admin-bypass'
-        ]);
-    })->name('admin.prueba.prueba4');
-
-    Route::get('/prueba/prueba5', function () {
-        // Crear sesión temporal para admin con email falso
-        session([
-            'email' => 'admin-test@prueba5.test',
-            'nombre_equipo' => 'ADMIN TEST',
-            'clase' => 'Pruebas',
-            'prueba_4_completada' => true,
-        ]);
-        return view('qr.taquillas', [
-            'tiempo_transcurrido' => 0,
-            'titulo_prueba' => '[ADMIN TEST] Protocolo Espejo',
-            'identificador' => 'admin-bypass'
-        ]);
-    })->name('admin.prueba.prueba5');
-    Route::get('/prueba/prueba6', [JuegoController::class, 'mostrarPrueba6'])->name('admin.prueba.prueba6');
-    Route::get('/prueba/prueba7', function () {
-        session([
-            'email' => 'admin-test@prueba7.test',
-            'nombre_equipo' => 'ADMIN TEST',
-            'clase' => 'Pruebas',
-        ]);
-        return app(\App\Http\Controllers\JuegoController::class)->mostrarPrueba7();
-    })->name('admin.prueba.prueba7');
-    Route::get('/prueba/prueba8', [JuegoController::class, 'mostrarPrueba8'])->name('admin.prueba.prueba8');
-    Route::get('/prueba/prueba9', function () {
-        $email = 'admin-test@prueba9.test';
-
-        // Upsert de la Partida de prueba del admin.
-        // validarPrueba9() necesita una Partida real para registrar intentos,
-        // hitos y marcar FINALIZADO. Reseteamos en cada entrada para que el
-        // test sea repetible.
         $partida = \App\Models\Partida::firstOrNew(['email' => $email]);
         $partida->fill([
             'nombre_equipo'              => 'ADMIN TEST',
             'clase'                      => 'Pruebas',
-            'fase_actual'                => config('fases.fases.prueba9.db'),
+            'fase_actual'                => config("{$faseKey}.db"),
             'inicio_juego'               => now(),
             'tiempo_segundos'            => 0,
             'tiempo_pausado_segundos'    => 0,
             'ultima_pausa_at'            => null,
             'penalizacion_segundos'      => 0,
-            'estado'                     => 'activo',
+            'estado'                     => 'jugando',
+            'intentos_codice'            => 0,
             'intentos_prueba9'           => 0,
             'hints_used'                 => false,
+            'combinacion_codice'         => null,
+            'logros'                     => [],
             'ranking_posicion_bloqueada' => null,
+            'color_hex'                  => $partida->color_hex ?: '#00ff88',
+            'icono'                      => $partida->icono ?: 'ph-user-focus',
         ])->save();
 
-        session([
-            'email'                => $email,
-            'nombre_equipo'        => 'ADMIN TEST',
-            'clase'                => 'Pruebas',
-            'prueba_8_completada'  => true,
-        ]);
+        // Flags de progresión — marcamos TODAS las pruebas anteriores como
+        // superadas para evitar que CheckFase redirija la POST/GET.
+        $progresoFlags = [
+            'sergio_intro_visto'         => true,
+            'prueba1mario_superada'      => $n >= 2,
+            'prueba2yoseth_superada'     => $n >= 3,
+            'prueba3angel_superada'      => $n >= 4,
+            'prueba4arturo_superada'     => $n >= 5,
+            'prueba5eloy_superada'       => $n >= 6,
+            'prueba6migue_superada'      => $n >= 7,
+            'prueba7_superada'           => $n >= 8,
+            'prueba8_superada'           => $n >= 9,
+        ];
 
-        // Limpiar estado de sesión de prueba9 para poder re-testear la finalización
+        session(array_merge([
+            'email'          => $email,
+            'nombre_equipo'  => 'ADMIN TEST',
+            'clase'          => 'Pruebas',
+        ], $progresoFlags, $sessionExtras));
+
+        // Limpiar flags de superación y estados intermedios de ESTA prueba
+        // para que el test sea repetible.
         session()->forget([
+            "prueba{$n}mario_superada",
+            "prueba{$n}yoseth_superada",
+            "prueba{$n}angel_superada",
+            "prueba{$n}arturo_superada",
+            "prueba{$n}eloy_superada",
+            "prueba{$n}migue_superada",
+            "prueba{$n}_superada",
+            'prueba6_sequence',
+            'prueba8_preguntas',
             'prueba9_index',
             'prueba9_letters',
             'prueba9_intentos_fallidos',
-            'prueba9_superada',
         ]);
 
+        // Volver a marcar la prueba N-1 como superada tras el forget (por si
+        // el forget tocó la flag propia de la prueba anterior).
+        if ($n >= 2) session(['prueba1mario_superada'  => true]);
+        if ($n >= 3) session(['prueba2yoseth_superada' => true]);
+        if ($n >= 4) session(['prueba3angel_superada'  => true]);
+        if ($n >= 5) session(['prueba4arturo_superada' => true]);
+        if ($n >= 6) session(['prueba5eloy_superada'   => true]);
+        if ($n >= 7) session(['prueba6migue_superada'  => true]);
+        if ($n >= 8) session(['prueba7_superada'       => true]);
+        if ($n >= 9) session(['prueba8_superada'       => true]);
+
+        if ($after) $after($partida);
+        return $partida;
+    };
+
+    Route::get('/prueba/prueba1', function () use ($adminBypass) {
+        $adminBypass(1);
+        return app(\App\Http\Controllers\JuegoController::class)->mostrarPrueba1();
+    })->name('admin.prueba.prueba1');
+
+    Route::get('/prueba/prueba2', function () use ($adminBypass) {
+        $adminBypass(2);
+        return app(\App\Http\Controllers\JuegoController::class)->mostrarPrueba2();
+    })->name('admin.prueba.prueba2');
+
+    Route::get('/prueba/prueba3', function () use ($adminBypass) {
+        $adminBypass(3, ['prueba_2_completada' => true]);
+        return view('qr.maquina-cafe', [
+            'tiempo_transcurrido' => 0,
+            'titulo_prueba'       => '[ADMIN TEST] Máquina de Café',
+            'identificador'       => 'admin-bypass',
+        ]);
+    })->name('admin.prueba.prueba3');
+
+    Route::get('/prueba/prueba4', function () use ($adminBypass) {
+        $adminBypass(4, ['prueba_3_completada' => true]);
+        return view('qr.maquina-snacks', [
+            'tiempo_transcurrido' => 0,
+            'titulo_prueba'       => '[ADMIN TEST] Máquina Oasis',
+            'identificador'       => 'admin-bypass',
+        ]);
+    })->name('admin.prueba.prueba4');
+
+    Route::get('/prueba/prueba5', function () use ($adminBypass) {
+        $adminBypass(5, ['prueba_4_completada' => true]);
+        return view('qr.taquillas', [
+            'tiempo_transcurrido' => 0,
+            'titulo_prueba'       => '[ADMIN TEST] Protocolo Espejo',
+            'identificador'       => 'admin-bypass',
+        ]);
+    })->name('admin.prueba.prueba5');
+
+    Route::get('/prueba/prueba6', function () use ($adminBypass) {
+        $adminBypass(6);
+        return app(\App\Http\Controllers\JuegoController::class)->mostrarPrueba6();
+    })->name('admin.prueba.prueba6');
+
+    Route::get('/prueba/prueba7', function () use ($adminBypass) {
+        $adminBypass(7);
+        return app(\App\Http\Controllers\JuegoController::class)->mostrarPrueba7();
+    })->name('admin.prueba.prueba7');
+
+    Route::get('/prueba/prueba8', function () use ($adminBypass) {
+        $adminBypass(8);
+        return app(\App\Http\Controllers\JuegoController::class)->mostrarPrueba8();
+    })->name('admin.prueba.prueba8');
+
+    Route::get('/prueba/prueba9', function () use ($adminBypass) {
+        $adminBypass(9, ['prueba_8_completada' => true]);
         return app(\App\Http\Controllers\JuegoController::class)->mostrarPrueba9();
     })->name('admin.prueba.prueba9');
 
