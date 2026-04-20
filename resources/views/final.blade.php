@@ -994,128 +994,483 @@
     <a href="{{ route('legal') }}" style="color: rgba(255, 255, 255, 0.3); text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='#00ff88'" onmouseout="this.style.color='rgba(255, 255, 255, 0.3)'">AVISO LEGAL Y RGPD</a>
 </div>
 
-<!-- MODAL VALORACION -->
+<!-- FERNANDO — SISTEMA DE VALORACIÓN CON DIÁLOGO -->
 <style>
-.val-modal-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
-    z-index: 10000; display: flex; justify-content: center; align-items: center;
-    opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
+/* ═══ FERNANDO — OVERLAY DIÁLOGO (reutiliza estilos del sistema de pistas) ═══ */
+.fernando-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(4px);
+    overflow-y: auto;
 }
-.val-modal-overlay.active { opacity: 1; pointer-events: auto; }
-.val-modal {
-    background: #041a0e; border: 2px solid #00ff88; border-radius: 0;
-    padding: 2rem; width: 90%; max-width: 400px;
-    box-shadow: 0 0 30px rgba(0, 255, 136, 0.25), inset 0 0 40px rgba(0, 255, 136, 0.03);
-    text-align: center; color: #c8ffdf; font-family: 'Share Tech Mono', monospace;
-    transform: translateY(20px); transition: transform 0.5s ease;
+.fernando-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* --- Personaje arriba --- */
+.fernando-character-area {
+    margin-top: 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translateY(-30px);
+    opacity: 0;
+    transition: all 0.4s ease 0.1s;
+}
+.fernando-overlay.visible .fernando-character-area {
+    transform: translateY(0);
+    opacity: 1;
+}
+.fernando-character-frame {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid var(--green, #00ff88);
+    overflow: hidden;
+    background: linear-gradient(135deg, #041a0e, #0a2f18);
+    box-shadow: 0 0 25px rgba(0,255,136,0.4), 0 8px 25px rgba(0,0,0,0.6);
     position: relative;
 }
-.val-modal::before {
-    content: '// VALORACIÓN DEL SISTEMA';
-    position: absolute; top: -0.65rem; left: 1rem;
-    background: #041a0e; padding: 0 0.5rem;
-    color: #00ff88; font-size: 0.65rem; letter-spacing: 0.2em;
+.fernando-character-frame img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    image-rendering: pixelated;
+    display: block;
 }
-.val-modal-overlay.active .val-modal { transform: translateY(0); }
-.val-title { color: #00ff88; font-size: 1.3rem; margin-bottom: 1rem; text-shadow: 0 0 12px rgba(0, 255, 136, 0.7); letter-spacing: 0.1em; text-transform: uppercase; }
-.val-stars { display: flex; justify-content: center; gap: 10px; margin-bottom: 1.5rem; flex-direction: row-reverse; }
-.val-stars input { display: none; }
-.val-stars label { font-size: 2.5rem; color: #1a4a2e; cursor: pointer; transition: color 0.2s, text-shadow 0.2s; }
-.val-stars label:hover, .val-stars label:hover ~ label, .val-stars input:checked ~ label { color: #00ff88; text-shadow: 0 0 15px rgba(0, 255, 136, 0.9); }
-.val-textarea { width: 100%; background: #020c06; border: 1px solid #00ff8840; border-radius: 0; color: #c8ffdf; padding: 0.75rem; font-family: inherit; resize: none; margin-bottom: 1.5rem; margin-top: 1rem; }
-.val-textarea:focus { outline: none; border-color: #00ff88; box-shadow: 0 0 8px rgba(0, 255, 136, 0.3); }
-.val-textarea::placeholder { color: #445544; }
-.val-buttons { display: flex; gap: 1rem; }
-.val-btn { flex: 1; padding: 0.75rem; border-radius: 0; font-weight: bold; font-family: inherit; cursor: pointer; text-transform: uppercase; border: none; transition: all 0.2s; letter-spacing: 0.1em; }
-.val-btn-submit { background: transparent; color: #00ff88; border: 2px solid #00ff88; position: relative; overflow: hidden; }
-.val-btn-submit::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: #00ff88; transition: left 0.3s; z-index: 0; }
-.val-btn-submit span { position: relative; z-index: 1; }
-.val-btn-submit:not(.disabled):hover::before { left: 0; }
-.val-btn-submit:not(.disabled):hover { color: #020c06; box-shadow: 0 0 18px rgba(0, 255, 136, 0.5); }
-.val-btn-submit.disabled { opacity: 0.35; cursor: not-allowed; border-color: #00ff8860; color: #00ff8860; }
-.val-btn-skip { background: transparent; border: 1px solid #2a4a35; color: #88ccaa; }
-.val-btn-skip:hover { background: #0a1f10; border-color: #00ff8860; color: #c8ffdf; }
-.val-msg { display: none; margin-top: 1rem; color: #00ff88; font-weight: bold; text-shadow: 0 0 8px rgba(0, 255, 136, 0.5); letter-spacing: 0.05em; }
+.fernando-character-frame.talking {
+    border-color: #66ffaa;
+    box-shadow: 0 0 30px rgba(0,255,136,0.6), 0 8px 25px rgba(0,0,0,0.6);
+}
+.fernando-character-name {
+    margin-top: 0.5rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    color: var(--green, #00ff88);
+    text-shadow: 0 0 10px rgba(0,255,136,0.5);
+    letter-spacing: 0.1em;
+}
+
+/* --- Bocadillo de diálogo --- */
+.fernando-speech-container {
+    margin-top: 1.2rem;
+    width: 90%;
+    max-width: 520px;
+    transform: scale(0.85) translateY(15px);
+    opacity: 0;
+    transition: all 0.4s ease 0.25s;
+}
+.fernando-overlay.visible .fernando-speech-container {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+.fernando-speech-box {
+    position: relative;
+    background: linear-gradient(180deg, #f8f5e8 0%, #e8e4d4 100%);
+    border: 4px solid #2a2a3e;
+    border-radius: 14px;
+    padding: 1.5rem 1.3rem 1.3rem;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.3);
+    min-height: 120px;
+}
+.fernando-speech-box::before {
+    content: '';
+    position: absolute;
+    top: -14px; left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-bottom: 14px solid #2a2a3e;
+}
+.fernando-speech-box::after {
+    content: '';
+    position: absolute;
+    top: -9px; left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 11px solid transparent;
+    border-right: 11px solid transparent;
+    border-bottom: 11px solid #f8f5e8;
+}
+
+.fernando-speech-text {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(0.85rem, 2.8vw, 1rem);
+    color: #1a1a2e;
+    line-height: 1.8;
+    min-height: 60px;
+    word-wrap: break-word;
+}
+.fernando-speech-text .fernando-cursor {
+    display: inline-block;
+    width: 8px;
+    height: 1.1em;
+    background: #1a1a2e;
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    animation: fernando-blink 0.6s steps(2) infinite;
+}
+@keyframes fernando-blink {
+    0%   { opacity: 1; }
+    50%  { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* --- Formulario de valoración dentro del bocadillo --- */
+.fernando-val-form {
+    margin-top: 1.2rem;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.4s ease;
+    pointer-events: none;
+}
+.fernando-val-form.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+.fernando-val-stars {
+    display: flex; justify-content: center; gap: 10px;
+    margin-bottom: 1rem; flex-direction: row-reverse;
+}
+.fernando-val-stars input { display: none; }
+.fernando-val-stars label {
+    font-size: 2.2rem; color: #c4c0b0; cursor: pointer;
+    transition: color 0.2s, text-shadow 0.2s, transform 0.2s;
+}
+.fernando-val-stars label:hover,
+.fernando-val-stars label:hover ~ label,
+.fernando-val-stars input:checked ~ label {
+    color: #00cc66; text-shadow: 0 0 12px rgba(0, 204, 102, 0.8);
+    transform: scale(1.15);
+}
+.fernando-val-textarea {
+    width: 100%; background: rgba(26,26,46,0.08);
+    border: 2px solid #2a2a3e40; border-radius: 8px;
+    color: #1a1a2e; padding: 0.65rem; font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem; resize: none; margin-bottom: 1rem;
+}
+.fernando-val-textarea:focus {
+    outline: none; border-color: #00cc66;
+    box-shadow: 0 0 6px rgba(0, 204, 102, 0.3);
+}
+.fernando-val-textarea::placeholder { color: #999; }
+.fernando-val-buttons { display: flex; gap: 0.8rem; justify-content: center; }
+.fernando-btn-submit, .fernando-btn-skip {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem; font-weight: 700;
+    padding: 0.6rem 1.8rem; border-radius: 8px;
+    border: 3px solid; cursor: pointer;
+    transition: all 0.2s ease; letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+.fernando-btn-submit {
+    background: linear-gradient(135deg, #00cc66, #009944);
+    border-color: #00ff88; color: #fff;
+    box-shadow: 0 0 15px rgba(0,255,136,0.3);
+}
+.fernando-btn-submit:not(.disabled):hover {
+    background: linear-gradient(135deg, #00ee77, #00bb55);
+    box-shadow: 0 0 25px rgba(0,255,136,0.5);
+    transform: scale(1.05);
+}
+.fernando-btn-submit.disabled {
+    opacity: 0.4; cursor: not-allowed;
+    border-color: #00ff8860; color: #fff9;
+}
+.fernando-btn-skip {
+    background: linear-gradient(135deg, #666, #444);
+    border-color: #888; color: #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+.fernando-btn-skip:hover {
+    background: linear-gradient(135deg, #777, #555);
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    transform: scale(1.05);
+}
+.fernando-val-msg {
+    display: none; margin-top: 0.8rem; text-align: center;
+    color: #00aa55; font-weight: bold; font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem; letter-spacing: 0.05em;
+}
+
+/* --- Botón cerrar --- */
+.fernando-close {
+    position: absolute; top: -12px; right: -12px;
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 2px solid #2a2a3e; background: #ff4466; color: #fff;
+    font-size: 1rem; font-weight: bold; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; z-index: 10;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    opacity: 0; pointer-events: none;
+}
+.fernando-close.visible { opacity: 1; pointer-events: auto; }
+.fernando-close:hover { background: #ff2244; transform: scale(1.1); }
+
+@media (max-width: 600px) {
+    .fernando-character-frame { width: 90px; height: 90px; }
+    .fernando-character-area { margin-top: 1.5rem; }
+    .fernando-speech-container { width: 95%; }
+    .fernando-speech-box { padding: 1.2rem 1rem 1rem; min-height: 100px; }
+    .fernando-speech-text { font-size: 0.82rem; }
+    .fernando-val-stars label { font-size: 1.8rem; }
+    .fernando-btn-submit, .fernando-btn-skip { padding: 0.5rem 1.2rem; font-size: 0.75rem; }
+}
 </style>
 
-<div class="val-modal-overlay" id="valModalOverlay">
-    <div class="val-modal">
-        <div class="val-title">¿Qué te ha parecido la actividad?</div>
-        
-        <div class="val-stars">
-            <input type="radio" name="estrellas" id="star5" value="5"><label for="star5">★</label>
-            <input type="radio" name="estrellas" id="star4" value="4"><label for="star4">★</label>
-            <input type="radio" name="estrellas" id="star3" value="3"><label for="star3">★</label>
-            <input type="radio" name="estrellas" id="star2" value="2"><label for="star2">★</label>
-            <input type="radio" name="estrellas" id="star1" value="1"><label for="star1">★</label>
+<!-- Fernando Overlay -->
+<div class="fernando-overlay" id="fernandoOverlay">
+    <div class="fernando-character-area">
+        <div class="fernando-character-frame" id="fernandoCharFrame">
+            <img src="/images/pistas/fernando.png" alt="Fernando" id="fernandoCharImg"
+                 data-img-closed="/images/pistas/fernando.png"
+                 data-img-open="/images/pistas/fernando1.png">
         </div>
-        
-        <textarea id="valComentario" class="val-textarea" rows="3" placeholder="Déjanos un comentario (opcional)..."></textarea>
-        
-        <div class="val-buttons" id="valButtons">
-            <button class="val-btn val-btn-skip" id="btnSkipVal">Omitir</button>
-            <button class="val-btn val-btn-submit disabled" id="btnSubmitVal" disabled><span>Enviar valoración</span></button>
+        <div class="fernando-character-name">FERNANDO</div>
+    </div>
+
+    <div class="fernando-speech-container">
+        <div class="fernando-speech-box" id="fernandoSpeechBox">
+            <div class="fernando-speech-text" id="fernandoSpeechText"></div>
+
+            <!-- Formulario de valoración (aparece tras el diálogo) -->
+            <div class="fernando-val-form" id="fernandoValForm">
+                <div class="fernando-val-stars">
+                    <input type="radio" name="fEstrellas" id="fStar5" value="5"><label for="fStar5">★</label>
+                    <input type="radio" name="fEstrellas" id="fStar4" value="4"><label for="fStar4">★</label>
+                    <input type="radio" name="fEstrellas" id="fStar3" value="3"><label for="fStar3">★</label>
+                    <input type="radio" name="fEstrellas" id="fStar2" value="2"><label for="fStar2">★</label>
+                    <input type="radio" name="fEstrellas" id="fStar1" value="1"><label for="fStar1">★</label>
+                </div>
+                <textarea id="fernandoComentario" class="fernando-val-textarea" rows="2" placeholder="Déjanos un comentario (opcional)..."></textarea>
+                <div class="fernando-val-buttons">
+                    <button class="fernando-btn-skip" id="fernandoBtnSkip">Omitir</button>
+                    <button class="fernando-btn-submit disabled" id="fernandoBtnSubmit" disabled>Enviar</button>
+                </div>
+                <div class="fernando-val-msg" id="fernandoValMsg"></div>
+            </div>
+
+            <button class="fernando-close" id="fernandoClose" title="Cerrar">✕</button>
         </div>
-        
-        <div class="val-msg" id="valMsg">[OK] Valoración registrada.<br>¡Gracias por tu feedback!</div>
     </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    // Verificar si ya se mostro para esta partida
-    if (localStorage.getItem('dawscape_valorado_{{ $partida->id ?? '' }}')) return;
+(function() {
+    // ═══ Verificar si ya se valoró ═══
+    var partidaId = '{{ $partida->id ?? '' }}';
+    if (localStorage.getItem('dawscape_valorado_' + partidaId)) return;
 
-    const overlay = document.getElementById('valModalOverlay');
-    const btnSubmit = document.getElementById('btnSubmitVal');
-    const btnSkip = document.getElementById('btnSkipVal');
-    const msg = document.getElementById('valMsg');
-    const buttonsContainer = document.getElementById('valButtons');
-    const stars = document.querySelectorAll('input[name="estrellas"]');
-    
-    // Habilitar boton cuando se selecciona una estrella
-    stars.forEach(star => {
-        star.addEventListener('change', () => {
+    // ═══ CONFIG ═══
+    var VELOCIDAD_TEXTO = 35;
+    var MOUTH_INTERVAL_MS = 150;
+    var DIALOGO_LINEAS = [
+        '¡Enhorabuena por completar DAWSCAPE!',
+        '¿Qué te ha parecido el escape room?',
+        'Nos ayudaría mucho si dejas una valoración 😊'
+    ];
+
+    // ═══ ESTADO ═══
+    var typewriterInterval = null;
+    var speakingAudio = null;
+    var mouthAnimInterval = null;
+    var mouthOpen = false;
+
+    // ═══ ELEMENTOS DOM ═══
+    var overlay = document.getElementById('fernandoOverlay');
+    var charFrame = document.getElementById('fernandoCharFrame');
+    var charImg = document.getElementById('fernandoCharImg');
+    var speechText = document.getElementById('fernandoSpeechText');
+    var valForm = document.getElementById('fernandoValForm');
+    var btnSubmit = document.getElementById('fernandoBtnSubmit');
+    var btnSkip = document.getElementById('fernandoBtnSkip');
+    var closeBtn = document.getElementById('fernandoClose');
+    var valMsg = document.getElementById('fernandoValMsg');
+    var stars = document.querySelectorAll('input[name="fEstrellas"]');
+
+    if (!overlay || !charImg) return;
+
+    // ═══ IMÁGENES DE BOCA ═══
+    var imgClosed = charImg.getAttribute('data-img-closed');
+    var imgOpen = charImg.getAttribute('data-img-open');
+    var hasSpeakingFrames = imgClosed !== imgOpen;
+
+    // Precargar imagen boca abierta
+    if (hasSpeakingFrames) {
+        var preload = new Image();
+        preload.src = imgOpen;
+    }
+
+    // ═══ ANIMACIÓN DE BOCA ═══
+    function iniciarAnimBoca() {
+        charFrame.classList.add('talking');
+        if (!hasSpeakingFrames) return;
+        mouthOpen = false;
+        mouthAnimInterval = setInterval(function() {
+            mouthOpen = !mouthOpen;
+            charImg.src = mouthOpen ? imgOpen : imgClosed;
+        }, MOUTH_INTERVAL_MS);
+    }
+
+    function detenerAnimBoca() {
+        charFrame.classList.remove('talking');
+        if (mouthAnimInterval) { clearInterval(mouthAnimInterval); mouthAnimInterval = null; }
+        mouthOpen = false;
+        if (hasSpeakingFrames) charImg.src = imgClosed;
+    }
+
+    // ═══ SONIDO DE HABLA ═══
+    var _speakingAudioUrl = ((window.AUDIO_BASE_URL || '/sonido').replace(/\/$/, '')) + '/hablando-pista.mp3';
+
+    function iniciarSonidoHabla() {
+        try {
+            if (speakingAudio) speakingAudio.pause();
+            speakingAudio = new Audio(_speakingAudioUrl);
+            speakingAudio.loop = true;
+            speakingAudio.volume = 0.85;
+            speakingAudio.play().catch(function() {});
+        } catch(e) {}
+    }
+
+    function detenerSonidoHabla() {
+        if (speakingAudio) {
+            speakingAudio.pause();
+            speakingAudio.currentTime = 0;
+            speakingAudio = null;
+        }
+    }
+
+    // ═══ TYPEWRITER ═══
+    function typewriter(texto, callback) {
+        if (typewriterInterval) clearInterval(typewriterInterval);
+        speechText.innerHTML = '';
+        var i = 0;
+
+        iniciarSonidoHabla();
+        iniciarAnimBoca();
+
+        var cursorSpan = document.createElement('span');
+        cursorSpan.className = 'fernando-cursor';
+
+        typewriterInterval = setInterval(function() {
+            if (i < texto.length) {
+                speechText.textContent = texto.substring(0, i + 1);
+                speechText.appendChild(cursorSpan);
+                i++;
+            } else {
+                clearInterval(typewriterInterval);
+                typewriterInterval = null;
+                detenerSonidoHabla();
+                detenerAnimBoca();
+                setTimeout(function() {
+                    if (cursorSpan.parentNode) cursorSpan.remove();
+                }, 600);
+                if (callback) callback();
+            }
+        }, VELOCIDAD_TEXTO);
+    }
+
+    // ═══ DIÁLOGO SECUENCIAL ═══
+    function iniciarDialogo() {
+        overlay.classList.add('visible');
+
+        // Pausar música de fondo si existe
+        if (window.audioManager) {
+            try { window.audioManager.pauseMusic(); } catch(e) {}
+        }
+
+        var lineaActual = 0;
+
+        function siguienteLinea() {
+            if (lineaActual < DIALOGO_LINEAS.length) {
+                typewriter(DIALOGO_LINEAS[lineaActual], function() {
+                    lineaActual++;
+                    if (lineaActual < DIALOGO_LINEAS.length) {
+                        setTimeout(siguienteLinea, 1200);
+                    } else {
+                        // Diálogo terminado → mostrar formulario
+                        setTimeout(function() {
+                            valForm.classList.add('visible');
+                            closeBtn.classList.add('visible');
+                        }, 800);
+                    }
+                });
+            }
+        }
+
+        // Pequeña pausa antes de empezar a hablar
+        setTimeout(siguienteLinea, 600);
+    }
+
+    // ═══ CERRAR ═══
+    function cerrarFernando() {
+        overlay.classList.remove('visible');
+        valForm.classList.remove('visible');
+        closeBtn.classList.remove('visible');
+        if (typewriterInterval) { clearInterval(typewriterInterval); typewriterInterval = null; }
+        detenerSonidoHabla();
+        detenerAnimBoca();
+        if (window.audioManager) {
+            try { window.audioManager.resumeMusic(); } catch(e) {}
+        }
+    }
+
+    // ═══ EVENTOS ═══
+
+    // Habilitar botón enviar al seleccionar estrella
+    stars.forEach(function(star) {
+        star.addEventListener('change', function() {
             btnSubmit.disabled = false;
             btnSubmit.classList.remove('disabled');
         });
     });
 
-    // Mostrar modal despues de 5s
-    setTimeout(() => {
-        overlay.classList.add('active');
-    }, 5000);
-
-    // Omitir
-    btnSkip.addEventListener('click', () => {
-        localStorage.setItem('dawscape_valorado_{{ $partida->id ?? '' }}', 'true');
-        overlay.classList.remove('active');
+    // Cerrar
+    closeBtn.addEventListener('click', function() {
+        localStorage.setItem('dawscape_valorado_' + partidaId, 'true');
+        cerrarFernando();
     });
 
-    // Enviar
-    btnSubmit.addEventListener('click', () => {
-        if(btnSubmit.disabled) return;
-        
-        const checkedStar = document.querySelector('input[name="estrellas"]:checked');
-        if(!checkedStar) return;
-        
-        const starsVal = checkedStar.value;
-        const comment = document.getElementById('valComentario').value;
-        const partidaId = '{{ $partida->id ?? '' }}';
-        
-        let csrfToken = '';
-        const metaCsrf = document.querySelector('meta[name="csrf-token"]');
-        if(metaCsrf) {
+    // Omitir
+    btnSkip.addEventListener('click', function() {
+        localStorage.setItem('dawscape_valorado_' + partidaId, 'true');
+        // Fernando se despide
+        valForm.classList.remove('visible');
+        typewriter('¡No pasa nada! Gracias por jugar. ¡Hasta la próxima!', function() {
+            setTimeout(cerrarFernando, 1500);
+        });
+    });
+
+    // Enviar valoración
+    btnSubmit.addEventListener('click', function() {
+        if (btnSubmit.disabled) return;
+
+        var checkedStar = document.querySelector('input[name="fEstrellas"]:checked');
+        if (!checkedStar) return;
+
+        var starsVal = checkedStar.value;
+        var comment = document.getElementById('fernandoComentario').value;
+
+        var csrfToken = '';
+        var metaCsrf = document.querySelector('meta[name="csrf-token"]');
+        if (metaCsrf) {
             csrfToken = metaCsrf.getAttribute('content');
         } else {
-            // Si la vista no tiene meta csrf, lo buscamos en campos hidden o añadimos un tag global en algun lado. Pero laravel permite headers o inputs.
             csrfToken = '{{ csrf_token() }}';
         }
 
-        // Deshabilitar boton
         btnSubmit.disabled = true;
-        btnSubmit.querySelector('span').textContent = 'Enviando...';
+        btnSubmit.textContent = 'Enviando...';
 
         fetch('/valoraciones', {
             method: 'POST',
@@ -1129,34 +1484,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 estrellas: starsVal,
                 comentario: comment
             })
-        }).then(res => res.json())
-          .then(data => {
-              localStorage.setItem('dawscape_valorado_{{ $partida->id ?? '' }}', 'true');
-              buttonsContainer.style.display = 'none';
-              if (data.success) {
-                  msg.style.display = 'block';
-              } else if (data.message === 'Ya valorado') {
-                  msg.innerHTML = '[OK] Ya habías valorado anteriormente.<br>¡Gracias!';
-                  msg.style.display = 'block';
-              } else {
-                  msg.innerHTML = '[OK] Valoración registrada.<br>¡Gracias!';
-                  msg.style.display = 'block';
+        }).then(function(res) { return res.json(); })
+          .then(function(data) {
+              localStorage.setItem('dawscape_valorado_' + partidaId, 'true');
+              valForm.classList.remove('visible');
+
+              // Fernando agradece con diálogo
+              var msgGracias = '¡Muchas gracias por tu valoración! Tu feedback nos ayuda a mejorar.';
+              if (data.message === 'Ya valorado') {
+                  msgGracias = '¡Ya habías valorado antes! Gracias igualmente.';
               }
-              setTimeout(() => {
-                  overlay.classList.remove('active');
-              }, 2000);
-          }).catch(err => {
-              console.error('Error', err);
-              localStorage.setItem('dawscape_valorado_{{ $partida->id ?? '' }}', 'true');
-              buttonsContainer.style.display = 'none';
-              msg.innerHTML = '[OK] ¡Gracias por participar!';
-              msg.style.display = 'block';
-              setTimeout(() => {
-                  overlay.classList.remove('active');
-              }, 2000);
+              typewriter(msgGracias, function() {
+                  setTimeout(cerrarFernando, 2000);
+              });
+          }).catch(function(err) {
+              console.error('Error enviando valoración:', err);
+              localStorage.setItem('dawscape_valorado_' + partidaId, 'true');
+              valForm.classList.remove('visible');
+              typewriter('¡Gracias por participar en DAWSCAPE!', function() {
+                  setTimeout(cerrarFernando, 2000);
+              });
           });
     });
-});
+
+    // ═══ INICIAR AUTOMÁTICAMENTE tras 5 segundos ═══
+    setTimeout(iniciarDialogo, 5000);
+})();
 </script>
 </body>
 </html>
