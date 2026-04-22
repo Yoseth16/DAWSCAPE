@@ -391,6 +391,18 @@
             grid-template-rows: 1fr 1fr;
         }
     }
+
+    @media (max-width: 768px) {
+        .live-grid {
+            grid-template-columns: 1fr;
+            grid-template-rows: auto auto;
+            height: auto;
+            gap: 1rem;
+        }
+        .log-panel, .control-panel { max-height: 50vh; }
+        .terminal-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+        .terminal-header .title-block h1 { font-size: 1.1rem; }
+    }
 </style>
 @endpush
 

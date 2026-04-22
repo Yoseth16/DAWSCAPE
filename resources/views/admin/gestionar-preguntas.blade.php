@@ -156,6 +156,180 @@
             grid-template-columns: 1fr 2.5fr;
             gap: 1.5rem;
         }
+
+
+        /* ========== PREGUNTAS — MOBILE CARDS ========== */
+        @media (max-width: 768px) {
+            .split-grid { grid-template-columns: 1fr; }
+            .glass-panel { padding: 1rem; height: auto; }
+            .panel-heading { font-size: 1rem; margin-bottom: 1rem; padding-bottom: 0.75rem; }
+
+            /* --- Tabla → Tarjetas apiladas --- */
+            .table-responsive {
+                border: none;
+                box-shadow: none;
+                border-radius: 0;
+                background: transparent;
+                overflow: visible;
+            }
+
+            .table-custom thead { display: none; }
+
+            .table-custom,
+            .table-custom tbody {
+                display: block;
+                width: 100%;
+            }
+
+            .table-custom tr {
+                display: block;
+                background: #ffffff;
+                border: 1px solid var(--border-color);
+                border-radius: 12px;
+                padding: 1rem;
+                margin-bottom: 0.75rem;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            }
+
+            .table-custom tr:hover {
+                background: #ffffff;
+            }
+
+            .table-custom tr.inactive {
+                opacity: 0.55;
+                background: #f8fafc;
+            }
+
+            .table-custom td {
+                display: block;
+                padding: 0.4rem 0;
+                border-bottom: none;
+                text-align: left !important;
+                white-space: normal !important;
+                font-size: 0.9rem;
+                line-height: 1.5;
+            }
+
+            /* Etiquetas para cada campo */
+            .table-custom td:nth-child(1)::before {
+                content: '';
+            }
+            .table-custom td:nth-child(2)::before {
+                content: 'Enunciado';
+                display: block;
+                font-size: 0.7rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                color: var(--text-muted);
+                margin-bottom: 4px;
+            }
+            .table-custom td:nth-child(3)::before {
+                content: 'Respuestas';
+                display: block;
+                font-size: 0.7rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                color: var(--text-muted);
+                margin-bottom: 4px;
+                margin-top: 8px;
+            }
+
+            /* Estado: ponerlo arriba como badge */
+            .table-custom td:nth-child(1) {
+                padding-bottom: 0.5rem;
+                margin-bottom: 0.25rem;
+                border-bottom: 1px solid #f1f5f9;
+            }
+
+            /* Enunciado: texto grande y legible */
+            .table-custom td:nth-child(2) {
+                font-size: 0.95rem;
+                font-weight: 500;
+                padding-bottom: 0.5rem;
+            }
+
+            /* Respuestas */
+            .table-custom td:nth-child(3) {
+                padding-bottom: 0.75rem;
+            }
+
+            /* Acciones: fila de botones grandes */
+            .table-custom td:nth-child(4) {
+                display: flex;
+                gap: 8px;
+                padding-top: 0.75rem;
+                border-top: 1px solid #f1f5f9;
+                justify-content: flex-start;
+            }
+
+            /* Botones de acción mucho más grandes para touch */
+            .table-custom .btn-action {
+                width: 44px;
+                height: 44px;
+                border-radius: 10px;
+                font-size: 1.2rem;
+                border: 1px solid var(--border-color);
+            }
+
+            .table-custom .btn-action i {
+                font-size: 1.3rem;
+            }
+
+            /* Answer text más legible */
+            .answer-text {
+                font-size: 0.85rem;
+                padding: 5px 10px;
+            }
+
+            /* Status pill */
+            .status-pill {
+                font-size: 0.7rem;
+                padding: 4px 10px;
+            }
+
+            /* Formulario mejorado */
+            .form-control {
+                padding: 0.8rem 1rem;
+                font-size: 16px; /* ≥16px evita zoom en iOS Safari */
+                -webkit-appearance: none; /* Reset estilo Safari iOS */
+                appearance: none;
+            }
+
+            textarea.form-control {
+                min-height: 80px;
+                -webkit-appearance: none;
+                appearance: none;
+            }
+
+            .btn-submit {
+                padding: 0.9rem;
+                font-size: 0.95rem;
+                -webkit-appearance: none;
+                appearance: none;
+            }
+
+            /* Header responsive */
+            .page-header {
+                -webkit-flex-direction: column;
+                flex-direction: column;
+                -webkit-align-items: flex-start;
+                align-items: flex-start;
+                gap: 0.75rem;
+                margin-bottom: 1.5rem;
+            }
+            .page-title { font-size: 1.3rem; }
+            .page-subtitle { font-size: 0.85rem; }
+
+            /* Acciones: flex con webkit */
+            .table-custom td:nth-child(4) {
+                display: -webkit-flex;
+                display: flex;
+                -webkit-flex-wrap: wrap;
+                flex-wrap: wrap;
+            }
+        }
     </style>
 @endpush
 
@@ -220,6 +394,8 @@
                 <div class="panel-heading" style="justify-content: space-between;">
                     <div><i class="ph ph-list-bullets"></i> Inventario de Pruebas</div>
                 </div>
+
+
 
                 <div class="table-responsive">
                     <table class="table-custom">
@@ -289,8 +465,7 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
-        </div>
-
-    </div>
+            </di       });
+    })();
+    </script>
 @endsection

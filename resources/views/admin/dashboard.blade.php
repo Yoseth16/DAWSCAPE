@@ -175,6 +175,216 @@
         .search-wrapper i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 1.1rem; }
         .search-input { width: 100%; padding: 0.6rem 1rem 0.6rem 2.5rem; border: 1px solid var(--border-color); border-radius: 8px; background: #ffffff; color: var(--text-main); transition: all 0.2s; outline: none; font-size: 0.95rem; }
         .search-input:focus { border-color: var(--brand-color); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+
+        /* ========== DASHBOARD MOBILE ========== */
+        @media (max-width: 768px) {
+            /* KPIs */
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1.5rem; }
+            .kpi-card { padding: 1rem; gap: 0.8rem; }
+            .kpi-icon-wrap { width: 38px; height: 38px; font-size: 1.2rem; }
+            .kpi-info h4 { font-size: 0.7rem; }
+            .kpi-info p { font-size: 1.2rem; }
+
+            /* Chart + Podium */
+            .mid-grid { grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+            .chart-container { height: 200px; }
+            .podium-item { padding: 10px 12px; }
+            .podium-name { font-size: 0.85rem; }
+            .podium-time { font-size: 0.95rem; }
+
+            /* Buscador full-width */
+            .search-wrapper { max-width: 100%; }
+
+            /* Export buttons */
+            .export-btn { padding: 0.4rem 0.7rem; font-size: 0.8rem; }
+
+            /* ====== TABLA EQUIPOS → TARJETAS ====== */
+            #mainTable { border-collapse: separate; border-spacing: 0; }
+
+            .table-responsive {
+                border: none;
+                box-shadow: none;
+                border-radius: 0;
+                background: transparent;
+                overflow: visible;
+            }
+
+            #mainTable thead { display: none; }
+
+            #mainTable,
+            #mainTable tbody {
+                display: block;
+                width: 100%;
+            }
+
+            #mainTable tr.team-row {
+                display: -ms-grid;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 0;
+                background: #ffffff;
+                border: 1px solid var(--border-color);
+                border-radius: 12px;
+                padding: 1rem;
+                margin-bottom: 0.75rem;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+                position: relative;
+            }
+
+            #mainTable tr.team-row:hover td { background: transparent; }
+
+            #mainTable td {
+                display: block;
+                padding: 0.3rem 0;
+                border-bottom: none;
+                text-align: left !important;
+                white-space: normal;
+                font-size: 0.9rem;
+            }
+
+            /* Celda 1: ID — esquina superior izq como badge sutil */
+            #mainTable td:nth-child(1) {
+                grid-column: 1 / -1;
+                font-size: 0.7rem;
+                color: var(--text-muted) !important;
+                padding-bottom: 0.5rem;
+                margin-bottom: 0.25rem;
+                border-bottom: 1px solid #f1f5f9;
+            }
+
+            /* Celda 2: Equipo & Contacto — full-width */
+            #mainTable td:nth-child(2) {
+                grid-column: 1 / -1;
+                padding-bottom: 0.6rem;
+            }
+            #mainTable .team-cell { gap: 10px; }
+            #mainTable .avatar { width: 36px; height: 36px; font-size: 1.1rem; flex-shrink: 0; }
+            #mainTable .team-meta .t-name { font-size: 0.95rem; }
+            #mainTable .team-meta .t-email { font-size: 0.75rem; word-break: break-all; }
+
+            /* Celda 3: Clase */
+            #mainTable td:nth-child(3) {
+                grid-column: 1;
+            }
+            #mainTable td:nth-child(3)::before {
+                content: 'Clase';
+                display: block;
+                font-size: 0.65rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                color: var(--text-muted);
+                margin-bottom: 3px;
+            }
+
+            /* Celda 4: Estado */
+            #mainTable td:nth-child(4) {
+                grid-column: 2;
+            }
+            #mainTable td:nth-child(4)::before {
+                content: 'Estado';
+                display: block;
+                font-size: 0.65rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                color: var(--text-muted);
+                margin-bottom: 3px;
+            }
+
+            /* Celda 5: Códice */
+            #mainTable td:nth-child(5) {
+                grid-column: 1;
+                text-align: left !important;
+                padding-top: 0.4rem;
+            }
+            #mainTable td:nth-child(5)::before {
+                content: 'Códice (P7)';
+                display: block;
+                font-size: 0.65rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                color: var(--text-muted);
+                margin-bottom: 3px;
+            }
+
+            /* Celda 6: Tiempo */
+            #mainTable td:nth-child(6) {
+                grid-column: 2;
+                padding-top: 0.4rem;
+            }
+            #mainTable td:nth-child(6)::before {
+                content: 'Tiempo';
+                display: block;
+                font-size: 0.65rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                color: var(--text-muted);
+                margin-bottom: 3px;
+            }
+
+            /* Celda 7: Pistas */
+            #mainTable td:nth-child(7) {
+                grid-column: 1;
+                text-align: left !important;
+                padding-top: 0.4rem;
+            }
+            #mainTable td:nth-child(7)::before {
+                content: 'Pistas';
+                display: block;
+                font-size: 0.65rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                color: var(--text-muted);
+                margin-bottom: 3px;
+            }
+
+            /* Celda 8: Borrar — botón grande */
+            #mainTable td:nth-child(8) {
+                grid-column: 2;
+                display: flex;
+                align-items: flex-end;
+                justify-content: flex-end;
+                padding-top: 0.4rem;
+            }
+
+            #mainTable .btn-action {
+                width: 44px;
+                height: 44px;
+                border-radius: 10px;
+                border: 1px solid #fecaca;
+                background: #fee2e2;
+                color: #dc2626;
+                font-size: 1.2rem;
+            }
+
+            /* Fila vacía (empty state) */
+            #mainTable tr:not(.team-row) {
+                display: block;
+            }
+            #mainTable tr:not(.team-row) td {
+                display: block;
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .kpi-grid { grid-template-columns: 1fr; }
+            #mainTable tr.team-row {
+                grid-template-columns: 1fr;
+            }
+            #mainTable td:nth-child(3),
+            #mainTable td:nth-child(4),
+            #mainTable td:nth-child(5),
+            #mainTable td:nth-child(6),
+            #mainTable td:nth-child(7),
+            #mainTable td:nth-child(8) {
+                grid-column: 1;
+            }
+        }
     </style>
 @endpush
 
@@ -184,7 +394,7 @@
                 <h1 class="page-title">Visión General</h1>
                 <div class="page-subtitle">Monitorización en tiempo real de la actividad del Escape Room.</div>
             </div>
-            <div style="display:flex; gap: 15px; align-items:center;">
+            <div style="display:flex; gap: 10px; align-items:center; flex-wrap: wrap;">
                 <button onclick="window.location.reload()" class="export-btn">
                     <i class="ph ph-arrows-clockwise"></i> Recargar
                 </button>

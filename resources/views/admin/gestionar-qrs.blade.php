@@ -56,6 +56,13 @@
             .card-qr.printing .qr-info h3 { font-size: 1.5rem; }
             .card-qr.printing .qr-info p { font-size: 1.2rem; color: #000; border-left: 4px solid #000; padding: 15px; margin-top: 10px; background: #f9f9f9; }
         }
+
+        @media (max-width: 768px) {
+            .card-qr { flex-direction: column; gap: 1rem; align-items: flex-start; }
+            .print-container { flex-direction: column; }
+            .actions { flex-direction: row; width: 100%; }
+            .actions .btn-print, .actions .btn-delete { flex: 1; }
+        }
     </style>
 @endpush
 
@@ -122,7 +129,7 @@
             No hay ningún QR en el sistema. Genera el primero arriba.
         </div>
     @else
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
             @foreach($qrs as $qr)
             <div class="card-qr" id="qr-card-{{ $qr->id }}">
                 <div class="print-container">
