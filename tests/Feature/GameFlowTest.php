@@ -62,6 +62,90 @@ class GameFlowTest extends TestCase
         $response->assertStatus(302);
     }
 
+    public function test_reconnect_restores_progress_for_prueba9(): void
+    {
+        $inscripcion = Inscripcion::create([
+            'nombre_equipo' => 'Equipo Prueba 9',
+            'correo' => 'prueba9@estudiante.xtart.com',
+            'clase' => '2DAW',
+        ]);
+
+        Partida::create([
+            'uuid' => (string) \Illuminate\Support\Str::uuid(),
+            'email' => 'prueba9@estudiante.xtart.com',
+            'nombre_equipo' => 'Equipo Prueba 9',
+            'clase' => '2DAW',
+            'fase_actual' => config('fases.fases.prueba9.db'),
+            'tiempo_segundos' => 0,
+            'inicio_juego' => now(),
+            'combinacion_codice' => [0, 1, 2, 3],
+            'intentos_codice' => 0,
+        ]);
+
+        $response = $this->post('/empezar', [
+            'correo' => 'prueba9@estudiante.xtart.com',
+            'codigo_acceso' => $inscripcion->codigo_acceso,
+        ]);
+
+        $response->assertRedirect(route('prueba9'));
+        $response->assertSessionHas('prueba8_superada', true);
+        $response->assertSessionMissing('prueba9_superada');
+    }
+
+    public function test_reconnect_restores_progress_for_finalized_games(): void
+    {
+        $inscripcion = Inscripcion::create([
+            'nombre_equipo' => 'Equipo Final',
+            'correo' => 'final@estudiante.xtart.com',
+            'clase' => '2DAW',
+        ]);
+
+        Partida::create([
+            'uuid' => (string) \Illuminate\Support\Str::uuid(),
+            'email' => 'final@estudiante.xtart.com',
+            'nombre_equipo' => 'Equipo Final',
+            'clase' => '2DAW',
+            'fase_actual' => config('fases.fases.finalizado.db'),
+            'tiempo_segundos' => 1234,
+            'inicio_juego' => now()->subMinutes(20),
+            'combinacion_codice' => [4, 5, 6, 7],
+            'intentos_codice' => 0,
+        ]);
+
+        $response = $this->post('/empezar', [
+            'correo' => 'final@estudiante.xtart.com',
+            'codigo_acceso' => $inscripcion->codigo_acceso,
+        ]);
+
+        $response->assertRedirect(route('final'));
+        $response->assertSessionHas('prueba9_superada', true);
+    }
+
+    public function test_final_route_is_accessible_when_timeout_is_already_persisted(): void
+    {
+        Partida::create([
+            'uuid' => (string) \Illuminate\Support\Str::uuid(),
+            'email' => 'timeout@estudiante.xtart.com',
+            'nombre_equipo' => 'Equipo Timeout',
+            'clase' => '2DAW',
+            'fase_actual' => config('fases.fases.timeout.db'),
+            'tiempo_segundos' => 5400,
+            'inicio_juego' => now()->subMinutes(90),
+            'combinacion_codice' => [7, 8, 9, 0],
+            'intentos_codice' => 0,
+        ]);
+
+        $response = $this->withSession([
+            'email' => 'timeout@estudiante.xtart.com',
+            'nombre_equipo' => 'Equipo Timeout',
+            'clase' => '2DAW',
+        ])->get('/final');
+
+        $response->assertOk();
+        $response->assertSessionHas('prueba9_superada', true);
+        $response->assertSee('Equipo Timeout');
+    }
+
     public function test_invalid_code_cannot_start_game(): void
     {
         Inscripcion::create([

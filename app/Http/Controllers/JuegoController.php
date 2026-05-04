@@ -103,6 +103,57 @@ class JuegoController extends Controller
         return $ruta ? redirect()->route($ruta) : null;
     }
 
+    /**
+     * Rehidrata las flags de progreso en sesión usando `partidas.fase_actual`
+     * como fuente de verdad al reconectar un equipo.
+     */
+    private function restaurarProgresoDesdeFaseActual(?string $faseActual): int
+    {
+        $nivelesPorFase = [
+            config('fases.fases.prueba1.db')    => 1,
+            config('fases.fases.prueba2.db')    => 2,
+            config('fases.fases.prueba3.db')    => 3,
+            config('fases.fases.prueba4.db')    => 4,
+            config('fases.fases.prueba5.db')    => 5,
+            config('fases.fases.prueba6.db')    => 6,
+            config('fases.fases.prueba7.db')    => 7,
+            config('fases.fases.prueba8.db')    => 8,
+            config('fases.fases.prueba9.db')    => 9,
+            config('fases.fases.finalizado.db') => 10,
+            config('fases.fases.timeout.db')    => 10,
+        ];
+
+        $nivelActual = $nivelesPorFase[trim((string) $faseActual)] ?? 0;
+
+        session()->forget([
+            'sergio_intro_visto',
+            'prueba1mario_superada',
+            'prueba2yoseth_superada',
+            'prueba3angel_superada',
+            'prueba4arturo_superada',
+            'prueba5eloy_superada',
+            'prueba6migue_superada',
+            'prueba7_superada',
+            'prueba8_superada',
+            'prueba9_superada',
+        ]);
+
+        $flagsProgreso = ['sergio_intro_visto' => true];
+        if ($nivelActual >= 2) $flagsProgreso['prueba1mario_superada'] = true;
+        if ($nivelActual >= 3) $flagsProgreso['prueba2yoseth_superada'] = true;
+        if ($nivelActual >= 4) $flagsProgreso['prueba3angel_superada'] = true;
+        if ($nivelActual >= 5) $flagsProgreso['prueba4arturo_superada'] = true;
+        if ($nivelActual >= 6) $flagsProgreso['prueba5eloy_superada'] = true;
+        if ($nivelActual >= 7) $flagsProgreso['prueba6migue_superada'] = true;
+        if ($nivelActual >= 8) $flagsProgreso['prueba7_superada'] = true;
+        if ($nivelActual >= 9) $flagsProgreso['prueba8_superada'] = true;
+        if ($nivelActual >= 10) $flagsProgreso['prueba9_superada'] = true;
+
+        session($flagsProgreso);
+
+        return $nivelActual;
+    }
+
     // =====================================================
     // SISTEMA DE PISTAS / AYUDA
     // =====================================================
@@ -187,28 +238,7 @@ class JuegoController extends Controller
             ]);
 
             // Restaurar progreso en la sesión según la fase en BBDD
-            $fasesOrdenadas = [
-                config('fases.fases.prueba1.db') => 1,
-                config('fases.fases.prueba2.db') => 2,
-                config('fases.fases.prueba3.db') => 3,
-                config('fases.fases.prueba4.db') => 4,
-                config('fases.fases.prueba5.db') => 5,
-                config('fases.fases.prueba6.db') => 6,
-                config('fases.fases.prueba7.db') => 7,
-                config('fases.fases.prueba8.db') => 8,
-                config('fases.fases.prueba9.db') => 9,
-                config('fases.fases.finalizado.db') => 10,
-            ];
-
-            $faseActualDBNormalizada = ucwords(strtolower(trim($partidaExistente->fase_actual ?? '')));
-            $nivelDB = $fasesOrdenadas[$faseActualDBNormalizada] ?? 0;
-
-            foreach ($fasesOrdenadas as $faseNombre => $nivel) {
-                if ($nivel < $nivelDB) {
-                    $slugFase = \Illuminate\Support\Str::slug(strtolower($faseNombre), '');
-                    session(['prueba' . $nivel . $slugFase . '_superada' => true]);
-                }
-            }
+            $nivelDB = $this->restaurarProgresoDesdeFaseActual($partidaExistente->fase_actual);
 
             // Actualizar avatar o color si el jugador lo seleccionó en el form (opcional)
             $updateData = [];

@@ -51,7 +51,7 @@ El proyecto integra tecnologías modernas como **Laravel Reverb** para actualiza
 - **Registro previo de equipos** con validación de correo único y nombre de equipo único
 - **Código QR descargable** por equipo (token de 32 caracteres)
 - **Código de acceso de 6 caracteres** alfanuméricos enviado por email vía Resend
-- **Validación triple**: Correo + Nombre de Equipo + Código de Acceso
+- **Validación de acceso**: Correo corporativo inscrito + Código de Acceso
 
 ### 👨‍💼 Panel de Administración
 - **Dashboard en tiempo real**: Monitorización de todos los equipos activos y pendientes de inicio
@@ -288,6 +288,8 @@ chmod +x deploy.sh
 3. **Día del evento** → `/` — Introducir credenciales y empezar partida
 4. **Resolver 9 pruebas** — Seguir el orden secuencial, escanear QRs y colaborar
 5. **Ver resultados** — Pantalla final con tiempo, logros y posición en ranking
+
+La reconexión de un equipo reutiliza la `partida` existente y reconstruye el progreso desde `partidas.fase_actual`, que es la fuente de verdad para reanudar en la prueba correcta o volver directamente a `/final` si el equipo ya terminó.
 
 ### Para Administradores
 
