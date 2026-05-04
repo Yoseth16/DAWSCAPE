@@ -393,7 +393,7 @@
   <div class="win-title">ACCESO CONCEDIDO</div>
   <div class="subtitle">// Todos los sistemas desbloqueados</div>
   <div class="result-panel" id="win-stats"></div>
-  <a href="{{ route('prueba2') }}" class="btn">PASAR A LA SIGUIENTE PRUEBA →</a>
+  <a href="{{ route('prueba2') }}" class="btn" id="btn-continuar" style="pointer-events:none; opacity:0.4;">VERIFICANDO CON EL SERVIDOR...</a>
 </div>
 
 <script>
@@ -594,26 +594,93 @@ function showWin() {
   document.getElementById('progress-fill').style.width = '100%';
   document.getElementById('win-stats').innerHTML =
     `Acertijos logicos eludidos: <span>${questions.length} / ${questions.length}</span><br><br>` +
-    `<span style="font-size:0.8rem; color:#445544">// SISTEMA DESBLOQUEADO — PUEDES SALIR</span>`;
+    `<span style="font-size:0.8rem; color:#445544">// ENVIANDO VALIDACIÓN AL BACKEND...</span>`;
   showScreen('screen-win');
 
-// Notificar al servidor que se completó el escape room
+  // Iniciar validación con reintentos automáticos
+  sendValidation(1);
+}
+
+/**
+ * Envía la validación al backend con reintentos automáticos.
+ * NUNCA recarga la página — preserva userAnswers para no perder progreso.
+ */
+function sendValidation(attempt) {
+  var maxAttempts = 3;
+  var btnContinuar = document.getElementById('btn-continuar');
+
+  // Feedback visual durante el intento
+  if (attempt > 1) {
+    document.getElementById('win-stats').innerHTML =
+      `Acertijos logicos eludidos: <span>${questions.length} / ${questions.length}</span><br><br>` +
+      `<span style="font-size:0.8rem; color:#ffaa00;">// REINTENTANDO VALIDACIÓN (${attempt}/${maxAttempts})...</span>`;
+  }
+
+  btnContinuar.style.pointerEvents = 'none';
+  btnContinuar.style.opacity = '0.4';
+  btnContinuar.textContent = 'VERIFICANDO CON EL SERVIDOR...';
+
   fetch("/prueba1", {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
       'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     },
     body: JSON.stringify({
       completed: true,
       answers: userAnswers
     })
-  }).then(response => {
-      if(response.ok) {
-          // Si el servidor lo guarda bien, no redirigimos automáticamente.
-          // El usuario pulsará el botón para pasar de prueba y se le llevará a la prueba2yoseth.
-      }
-  }).catch(err => console.error('Error al notificar al servidor:', err));
+  })
+  .then(function(r) { return r.json().catch(function() { return {success: false, message: 'Respuesta inválida del servidor'}; }); })
+  .then(function(data) {
+    if (data.success) {
+      // ✅ Validación exitosa — habilitar botón de continuar
+      document.getElementById('win-stats').innerHTML =
+        `Acertijos logicos eludidos: <span>${questions.length} / ${questions.length}</span><br><br>` +
+        `<span style="font-size:0.8rem; color:var(--green);">// VALIDACIÓN COMPLETADA ✓</span>`;
+      btnContinuar.textContent = 'PASAR A LA SIGUIENTE PRUEBA →';
+      btnContinuar.style.pointerEvents = 'auto';
+      btnContinuar.style.opacity = '1';
+    } else {
+      handleValidationFailure(attempt, maxAttempts, 'El servidor rechazó la validación.');
+    }
+  })
+  .catch(function(err) {
+    console.error('Error de red al validar (intento ' + attempt + '):', err);
+    handleValidationFailure(attempt, maxAttempts, 'Error de conexión con el servidor.');
+  });
+}
+
+/**
+ * Gestiona fallos de validación: reintenta automáticamente o muestra
+ * un botón de reintento manual. NUNCA redirige/recarga la página.
+ */
+function handleValidationFailure(attempt, maxAttempts, errorMsg) {
+  var btnContinuar = document.getElementById('btn-continuar');
+
+  if (attempt < maxAttempts) {
+    // Reintentar automáticamente con backoff exponencial (2s, 4s)
+    var delay = 2000 * attempt;
+    document.getElementById('win-stats').innerHTML =
+      `Acertijos logicos eludidos: <span>${questions.length} / ${questions.length}</span><br><br>` +
+      `<span style="font-size:0.8rem; color:#ffaa00;">// ${errorMsg} Reintentando en ${delay/1000}s...</span>`;
+    setTimeout(function() { sendValidation(attempt + 1); }, delay);
+  } else {
+    // Todos los reintentos agotados — botón manual (SIN recargar página)
+    document.getElementById('win-stats').innerHTML =
+      `Acertijos logicos eludidos: <span>${questions.length} / ${questions.length}</span><br><br>` +
+      `<span style="color:var(--red);">${errorMsg}</span><br>` +
+      `<span style="font-size:0.8rem; color:#888;">Tus respuestas están guardadas. Pulsa el botón para reintentar.</span>`;
+    btnContinuar.textContent = '↻ REINTENTAR VALIDACIÓN';
+    btnContinuar.removeAttribute('href');
+    btnContinuar.onclick = function(e) {
+      e.preventDefault();
+      sendValidation(1);
+    };
+    btnContinuar.style.pointerEvents = 'auto';
+    btnContinuar.style.opacity = '1';
+  }
 }
 
 function resetGame() {

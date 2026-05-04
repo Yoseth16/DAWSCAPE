@@ -74,6 +74,74 @@
         .star-empty {
             color: #4b5563;
         }
+
+        /* ========== VALORACIONES — MOBILE ========== */
+        @media (max-width: 768px) {
+            .kpi-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.75rem;
+                margin-bottom: 1.5rem;
+            }
+            .kpi-card { padding: 1rem; border-radius: 12px; }
+            .kpi-value { font-size: 1.5rem; }
+            .kpi-title { font-size: 0.75rem; }
+
+            .table-container { padding: 0; border: none; box-shadow: none; background: transparent; }
+
+            .val-table thead { display: none; }
+            .val-table,
+            .val-table tbody { display: block; width: 100%; }
+            .val-table tr {
+                display: block;
+                background: var(--surface-color);
+                border: 1px solid var(--border-color);
+                border-radius: 12px;
+                padding: 1rem;
+                margin-bottom: 0.75rem;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            }
+            .val-table tr:hover { background: var(--surface-color); }
+            .val-table td {
+                display: block;
+                padding: 0.3rem 0;
+                border-bottom: none;
+                text-align: left !important;
+            }
+            /* Equipo → destacado */
+            .val-table td:nth-child(1) {
+                font-size: 1rem;
+                padding-bottom: 0.4rem;
+                margin-bottom: 0.3rem;
+                border-bottom: 1px solid #f1f5f9;
+            }
+            /* Estrellas */
+            .val-table td:nth-child(2) { padding: 0.3rem 0; }
+            /* Comentario */
+            .val-table td:nth-child(3) {
+                font-size: 0.9rem;
+                line-height: 1.5;
+                color: var(--text-main);
+            }
+            .val-table td:nth-child(3)::before {
+                content: 'Comentario';
+                display: block;
+                font-size: 0.65rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                color: var(--text-muted);
+                margin-top: 6px;
+                margin-bottom: 3px;
+            }
+            /* Fecha */
+            .val-table td:nth-child(4) {
+                font-size: 0.75rem;
+                color: var(--text-muted) !important;
+                margin-top: 0.5rem;
+                padding-top: 0.5rem;
+                border-top: 1px solid #f1f5f9;
+            }
+        }
     </style>
 @endpush
 

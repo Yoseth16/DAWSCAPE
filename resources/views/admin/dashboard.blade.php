@@ -385,6 +385,20 @@
                 grid-column: 1;
             }
         }
+
+        /* ========== INSCRIPCIONES PENDIENTES — MOBILE ========== */
+        @media (max-width: 768px) {
+            #inscripciones-panel .podium-item {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            #inscripciones-panel .podium-item > div[style*="white-space: nowrap"] {
+                flex-basis: 100%;
+                order: 3;
+                font-size: 0.7rem;
+                margin-right: 0;
+            }
+        }
     </style>
 @endpush
 

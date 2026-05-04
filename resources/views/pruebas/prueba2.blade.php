@@ -300,7 +300,7 @@
 
   <div class="console-out" id="console-out"></div>
 
-  <a href="{{ route('prueba3') }}" class="btn" id="next-btn">PASAR A LA SIGUIENTE PRUEBA →</a>
+  <a href="{{ route('prueba3') }}" class="btn" id="next-btn" style="pointer-events:none; opacity:0.4;">VERIFICANDO CON EL SERVIDOR...</a>
 
 </div>
 
@@ -366,7 +366,6 @@ function submitAnswer() {
         document.getElementById('submit-btn').disabled = true;
         if (window.audioManager) window.audioManager.playSFX('correct');
         printSuccess();
-        notifyServer();
     } else {
         failedAttempts++;
         if (window.audioManager) window.audioManager.playSFX('error');
@@ -395,20 +394,85 @@ function printSuccess() {
         <span class="out-ok">[OK] Reconstrucción de paquetes exitosa... 100%</span><br>
         <span class="out-ok">[OK] Clave maestra aceptada.</span><br>
         <span class="out-ok">[OK] Cortafuegos perimetral desactivado.</span><br><br>
-        <span style="color: #88ccaa">"Habéis restaurado el flujo de datos. Avanzad al siguiente nivel."</span>
+        <span style="color: #88ccaa">"Habéis restaurado el flujo de datos."</span><br>
+        <span style="font-size:0.8rem; color:#445544">// ENVIANDO VALIDACIÓN AL BACKEND...</span>
     `;
     nextBtn.classList.add('visible');
+    sendValidation(1);
 }
 
-function notifyServer() {
+/**
+ * Envía la validación al backend con reintentos automáticos.
+ * NUNCA recarga la página.
+ */
+function sendValidation(attempt) {
+    var maxAttempts = 3;
+
+    if (attempt > 1) {
+        consoleOut.innerHTML = `
+            <span class="out-ok">[OK] Clave maestra aceptada.</span><br>
+            <span style="font-size:0.8rem; color:#ffaa00;">// REINTENTANDO VALIDACIÓN (${attempt}/${maxAttempts})...</span>
+        `;
+    }
+
+    nextBtn.style.pointerEvents = 'none';
+    nextBtn.style.opacity = '0.4';
+    nextBtn.textContent = 'VERIFICANDO CON EL SERVIDOR...';
+
     fetch("/prueba2", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'Accept': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         },
         body: JSON.stringify({ answer: inputField.value.trim() })
-    }).catch(err => console.error('Error:', err));
+    })
+    .then(function(r) { return r.json().catch(function() { return {success: false, message: 'Respuesta inválida del servidor'}; }); })
+    .then(function(data) {
+        if (data.success) {
+            consoleOut.innerHTML = `
+                <span class="out-ok">[OK] Reconstrucción de paquetes exitosa... 100%</span><br>
+                <span class="out-ok">[OK] Clave maestra aceptada.</span><br>
+                <span class="out-ok">[OK] Cortafuegos perimetral desactivado.</span><br><br>
+                <span style="color: #88ccaa">"Habéis restaurado el flujo de datos. Avanzad al siguiente nivel."</span><br>
+                <span style="font-size:0.8rem; color:var(--green);">// VALIDACIÓN COMPLETADA ✓</span>
+            `;
+            nextBtn.textContent = 'PASAR A LA SIGUIENTE PRUEBA →';
+            nextBtn.style.pointerEvents = 'auto';
+            nextBtn.style.opacity = '1';
+        } else {
+            handleValidationFailure(attempt, maxAttempts, 'El servidor rechazó la validación.');
+        }
+    })
+    .catch(function(err) {
+        console.error('Error de red al validar (intento ' + attempt + '):', err);
+        handleValidationFailure(attempt, maxAttempts, 'Error de conexión con el servidor.');
+    });
+}
+
+function handleValidationFailure(attempt, maxAttempts, errorMsg) {
+    if (attempt < maxAttempts) {
+        var delay = 2000 * attempt;
+        consoleOut.innerHTML = `
+            <span class="out-ok">[OK] Clave maestra aceptada.</span><br>
+            <span style="font-size:0.8rem; color:#ffaa00;">// ${errorMsg} Reintentando en ${delay/1000}s...</span>
+        `;
+        setTimeout(function() { sendValidation(attempt + 1); }, delay);
+    } else {
+        consoleOut.innerHTML = `
+            <span style="color:var(--red);">${errorMsg}</span><br>
+            <span style="font-size:0.8rem; color:#888;">Tu respuesta está guardada. Pulsa el botón para reintentar.</span>
+        `;
+        nextBtn.textContent = '↻ REINTENTAR VALIDACIÓN';
+        nextBtn.removeAttribute('href');
+        nextBtn.onclick = function(e) {
+            e.preventDefault();
+            sendValidation(1);
+        };
+        nextBtn.style.pointerEvents = 'auto';
+        nextBtn.style.opacity = '1';
+    }
 }
 </script>
 </body>

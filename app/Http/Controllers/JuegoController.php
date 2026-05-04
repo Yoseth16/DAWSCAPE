@@ -41,6 +41,21 @@ class JuegoController extends Controller
         }
     }
 
+    /**
+     * Notifica al dashboard admin y top10 de cambios en tiempo real.
+     * Envuelto en try-catch porque un fallo de Pusher/broadcasting
+     * NUNCA debe impedir que la validación de una prueba se complete.
+     */
+    private function broadcastDashboard(): void
+    {
+        try {
+            Top10Updated::dispatch();
+            AdminDashboardUpdated::dispatch();
+        } catch (\Throwable $e) {
+            \Log::warning('Broadcasting falló (no crítico): ' . $e->getMessage());
+        }
+    }
+
     private function desbloquearLogro($partida, $logroId)
     {
         if (!$partida) return false;
@@ -379,8 +394,7 @@ class JuegoController extends Controller
             }
 
             $this->timerService->avanzarFase($partida, config('fases.fases.prueba2.db'), 'Prueba 1 Mario Superada');
-            Top10Updated::dispatch();
-            AdminDashboardUpdated::dispatch();
+            $this->broadcastDashboard();
         }
 
         // Devolvemos un OK en formato JSON
@@ -428,8 +442,7 @@ class JuegoController extends Controller
         if ($partida && $partida->inicio_juego) {
             $this->logAccion($partida, config('fases.fases.prueba2.db'), 'Prueba superada');
             $this->timerService->avanzarFase($partida, config('fases.fases.prueba3.db'), 'Prueba 2 Yoseth Superada');
-            Top10Updated::dispatch();
-            AdminDashboardUpdated::dispatch();
+            $this->broadcastDashboard();
         }
 
         return response()->json(['success' => true]);
@@ -477,8 +490,7 @@ class JuegoController extends Controller
         if ($partida && $partida->inicio_juego) {
             $this->logAccion($partida, config('fases.fases.prueba3.db'), 'Prueba superada');
             $this->timerService->avanzarFase($partida, config('fases.fases.prueba4.db'), 'Prueba 3 Angel Superada');
-            Top10Updated::dispatch();
-            AdminDashboardUpdated::dispatch();
+            $this->broadcastDashboard();
         }
 
         // Mensaje final desde Back
@@ -532,8 +544,7 @@ class JuegoController extends Controller
         if ($partida && $partida->inicio_juego) {
             $this->logAccion($partida, config('fases.fases.prueba4.db'), 'Prueba superada');
             $this->timerService->avanzarFase($partida, config('fases.fases.prueba5.db'), 'Prueba 4 Arturo Superada');
-            Top10Updated::dispatch();
-            AdminDashboardUpdated::dispatch();
+            $this->broadcastDashboard();
         }
 
         // Mensaje final desde Back
@@ -592,8 +603,7 @@ class JuegoController extends Controller
         if ($partida && $partida->inicio_juego) {
             $this->logAccion($partida, config('fases.fases.prueba5.db'), 'Prueba superada');
             $this->timerService->avanzarFase($partida, config('fases.fases.prueba6.db'), 'Prueba 5 Eloy Superada');
-            Top10Updated::dispatch();
-            AdminDashboardUpdated::dispatch();
+            $this->broadcastDashboard();
         }
 
         // Mensaje final desde Back
@@ -665,8 +675,7 @@ class JuegoController extends Controller
             }
 
             $this->timerService->avanzarFase($partida, config('fases.fases.prueba7.db'), 'Prueba 6 Migue Superada');
-            Top10Updated::dispatch();
-            AdminDashboardUpdated::dispatch();
+            $this->broadcastDashboard();
         }
 
         $mensajeFinal = "Núcleo temporal estabilizado exitosamente. Pero el sistema central ha desplegado un último Cortafuegos de Conocimiento antes de liberar las cierres magnéticos.";
@@ -822,8 +831,7 @@ class JuegoController extends Controller
                 $this->logAccion($partida, config('fases.fases.prueba7.db'), 'Códice Oculto — COMBINACIÓN CORRECTA');
                 // Avanzamos a Prueba 8 (Cultura General)
                 $this->timerService->avanzarFase($partida, config('fases.fases.prueba8.db'), 'Prueba 7 Dinamica Superada');
-                Top10Updated::dispatch();
-                AdminDashboardUpdated::dispatch();
+                $this->broadcastDashboard();
             }
 
             return response()->json(['success' => true]);
@@ -858,12 +866,21 @@ class JuegoController extends Controller
         $tiempo_transcurrido = $this->timerService->obtenerTiempoTranscurrido();
         $this->logAccion($partida, config('fases.fases.prueba8.db'), 'Entra a la prueba (Cortafuegos)');
 
-        $preguntasAsignadas = PreguntaDinamica::where('activa', true)
-            ->inRandomOrder()
-            ->limit(5)
-            ->get();
+        $idsGuardados = session('prueba8_preguntas');
 
-        session(['prueba8_preguntas' => $preguntasAsignadas->pluck('id')->toArray()]);
+        if (empty($idsGuardados)) {
+            $preguntasAsignadas = PreguntaDinamica::where('activa', true)
+                ->inRandomOrder()
+                ->limit(5)
+                ->get();
+            session(['prueba8_preguntas' => $preguntasAsignadas->pluck('id')->toArray()]);
+        } else {
+            $preguntasAsignadas = PreguntaDinamica::whereIn('id', $idsGuardados)
+                ->get()
+                ->sortBy(function($model) use ($idsGuardados) {
+                    return array_search($model->id, $idsGuardados);
+                })->values();
+        }
 
         return view('pruebas.prueba8', compact('tiempo_transcurrido', 'preguntasAsignadas'));
     }
@@ -879,6 +896,17 @@ class JuegoController extends Controller
             return response()->json(['success' => false, 'message' => 'Sesión no encontrada.'], 401);
         }
 
+        // Protección idempotente: si la BBDD ya refleja que esta prueba fue superada
+        // (ej: un POST anterior tuvo éxito pero la respuesta HTTP se perdió por red),
+        // marcamos la sesión y devolvemos éxito sin re-validar.
+        $faseConfig = collect(config('fases.fases'))->firstWhere('db', $partida->fase_actual);
+        $pesoActualDB = $faseConfig['peso'] ?? 0;
+        if ($pesoActualDB > 8) {
+            session(['prueba8_superada' => true]);
+            session()->forget('prueba8_preguntas');
+            return response()->json(['success' => true]);
+        }
+
         if (!$request->boolean('completed')) {
             return response()->json(['success' => false, 'message' => 'Validación fallida.'], 400);
         }
@@ -887,6 +915,7 @@ class JuegoController extends Controller
         $respuestasUsuario = $request->input('respuestas_usuario', []);
 
         if (count($ids) !== 5 || count($respuestasUsuario) !== 5) {
+            \Log::error('Validacion prueba 8 fallida - incompletos', ['ids' => $ids, 'resp' => $respuestasUsuario]);
             return response()->json(['success' => false, 'message' => 'Datos de validación incompletos o corruptos.'], 400);
         }
 
@@ -901,6 +930,13 @@ class JuegoController extends Controller
             $respuestaUsuario = strtolower(trim($respuestasUsuario[$index] ?? ''));
             $respuestaCorrecta = strtolower(trim($pregunta->respuesta_correcta));
             $alternativas = array_map('strtolower', $pregunta->respuestas_alternativas ?? []);
+
+            // Como algunas migraciones antiguas guardan las alternativas separadas por comas en la respuesta correcta
+            // emulamos la lógica del frontend que divide por comas si existen
+            if (str_contains($respuestaCorrecta, ',')) {
+                $extras = array_map('trim', explode(',', $respuestaCorrecta));
+                $alternativas = array_merge($alternativas, $extras);
+            }
 
             $normalizer = function($str) {
                 if (class_exists(\Normalizer::class)) {
@@ -917,18 +953,26 @@ class JuegoController extends Controller
             $esCorrecta = $respuestaUsuario === $respuestaCorrecta || in_array($respuestaUsuario, $alternativas);
 
             if (!$esCorrecta) {
+                \Log::error('Validacion prueba 8 fallida - incorrectas', [
+                    'id' => $id, 
+                    'user' => $respuestaUsuario,
+                    'correcta' => $respuestaCorrecta,
+                    'alternativas' => $alternativas
+                ]);
                 return response()->json(['success' => false, 'message' => 'Validación fallida en el servidor. Respuestas incorrectas.'], 400);
             }
         }
 
         session(['prueba8_superada' => true]);
+        
+        // Limpiamos la sesión de preguntas una vez superada la prueba exitosamente
+        session()->forget('prueba8_preguntas');
 
         $this->logAccion($partida, config('fases.fases.prueba8.db'), 'Prueba superada');
 
         // Avanzamos a Prueba 9 (Juego de Pistas)
         $this->timerService->avanzarFase($partida, config('fases.fases.prueba9.db'), 'Prueba 8 Cultura General Superada');
-        Top10Updated::dispatch();
-        AdminDashboardUpdated::dispatch();
+        $this->broadcastDashboard();
 
         return response()->json(['success' => true]);
     }
@@ -1091,8 +1135,7 @@ class JuegoController extends Controller
                 'fase_actual'     => config('fases.fases.finalizado.db'),
             ]);
 
-            Top10Updated::dispatch();
-            AdminDashboardUpdated::dispatch();
+            $this->broadcastDashboard();
 
             return response()->json(['success' => true, 'state' => 'done']);
         }

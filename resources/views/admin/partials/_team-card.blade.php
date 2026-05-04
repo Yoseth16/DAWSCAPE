@@ -19,7 +19,13 @@
 <div class="team-card" id="team-{{ $equipo->uuid }}" style="border-left: 3px solid {{ $color }}">
     <div class="team-header">
         <div class="team-info">
-            <span class="team-icon">{{ $icon }}</span>
+            <span class="team-icon">
+                @if(str_starts_with($icon, 'ph-'))
+                    <i class="ph {{ $icon }}"></i>
+                @else
+                    {{ $icon }}
+                @endif
+            </span>
             <span class="team-name">{{ $equipo->nombre_equipo }}</span>
         </div>
         <span class="team-class">{{ $equipo->clase ?? '—' }}</span>

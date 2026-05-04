@@ -190,7 +190,40 @@
     }
 
     @media (max-width: 768px) {
-        .health-grid { grid-template-columns: 1fr; }
+        .health-grid {
+            grid-template-columns: 1fr !important;
+        }
+        .health-card {
+            padding: 1.2rem;
+            border-radius: 12px;
+        }
+        .health-card .big-value {
+            font-size: 1.4rem;
+        }
+        .health-card .sub-value {
+            font-size: 0.8rem;
+        }
+        .status-line {
+            padding: 0.6rem 0;
+            font-size: 0.85rem;
+        }
+        .status-label {
+            font-size: 0.85rem;
+        }
+        .status-value {
+            font-size: 0.8rem;
+            word-break: break-all;
+        }
+        .ext-grid {
+            gap: 4px;
+        }
+        .ext-badge {
+            font-size: 0.65rem;
+            padding: 2px 8px;
+        }
+        .section-title {
+            font-size: 1rem;
+        }
     }
 </style>
 @endpush

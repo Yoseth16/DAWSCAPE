@@ -574,7 +574,28 @@ function showWin() {
     `<span style="font-size:0.8rem; color:#445544">// ENVIANDO HASH DE VALIDACIÓN AL BACKEND...</span>`;
   showScreen('screen-win');
 
+  // Iniciar validación con reintentos automáticos
+  sendValidation(1);
+}
+
+/**
+ * Envía la validación al backend con reintentos automáticos.
+ * NUNCA recarga la página — preserva userAnswers para no perder progreso.
+ */
+function sendValidation(attempt) {
+  var maxAttempts = 3;
   var btnContinuar = document.getElementById('btn-continuar');
+
+  // Feedback visual durante el intento
+  if (attempt > 1) {
+    document.getElementById('win-stats').innerHTML =
+      `Niveles de Conocimiento comprobados: <span>${questions.length} / ${questions.length}</span><br><br>` +
+      `<span style="font-size:0.8rem; color:#ffaa00;">// REINTENTANDO VALIDACIÓN (${attempt}/${maxAttempts})...</span>`;
+  }
+
+  btnContinuar.style.pointerEvents = 'none';
+  btnContinuar.style.opacity = '0.4';
+  btnContinuar.textContent = 'VERIFICANDO CON EL SERVIDOR...';
 
   fetch("/prueba8", {
     method: 'POST',
@@ -590,30 +611,56 @@ function showWin() {
   .then(function(r) { return r.json(); })
   .then(function(data) {
     if (data.success) {
+      // ✅ Validación exitosa — habilitar botón de continuar
       document.getElementById('win-stats').innerHTML =
         `Niveles de Conocimiento comprobados: <span>${questions.length} / ${questions.length}</span><br><br>` +
         `<span style="font-size:0.8rem; color:var(--green);">// VALIDACIÓN COMPLETADA ✓</span>`;
       btnContinuar.textContent = 'CONTINUAR A LA SIGUIENTE PRUEBA →';
+      btnContinuar.href = '/prueba9';
+      btnContinuar.onclick = null;
       btnContinuar.style.pointerEvents = 'auto';
       btnContinuar.style.opacity = '1';
     } else {
-      document.getElementById('win-stats').innerHTML =
-        `<span style="color:var(--red);">Error de validación en el servidor. Recarga la página e inténtalo de nuevo.</span>`;
-      btnContinuar.textContent = 'REINTENTAR';
-      btnContinuar.href = '/prueba8';
-      btnContinuar.style.pointerEvents = 'auto';
-      btnContinuar.style.opacity = '1';
+      // ❌ Servidor rechazó — reintentar automáticamente o mostrar botón manual
+      handleValidationFailure(attempt, maxAttempts, 'El servidor rechazó la validación.');
     }
   })
   .catch(function(err) {
-    console.error('Error al notificar al servidor:', err);
+    console.error('Error de red al validar (intento ' + attempt + '):', err);
+    // ❌ Error de red — reintentar automáticamente o mostrar botón manual
+    handleValidationFailure(attempt, maxAttempts, 'Error de conexión con el servidor.');
+  });
+}
+
+/**
+ * Gestiona fallos de validación: reintenta automáticamente o muestra
+ * un botón de reintento manual. NUNCA redirige a /prueba8 (no recarga).
+ */
+function handleValidationFailure(attempt, maxAttempts, errorMsg) {
+  var btnContinuar = document.getElementById('btn-continuar');
+
+  if (attempt < maxAttempts) {
+    // Reintentar automáticamente con backoff exponencial (2s, 4s)
+    var delay = 2000 * attempt;
     document.getElementById('win-stats').innerHTML =
-      `<span style="color:var(--red);">Error de conexión. Recarga la página e inténtalo de nuevo.</span>`;
-    btnContinuar.textContent = 'REINTENTAR';
-    btnContinuar.href = '/prueba8';
+      `Niveles de Conocimiento comprobados: <span>${questions.length} / ${questions.length}</span><br><br>` +
+      `<span style="font-size:0.8rem; color:#ffaa00;">// ${errorMsg} Reintentando en ${delay/1000}s...</span>`;
+    setTimeout(function() { sendValidation(attempt + 1); }, delay);
+  } else {
+    // Todos los reintentos agotados — botón manual (SIN recargar página)
+    document.getElementById('win-stats').innerHTML =
+      `Niveles de Conocimiento comprobados: <span>${questions.length} / ${questions.length}</span><br><br>` +
+      `<span style="color:var(--red);">${errorMsg}</span><br>` +
+      `<span style="font-size:0.8rem; color:#888;">Tus respuestas están guardadas. Pulsa el botón para reintentar.</span>`;
+    btnContinuar.textContent = '↻ REINTENTAR VALIDACIÓN';
+    btnContinuar.removeAttribute('href');
+    btnContinuar.onclick = function(e) {
+      e.preventDefault();
+      sendValidation(1);
+    };
     btnContinuar.style.pointerEvents = 'auto';
     btnContinuar.style.opacity = '1';
-  });
+  }
 }
 </script>
 </body>

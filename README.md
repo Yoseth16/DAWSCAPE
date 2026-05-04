@@ -642,7 +642,7 @@ App\Models\Partida::create([
 
 | Acertijo | Respuestas aceptadas |
 |----------|---------------------|
-| 1 | `115`, `aula 115` |
+| 1 | `115`, `aula 115`, `lab 115` |
 | 2 | `16`, `dieciseis` |
 | 3 | `32`, `treinta y dos` |
 | 4 | `14`, `catorce` |
@@ -783,9 +783,9 @@ App\Models\Partida::create([
 
 **Tipo**: Digital — 5 preguntas aleatorias del banco de preguntas dinámicas.
 
-**Lógica**: El administrador gestiona las preguntas desde el panel. Se seleccionan 5 preguntas activas al azar de la tabla `preguntas_dinamicas`. La validación pregunta a pregunta se realiza en el frontend; el backend verifica que el flag `completed: true` sea enviado.
+**Lógica**: El administrador gestiona las preguntas. Se seleccionan 5 preguntas activas al azar de la tabla `preguntas_dinamicas`. Durante cada intento (carga o recarga de la página), las 5 preguntas se bloquean en sesión de backend. El frontend envía las respuestas y el backend valida en el servidor que cada opción sea exactamente una de las guardadas (ya sea correcta principal o alternativa válida).
 
-**No hay respuestas fijas**: Depende del banco de preguntas configurado por el administrador.
+**No hay respuestas fijas**: Depende del banco. Si se comete un error, el backend rechazará con 400 y pedirá `REINTENTAR`, pero conservará la misma sesión. Únicamente al superar el bloque de 5 preguntas el backend borrará ese registro y abrirá la Prueba 9.
 
 </details>
 
@@ -801,12 +801,12 @@ App\Models\Partida::create([
 | # | Pregunta | Respuesta | Letra |
 |---|----------|-----------|-------|
 | 1 | Nombre del director del centro | `eduardo` | **N** |
-| 2 | ¿Cuántas clases de desarrollo web hay en total en el centro? | `1` | **H** |
-| 3 | ¿Qué empresa coreana invierte en FP como XTART para promocionar sus productos? | `samsung` | **O** |
-| 4 | ¿Cuántas ventanas hay en la clase de DAW? | `5` | **A** |
-| 5 | ¿Cuántas plantas tiene el centro? | `3` | **C** |
+| 2 | ¿Cuántas ventanas hay en la clase de DAW? | `5` | **A** |
+| 3 | ¿Cuántas plantas tiene el centro? | `3` | **C** |
+| 4 | ¿Cuántas clases de desarrollo web hay en total en el centro? | `1` | **H** |
+| 5 | ¿Qué empresa coreana invierte en FP como XTART para promocionar sus productos? | `samsung` | **O** |
 
-**Fase 2 — Contraseña final**: Las letras recopiladas (N, H, O, A, C) forman → **`nacho`**
+**Fase 2 — Contraseña final**: Las letras recopiladas (N, A, C, H, O) forman → **`nacho`**
 
 **Validación**: Las respuestas se normalizan (minúsculas, sin acentos, espacios colapsados). Tras 5 fallos acumulados aparece la pista: *"Piensa en lo que ves cada día en el instituto."*
 

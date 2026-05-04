@@ -100,6 +100,66 @@
         font-weight: 700;
         font-size: 0.85rem;
     }
+
+    /* ========== ANALÍTICA — MOBILE RESPONSIVE ========== */
+    @media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .stat-card {
+            padding: 1rem;
+        }
+        .stat-card .stat-value {
+            font-size: 1.4rem;
+        }
+        .stat-card .stat-label {
+            font-size: 0.7rem;
+        }
+
+        .chart-container {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .chart-title { font-size: 1rem; }
+        .chart-subtitle { font-size: 0.8rem; margin-bottom: 1rem; }
+
+        /* Tablas analítica → tarjetas */
+        .table-analytics thead { display: none; }
+        .table-analytics,
+        .table-analytics tbody { display: block; width: 100%; }
+        .table-analytics tr {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .table-analytics td {
+            padding: 0;
+            border-bottom: none;
+            font-size: 0.85rem;
+        }
+        .table-analytics td:first-child {
+            flex: 1;
+            min-width: 0;
+        }
+        .table-analytics td:first-child strong {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    @media (max-width: 400px) {
+        .stats-grid { grid-template-columns: 1fr; }
+    }
 </style>
 @endpush
 

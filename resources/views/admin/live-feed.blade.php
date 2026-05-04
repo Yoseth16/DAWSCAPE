@@ -399,9 +399,62 @@
             height: auto;
             gap: 1rem;
         }
-        .log-panel, .control-panel { max-height: 50vh; }
-        .terminal-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+        .log-panel, .control-panel {
+            max-height: 55vh;
+            min-height: 200px;
+        }
+        .terminal-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
         .terminal-header .title-block h1 { font-size: 1.1rem; }
+
+        /* Bigger touch targets for action buttons */
+        .btn-penalty, .btn-bonus {
+            padding: 10px 0;
+            font-size: 0.8rem;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Team cards spacing */
+        .team-card {
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+        .team-card .team-name { font-size: 0.85rem; }
+        .team-card .team-phase { font-size: 0.75rem; }
+        .team-card .team-time { font-size: 0.75rem; margin-bottom: 10px; }
+
+        /* Panel bar buttons bigger for touch */
+        .panel-bar .bar-actions button {
+            padding: 8px 14px;
+            font-size: 0.8rem;
+            min-height: 36px;
+        }
+
+        /* Log entries more compact */
+        .log-entry {
+            gap: 8px;
+            font-size: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .log-entry .log-time { font-size: 0.7rem; }
+        .log-entry .log-msg { min-width: 0; word-break: break-word; }
+
+        /* Toast position for mobile */
+        .toast-container {
+            bottom: max(12px, env(safe-area-inset-bottom));
+            right: 12px;
+            left: 12px;
+        }
+        .toast-msg {
+            max-width: 100%;
+            font-size: 0.8rem;
+        }
     }
 </style>
 @endpush
@@ -551,6 +604,7 @@
     function renderTeamCard(eq) {
         const faseNombre = fasesMap[eq.fase_actual] || eq.fase_actual;
         const icon = eq.icono || '🎮';
+        const iconHtml = icon.startsWith('ph-') ? '<i class="ph ' + escapeHtml(icon) + '"></i>' : icon;
         const color = eq.color_hex || '#3b82f6';
         const elapsed = fmtTime(eq.tiempo_elapsed);
         const penalty = eq.penalizacion_segundos || 0;
@@ -558,7 +612,7 @@
         return '<div class="team-card" id="team-' + escapeHtml(eq.uuid) + '" style="border-left: 3px solid ' + escapeHtml(color) + '">' +
             '<div class="team-header">' +
                 '<div class="team-info">' +
-                    '<span class="team-icon">' + icon + '</span>' +
+                    '<span class="team-icon">' + iconHtml + '</span>' +
                     '<span class="team-name">' + escapeHtml(eq.nombre_equipo) + '</span>' +
                 '</div>' +
                 '<span class="team-class">' + escapeHtml(eq.clase || '—') + '</span>' +
