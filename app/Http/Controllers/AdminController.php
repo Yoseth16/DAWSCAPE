@@ -139,6 +139,9 @@ class AdminController extends Controller
         $metrics = $this->statsService->getMetrics();
         $chartData = $this->statsService->getChartData();
         $bottlenecks = $this->statsService->getBottlenecks();
+        $pistasCountByPartida = \App\Models\PistaUsada::select('partida_id', \Illuminate\Support\Facades\DB::raw('COUNT(*) as total'))
+            ->groupBy('partida_id')
+            ->pluck('total', 'partida_id');
 
         // Limpieza drástica del método, delegando a la capa Controller solo el Response JSON.
         return response()->json([
@@ -150,12 +153,12 @@ class AdminController extends Controller
             ],
             'chart' => $chartData,
             'bottlenecks' => $bottlenecks,
-            'partidas' => $partidas->map(function($p) {
+            'partidas' => $partidas->map(function($p) use ($pistasCountByPartida) {
                 $segsLive = 0;
                 if ($p->fase_actual !== config('fases.fases.finalizado.db') && $p->fase_actual !== config('fases.fases.timeout.db') && $p->inicio_juego) {
                     $segsLive = abs(now()->diffInSeconds(\Carbon\Carbon::parse($p->inicio_juego)));
                 }
-                $pistasCount = \App\Models\PistaUsada::where('partida_id', $p->id)->count();
+                $pistasCount = (int) ($pistasCountByPartida[$p->id] ?? 0);
                 return [
                     'uuid' => $p->uuid,
                     'id' => str_pad($p->id, 3, '0', STR_PAD_LEFT),

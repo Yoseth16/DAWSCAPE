@@ -70,7 +70,7 @@ class Top10Controller extends Controller
 
                 // Live time si está jugando; si ya terminó/timeout, usamos tiempo_segundos (que debería ser el final)
                 if (!$esTerminada && $partida->inicio_juego) {
-                    $segs = abs(now()->diffInSeconds(Carbon::parse($partida->inicio_juego))) + $penalizacion;
+                    $segs = (int) abs(now()->diffInSeconds(Carbon::parse($partida->inicio_juego))) + $penalizacion;
                 } else {
                     $segs = (int)($partida->tiempo_segundos ?? 0) + $penalizacion;
                 }
@@ -119,7 +119,7 @@ class Top10Controller extends Controller
 
             $esTerminada = in_array($partida->fase_actual, $terminadasFases, true);
             if (!$esTerminada && $partida->inicio_juego) {
-                $segsLive = abs(now()->diffInSeconds(Carbon::parse($partida->inicio_juego))) + $penalizacion;
+                $segsLive = (int) abs(now()->diffInSeconds(Carbon::parse($partida->inicio_juego))) + $penalizacion;
             } else {
                 $segsLive = (int)($partida->tiempo_segundos ?? 0) + $penalizacion;
             }
@@ -199,7 +199,11 @@ class Top10Controller extends Controller
                 $top10 = $top10->values()->transform(function ($item, $key) use ($firstTime) {
                     if ($key > 0 && $key < 3) {
                         $diff = $item['tiempo_segundos'] - $firstTime;
-                        $item['gap'] = '+' . floor($diff / 60) . 'm ' . str_pad($diff % 60, 2, '0', STR_PAD_LEFT) . 's sobre el 1º';
+                        if ($diff > 0) {
+                            $item['gap'] = '+' . floor($diff / 60) . 'm ' . str_pad($diff % 60, 2, '0', STR_PAD_LEFT) . 's sobre el 1º';
+                        } else {
+                            $item['gap'] = null;
+                        }
                     } else {
                         $item['gap'] = null;
                     }

@@ -32,8 +32,9 @@ class QrController extends Controller
 
         // Normalizar texto QR: quitar invisibles/espacios y forzar mayúsculas
         $codigoRaw = (string) $data['codigo'];
-        $codigo = preg_replace('/[[:^print:]]/u', '', $codigoRaw) ?? $codigoRaw; // quita \r \n etc.
-        $codigo = strtoupper(trim($codigo));
+        $codigoSanitizado = preg_replace('/[[:^print:]]/u', '', $codigoRaw) ?? $codigoRaw; // quita \r \n etc.
+        $codigoSanitizado = trim($codigoSanitizado);
+        $codigo = strtoupper($codigoSanitizado);
         $prueba = (int) $data['prueba'];
 
         // Anti-salto: alinear con las claves reales de progreso del JuegoController
@@ -88,7 +89,7 @@ class QrController extends Controller
         $urlAdmitida = $urlsAdmitidas[$prueba];
         
         // Quitar guiones para facilitar búsquedas tipo "prueba-3-angel" => "prueba3angel"
-        $codigoLimpiado = strtoupper(trim(str_replace('-', '', $codigo)));
+        $codigoLimpiado = strtoupper(trim(str_replace('-', '', $codigoSanitizado)));
 
         $esValido = false;
 
@@ -99,13 +100,13 @@ class QrController extends Controller
 
         // 2. O busca en base de datos si es una URL generada dinámicamente
         if (!$esValido) {
-            $qrEnBD = \App\Models\Qr::where('url', $codigo)->first();
+            $qrEnBD = \App\Models\Qr::where('url', $codigoSanitizado)->first();
             
             // Si no coincide la URL exacta, intentamos buscar si el slug de la URL coincide en la BD
             if (!$qrEnBD) {
-                $pos = strrpos($codigo, '/qr/');
+                $pos = strrpos(strtolower($codigoSanitizado), '/qr/');
                 if ($pos !== false) {
-                    $slug = substr($codigo, $pos + 4);
+                    $slug = ltrim(substr($codigoSanitizado, $pos + 4), '/');
                     $qrEnBD = \App\Models\Qr::where('url', 'LIKE', '%/qr/' . $slug)->first();
                 }
             }
@@ -135,7 +136,7 @@ class QrController extends Controller
             Log::info('QR inválido', [
                 'prueba'             => $prueba,
                 'codigo_normalizado' => $codigoLimpiado,
-                'codigo_original'    => $codigo,
+                'codigo_original'    => $codigoSanitizado,
             ]);
             return response()->json([
                 'success' => false,

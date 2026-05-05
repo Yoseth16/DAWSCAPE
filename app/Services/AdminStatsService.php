@@ -126,7 +126,7 @@ class AdminStatsService
         foreach ($tiemposPorFase as $fase => $data) {
             $resultados[] = [
                 'fase' => $fase,
-                'media_segundos' => round($data['total'] / $data['count']),
+                'media_segundos' => (int) round($data['total'] / $data['count']),
                 'media_minutos' => round(($data['total'] / $data['count']) / 60, 1)
             ];
         }

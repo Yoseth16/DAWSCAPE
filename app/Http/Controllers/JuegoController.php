@@ -888,6 +888,7 @@ class JuegoController extends Controller
     public function validarPrueba8(Request $request)
     {
         if (session('prueba8_superada')) {
+            session()->forget('prueba8_preguntas');
             return response()->json(['success' => true]);
         }
 
@@ -1095,6 +1096,13 @@ class JuegoController extends Controller
         }
 
         if ($action === 'password') {
+            if ($index < count($questions) || count($letters) < count($questions)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Debes completar todas las preguntas antes de introducir la contraseña.',
+                ], 400);
+            }
+
             $pass = $this->normalizarRespuesta((string) $request->input('password', ''));
             if ($pass !== $finalPassword) {
                 $fails++;
