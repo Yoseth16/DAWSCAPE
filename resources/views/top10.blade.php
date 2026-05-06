@@ -1048,9 +1048,10 @@ function renderLive(liveTeams, bestFinishedSecs) {
 
 // ── RENDER: dashboard (main entry) ──
 function renderDashboard(data) {
-    const all = Array.isArray(data.top10) ? data.top10 : [];
-    const finished = all.filter(t => t.estado === 'finalizado' || t.estado === 'timeout');
-    const live = all.filter(t => t.estado === 'jugando');
+    const finished = Array.isArray(data.finalizados)
+        ? data.finalizados
+        : (Array.isArray(data.top10) ? data.top10 : []);
+    const live = Array.isArray(data.en_progreso) ? data.en_progreso : [];
 
     // Podium (top 3 of finished only)
     const top3 = finished.slice(0, 3);
@@ -1106,7 +1107,7 @@ async function fetchTop10() {
         const r = await fetch('/top10/datos');
         if (!r.ok) return;
         const data = await r.json();
-        renderDashboard(data || { top10: [], finalizados: [] });
+        renderDashboard(data || { top10: [], finalizados: [], en_progreso: [] });
     } catch (e) {
         console.error('Top10 fetch error', e);
     }

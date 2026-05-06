@@ -2,12 +2,24 @@
 
 namespace App\Services;
 
+use App\Events\AdminDashboardUpdated;
+use App\Events\Top10Updated;
 use Carbon\Carbon;
 use App\Models\Partida;
 
 class GameTimerService
 {
     const MAX_TIEMPO_MINUTOS = 90;
+
+    private function broadcastDashboardUpdates(): void
+    {
+        try {
+            Top10Updated::dispatch();
+            AdminDashboardUpdated::dispatch();
+        } catch (\Throwable $e) {
+            \Log::warning('Broadcasting falló (no crítico): ' . $e->getMessage());
+        }
+    }
 
     /**
      * Obtiene la partida activa actual en base a la sesión.
@@ -75,6 +87,9 @@ class GameTimerService
                 'tiempo_segundos' => $transcurrido,
                 'fase_actual' => config('fases.fases.timeout.db')
             ]);
+
+            $this->broadcastDashboardUpdates();
+
             return true;
         }
         
